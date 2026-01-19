@@ -11,8 +11,10 @@ namespace OnlineLearningPlatform.Models.Entities
 
         public int? AssignmentId { get; set; }
 
+        [Required]
         public string UserId { get; set; }
 
+        [Required]
         [MaxLength(255)]
         public string FileUrl { get; set; }
 
