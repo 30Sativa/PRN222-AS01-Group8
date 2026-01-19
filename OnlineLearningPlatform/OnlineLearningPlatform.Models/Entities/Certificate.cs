@@ -9,6 +9,7 @@ namespace OnlineLearningPlatform.Models.Entities
         [Key]
         public Guid CertificateId { get; set; }
 
+        [Required]
         public string UserId { get; set; }
 
         public Guid? CourseId { get; set; }
