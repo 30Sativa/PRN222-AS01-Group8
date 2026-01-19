@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace OnlineLearningPlatform.Services.Interfaces
 {
-    internal class Class1
+    public interface IAuthService
     {
+        Task<bool> LoginAsync(string email, string password, bool rememberMe);
+        Task LogoutAsync();
     }
 }

@@ -1,5 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models;
+using OnlineLearningPlatform.Models.Identity;
+using OnlineLearningPlatform.Repositories.Implements;
+using OnlineLearningPlatform.Repositories.Interfaces;
+using OnlineLearningPlatform.Services.Implements;
+using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Mvc
 {
@@ -15,10 +21,14 @@ namespace OnlineLearningPlatform.Mvc
             builder.Configuration.GetConnectionString("DefaultConnection")));
 
             //Cấu hình Identity
-
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+            // Đăng ký các dịch vụ tùy chỉnh
+            builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -33,12 +43,12 @@ namespace OnlineLearningPlatform.Mvc
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Account}/{action=Login}/{id?}");
 
             app.Run();
         }
