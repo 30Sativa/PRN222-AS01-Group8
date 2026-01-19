@@ -11,11 +11,13 @@ namespace OnlineLearningPlatform.Models.Entities
 
         public Guid? CourseId { get; set; }
 
+        [Required]
         public string UserId { get; set; }
 
         [Range(1, 5)]
         public int? Rating { get; set; }
 
+        [Required]
         public string Comment { get; set; }
 
         // Navigation properties
