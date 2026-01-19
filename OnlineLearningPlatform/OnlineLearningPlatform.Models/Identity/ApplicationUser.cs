@@ -10,6 +10,6 @@ namespace OnlineLearningPlatform.Models.Identity
         public string FullName { get; set; }
 
         [Required]
-        public DateTime CreatAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
