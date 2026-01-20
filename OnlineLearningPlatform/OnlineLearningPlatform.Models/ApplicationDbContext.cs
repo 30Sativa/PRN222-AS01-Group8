@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using OnlineLearningPlatform.Models.Entities;
 using OnlineLearningPlatform.Models.Identity;
 
@@ -71,6 +72,54 @@ namespace OnlineLearningPlatform.Models
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+        }
+
+        /// <summary>
+        /// Seed admin user và role khi khởi động ứng dụng
+        /// </summary>
+        public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // Tạo Admin role nếu chưa tồn tại
+            const string adminRole = "Admin";
+            if (!await roleManager.RoleExistsAsync(adminRole))
+            {
+                await roleManager.CreateAsync(new IdentityRole(adminRole));
+            }
+
+            // Tạo admin user nếu chưa tồn tại
+            const string adminEmail = "admin@gmail.com";
+            const string adminPassword = "Admin123@";
+            
+            var adminUser = await userManager.FindByNameAsync(adminEmail);
+            if (adminUser == null)
+            {
+                adminUser = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    FullName = "Administrator",
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, adminRole);
+                }
+            }
+            else
+            {
+                // Đảm bảo admin user có Admin role
+                if (!await userManager.IsInRoleAsync(adminUser, adminRole))
+                {
+                    await userManager.AddToRoleAsync(adminUser, adminRole);
+                }
+            }
         }
 
     }

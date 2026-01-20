@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models;
 using OnlineLearningPlatform.Models.Identity;
@@ -11,7 +11,7 @@ namespace OnlineLearningPlatform.Mvc
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +49,9 @@ namespace OnlineLearningPlatform.Mvc
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
+
+            // Seed admin user khi khởi động ứng dụng
+            await ApplicationDbContext.SeedAdminUserAsync(app.Services);
 
             app.Run();
         }
