@@ -1,0 +1,38 @@
+﻿@model OnlineLearningPlatform.Mvc.Models.LoginViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/css/Account/login.css" />
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <h2>Login</h2>
+
+            <form asp-action="Login" method="post">
+                <div class="form-group">
+                    <input asp-for="Email" placeholder="Email" />
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="Password" type="password" placeholder="Password" />
+                </div>
+
+                @* <div class="test">
+                    <input type="checkbox" name="rememberMe">
+                         Remember me
+                </div> *@
+                <button type="submit">Login</button>
+
+                <div style="color:red">
+                    @Html.ValidationSummary()
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
