@@ -23,24 +23,19 @@ namespace OnlineLearningPlatform.Services.Implements
 
 
 
-        public async Task<bool> LoginAsync(string email, string password, bool rememberMe)
+        public async Task<SignInResult> LoginAsync(string email, string password, bool rememberMe)
         {
             var user = await _authRepository.GetByEmailAsync(email);
             if(user == null)
             {
-                return false;
+                return SignInResult.Failed;
             }
-            if(!user.EmailConfirmed)
-            {
-                return false;
-            }
-            var vail = await _authRepository.CheckPasswordAsync(user, password);
-            if (!vail)
-            {
-                vail = false;
-            }
-            await _signInManager.SignInAsync(user, rememberMe);
-            return true;
+            return await _signInManager.PasswordSignInAsync(
+                     user.UserName,
+                     password,
+                     rememberMe,
+                     lockoutOnFailure: false
+            );
         }
 
         public async Task LogoutAsync()

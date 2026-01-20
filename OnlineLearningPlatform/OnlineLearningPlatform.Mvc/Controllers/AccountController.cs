@@ -25,27 +25,44 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            Console.WriteLine("Login attempt for user: " + model.Email);
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            var succes = await _authService.LoginAsync(
+            var result = await _authService.LoginAsync(
                 model.Email,
                 model.Password,
                 model.RememberMe);
-            if (!succes)
+
+
+            if (result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                return View(model);
+                Console.WriteLine("User logged in successfully.");
+                return RedirectToAction("Index", "Home");
             }
 
-            return RedirectToAction("Index", "Home");
+            if (result.IsNotAllowed)
+            {
+                ModelState.AddModelError("", "Email chưa được xác nhận");
+            }
+            else if (result.IsLockedOut)
+            {
+                ModelState.AddModelError("", "Tài khoản bị khóa");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
+            }
+
+            return View(model);
         }
 
 
         public async Task<IActionResult>   Logout()
         {
             await _authService.LogoutAsync();
+            Console.WriteLine("User logged out successfully.");
             return RedirectToAction("Index", "Home");
 
         }
