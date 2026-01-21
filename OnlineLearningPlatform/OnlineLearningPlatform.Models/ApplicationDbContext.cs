@@ -80,21 +80,32 @@ namespace OnlineLearningPlatform.Models
         public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
+
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Tạo Admin role nếu chưa tồn tại
-            const string adminRole = "Admin";
-            if (!await roleManager.RoleExistsAsync(adminRole))
+            // ===== 1. Seed roles =====
+            string[] roles =
             {
-                await roleManager.CreateAsync(new IdentityRole(adminRole));
+                 RolesEnum.Admin,
+                 RolesEnum.Instructor,
+                 RolesEnum.Student
+            };
+
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
             }
 
-            // Tạo admin user nếu chưa tồn tại
+            // ===== 2. Seed admin user =====
             const string adminEmail = "admin@gmail.com";
             const string adminPassword = "Admin123@";
-            
-            var adminUser = await userManager.FindByNameAsync(adminEmail);
+
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
             if (adminUser == null)
             {
                 adminUser = new ApplicationUser
@@ -107,20 +118,21 @@ namespace OnlineLearningPlatform.Models
                 };
 
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
+
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, adminRole);
+                    await userManager.AddToRoleAsync(adminUser, RolesEnum.Admin);
                 }
             }
             else
             {
-                // Đảm bảo admin user có Admin role
-                if (!await userManager.IsInRoleAsync(adminUser, adminRole))
+                if (!await userManager.IsInRoleAsync(adminUser, RolesEnum.Admin))
                 {
-                    await userManager.AddToRoleAsync(adminUser, adminRole);
+                    await userManager.AddToRoleAsync(adminUser, RolesEnum.Admin);
                 }
             }
-        }
 
+
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace OnlineLearningPlatform.Services.Implements
     {
         private readonly IAuthRepository _authRepository;
         private readonly SignInManager<ApplicationUser> _signInManager;
-
+        
         public AuthService(IAuthRepository authRepository, SignInManager<ApplicationUser> signInManager)
         {
             _authRepository = authRepository;
@@ -48,7 +48,14 @@ namespace OnlineLearningPlatform.Services.Implements
                 FullName = request.FullName
             };
 
-            return await _authRepository.CreateUserAsync(user, request.Password);
+            var result = await _authRepository.CreateUserAsync(user, request.Password);
+            if(!result.Succeeded)
+            {
+                return result;
+            }
+            //gán role mặc định
+            await _signInManager.UserManager.AddToRoleAsync(user, RolesEnum.Student);
+            return result;
         }
     }
 }

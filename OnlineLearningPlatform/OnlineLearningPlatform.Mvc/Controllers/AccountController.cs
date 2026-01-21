@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Mvc.Models;
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.Interfaces;
+using System.Security.Claims;
 
 namespace OnlineLearningPlatform.Mvc.Controllers
 {
@@ -9,10 +12,11 @@ namespace OnlineLearningPlatform.Mvc.Controllers
     {
 
         private readonly IAuthService _authService;
-
-        public AccountController(IAuthService authService)
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        public AccountController(IAuthService authService, SignInManager<ApplicationUser> signInManager)
         {
             _authService = authService;
+            _signInManager = signInManager;
         }
 
 
@@ -25,7 +29,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            Console.WriteLine("Login attempt for user: " + model.Email);
+  
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -38,7 +42,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             if (result.Succeeded)
             {
-                Console.WriteLine("User logged in successfully.");
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -57,7 +61,78 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             return View(model);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult LoginWithGoogle(string returnUrl)
+        {
+            returnUrl ??=  Url.Content("~/");
+            var redictUrl = Url.Action("GoogleCallback", "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redictUrl);
+            return Challenge(properties, "Google");
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> GoogleCallback(string returnUrl)
+        {
+            returnUrl ??= Url.Content("~/");
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            //Thử login nếu đã từng login Google
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false);
+
+            if (signInResult.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+
+            //Lấy info từ Google
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+            if (email == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            //Kiểm tra user đã tồn tại theo Email chưa
+            var user = await _signInManager.UserManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = name,
+                    EmailConfirmed = true
+                };
+
+                var createResult = await _signInManager.UserManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    return RedirectToAction("Login");
+                }
+
+                // GÁN ROLE MẶC ĐỊNH
+                await _signInManager.UserManager.AddToRoleAsync(user, RolesEnum.Student);
+            }
+
+            //liên kết Google ↔ User
+            await _signInManager.UserManager.AddLoginAsync(user, info);
+
+            //Sign in
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return LocalRedirect(returnUrl);
+        }
         [HttpGet]
         public IActionResult Register()
         {
