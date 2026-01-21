@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using OnlineLearningPlatform.Services.DTO;
+using OnlineLearningPlatform.Services.DTO.Request;
 
 namespace OnlineLearningPlatform.Services.Interfaces
 {
@@ -7,6 +7,6 @@ namespace OnlineLearningPlatform.Services.Interfaces
     {
         Task<SignInResult> LoginAsync(string email, string password, bool rememberMe);
         Task LogoutAsync();
-        Task<IdentityResult> RegisterAsync(RegisterDto dto);
+        Task<IdentityResult> RegisterAsync(RegisterRequest request);
     }
 }
