@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Repositories.Interfaces;
+using OnlineLearningPlatform.Services.DTO;
 using OnlineLearningPlatform.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OnlineLearningPlatform.Services.Implements
 {
@@ -41,6 +37,18 @@ namespace OnlineLearningPlatform.Services.Implements
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+        public async Task<IdentityResult> RegisterAsync(RegisterDto dto)
+        {
+            var user = new ApplicationUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                FullName = dto.FullName
+            };
+
+            return await _authRepository.CreateUserAsync(user, dto.Password);
         }
     }
 }
