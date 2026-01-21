@@ -26,6 +26,17 @@ namespace OnlineLearningPlatform.Mvc
                 .AddDefaultTokenProviders();
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            // Cấu hình xác thực Google
+            builder.Services.AddAuthentication().AddGoogle(op =>
+            {
+                op.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                op.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+            });
+            // Cấu hình thời gian sống cookie xác thực
+            builder.Services.ConfigureExternalCookie(op =>
+            {
+                op.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            });
             // Đăng ký các dịch vụ tùy chỉnh
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();

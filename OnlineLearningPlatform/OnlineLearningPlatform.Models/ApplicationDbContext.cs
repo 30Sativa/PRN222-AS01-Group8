@@ -80,21 +80,37 @@ namespace OnlineLearningPlatform.Models
         public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
+
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // Tạo Admin role nếu chưa tồn tại
-            const string adminRole = "Admin";
-            if (!await roleManager.RoleExistsAsync(adminRole))
+            // ===== 1. Seed roles =====
+            string[] roles =
             {
-                await roleManager.CreateAsync(new IdentityRole(adminRole));
+        RolesNames.Admin,
+        RolesNames.Instructor,
+        RolesNames.Student
+    };
+
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    var roleResult = await roleManager.CreateAsync(new IdentityRole(role));
+                    if (!roleResult.Succeeded)
+                    {
+                        throw new Exception($"Create role '{role}' failed: " +
+                            string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                    }
+                }
             }
 
-            // Tạo admin user nếu chưa tồn tại
+            // ===== 2. Seed admin user =====
             const string adminEmail = "admin@gmail.com";
             const string adminPassword = "Admin123@";
-            
-            var adminUser = await userManager.FindByNameAsync(adminEmail);
+
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
             if (adminUser == null)
             {
                 adminUser = new ApplicationUser
@@ -106,18 +122,24 @@ namespace OnlineLearningPlatform.Models
                     CreatedAt = DateTime.UtcNow
                 };
 
-                var result = await userManager.CreateAsync(adminUser, adminPassword);
-                if (result.Succeeded)
+                var createUserResult = await userManager.CreateAsync(adminUser, adminPassword);
+
+                if (!createUserResult.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, adminRole);
+                    throw new Exception("Create admin user failed: " +
+                        string.Join(", ", createUserResult.Errors.Select(e => e.Description)));
                 }
             }
-            else
+
+            // ===== 3. Ensure admin role assigned =====
+            if (!await userManager.IsInRoleAsync(adminUser, RolesNames.Admin))
             {
-                // Đảm bảo admin user có Admin role
-                if (!await userManager.IsInRoleAsync(adminUser, adminRole))
+                var addRoleResult = await userManager.AddToRoleAsync(adminUser, RolesNames.Admin);
+
+                if (!addRoleResult.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, adminRole);
+                    throw new Exception("Add admin role failed: " +
+                        string.Join(", ", addRoleResult.Errors.Select(e => e.Description)));
                 }
             }
         }

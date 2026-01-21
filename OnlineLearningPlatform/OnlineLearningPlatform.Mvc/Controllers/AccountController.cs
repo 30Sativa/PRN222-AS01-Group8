@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Mvc.Models;
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.Interfaces;
+using System.Security.Claims;
 
 namespace OnlineLearningPlatform.Mvc.Controllers
 {
@@ -9,10 +12,11 @@ namespace OnlineLearningPlatform.Mvc.Controllers
     {
 
         private readonly IAuthService _authService;
-
-        public AccountController(IAuthService authService)
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        public AccountController(IAuthService authService, SignInManager<ApplicationUser> signInManager)
         {
             _authService = authService;
+            _signInManager = signInManager;
         }
 
 
@@ -25,7 +29,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            Console.WriteLine("Login attempt for user: " + model.Email);
+  
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -38,8 +42,8 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             if (result.Succeeded)
             {
-                Console.WriteLine("User logged in successfully.");
-                return RedirectToAction("Index", "Home");
+
+                return RedirectToAction("Index", "RoleTest");
             }
 
             if (result.IsNotAllowed)
@@ -57,6 +61,92 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             return View(model);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult LoginWithGoogle()
+        {
+            var redirectUrl = Url.Action("GoogleCallback", "Account");
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+
+            return Challenge(properties, "Google");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GoogleCallback()
+        {
+
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+            if (email == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var user = await _signInManager.UserManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = name,
+                    EmailConfirmed = true
+                };
+
+                var createResult = await _signInManager.UserManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    return RedirectToAction("Login");
+                }
+            }
+
+            // ensure role
+            if (!await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Student))
+            {
+                await _signInManager.UserManager.AddToRoleAsync(user, RolesNames.Student);
+            }
+
+            // ensure external login linked
+            var logins = await _signInManager.UserManager.GetLoginsAsync(user);
+            if (!logins.Any(l => l.LoginProvider == info.LoginProvider))
+            {
+                await _signInManager.UserManager.AddLoginAsync(user, info);
+            }
+
+            // SIGN IN SAU KHI ROLE OK
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            
+            return await RedirectByRoleAsync(user);
+        }
+
+        private async Task<IActionResult> RedirectByRoleAsync(ApplicationUser user)
+        {
+            if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Admin))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
+            if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Instructor))
+            {
+                return RedirectToAction("Index", "Instructor");
+            }
+
+            // default: Student
+            return RedirectToAction("Index", "RoleTest");
+        }
+
+
 
         [HttpGet]
         public IActionResult Register()
@@ -93,12 +183,11 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public async Task<IActionResult>   Logout()
+        public async Task<IActionResult> Logout()
         {
             await _authService.LogoutAsync();
-            Console.WriteLine("User logged out successfully.");
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
 
         }
     }
-   }
+}

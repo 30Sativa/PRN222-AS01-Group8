@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Role Test";
+}
+
+<h2>ROLE TEST PAGE</h2>
+
+<p><b>Is Authenticated:</b> @User.Identity?.IsAuthenticated</p>
+<p><b>User Name:</b> @User.Identity?.Name</p>
+
+<h3>User Roles</h3>
+<ul>
+    @foreach (var claim in User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role))
+    {
+        <li>@claim.Value</li>
+    }
+</ul>
+
+<hr />
+
+<form asp-controller="Account" asp-action="Logout" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" onclick="alert('Logout thanhcong')">Logout</button>
+</form>
+<a asp-action="AdminOnly">Admin Only</a> |
+<a asp-action="InstructorOnly">Instructor Only</a> |
+<a asp-action="StudentOnly">Student Only</a>
