@@ -54,7 +54,7 @@ namespace OnlineLearningPlatform.Services.Implements
                 return result;
             }
             //gán role mặc định
-            await _signInManager.UserManager.AddToRoleAsync(user, RolesEnum.Student);
+            await _signInManager.UserManager.AddToRoleAsync(user, RolesNames.Student);
             return result;
         }
     }

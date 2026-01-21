@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OnlineLearningPlatform.Models.Identity
 {
-    public static class Roles
+    public static class RolesNames
     {
         public const string Admin = "Admin";
         public const string Instructor = "Instructor";

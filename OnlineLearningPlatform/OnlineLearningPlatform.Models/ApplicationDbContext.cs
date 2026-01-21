@@ -87,16 +87,21 @@ namespace OnlineLearningPlatform.Models
             // ===== 1. Seed roles =====
             string[] roles =
             {
-                 RolesEnum.Admin,
-                 RolesEnum.Instructor,
-                 RolesEnum.Student
-            };
+        RolesNames.Admin,
+        RolesNames.Instructor,
+        RolesNames.Student
+    };
 
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    var roleResult = await roleManager.CreateAsync(new IdentityRole(role));
+                    if (!roleResult.Succeeded)
+                    {
+                        throw new Exception($"Create role '{role}' failed: " +
+                            string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+                    }
                 }
             }
 
@@ -117,22 +122,27 @@ namespace OnlineLearningPlatform.Models
                     CreatedAt = DateTime.UtcNow
                 };
 
-                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                var createUserResult = await userManager.CreateAsync(adminUser, adminPassword);
 
-                if (result.Succeeded)
+                if (!createUserResult.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, RolesEnum.Admin);
+                    throw new Exception("Create admin user failed: " +
+                        string.Join(", ", createUserResult.Errors.Select(e => e.Description)));
                 }
             }
-            else
+
+            // ===== 3. Ensure admin role assigned =====
+            if (!await userManager.IsInRoleAsync(adminUser, RolesNames.Admin))
             {
-                if (!await userManager.IsInRoleAsync(adminUser, RolesEnum.Admin))
+                var addRoleResult = await userManager.AddToRoleAsync(adminUser, RolesNames.Admin);
+
+                if (!addRoleResult.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, RolesEnum.Admin);
+                    throw new Exception("Add admin role failed: " +
+                        string.Join(", ", addRoleResult.Errors.Select(e => e.Description)));
                 }
             }
-
-
         }
+
     }
 }

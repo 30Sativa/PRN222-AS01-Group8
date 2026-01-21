@@ -43,7 +43,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             if (result.Succeeded)
             {
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "RoleTest");
             }
 
             if (result.IsNotAllowed)
@@ -63,37 +63,26 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LoginWithGoogle(string returnUrl)
+        public IActionResult LoginWithGoogle()
         {
-            returnUrl ??=  Url.Content("~/");
-            var redictUrl = Url.Action("GoogleCallback", "Account", new { ReturnUrl = returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redictUrl);
+            var redirectUrl = Url.Action("GoogleCallback", "Account");
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+
             return Challenge(properties, "Google");
         }
 
         [HttpGet]
-        public async Task<IActionResult> GoogleCallback(string returnUrl)
+        public async Task<IActionResult> GoogleCallback()
         {
-            returnUrl ??= Url.Content("~/");
+
 
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login");
             }
 
-            //Thử login nếu đã từng login Google
-            var signInResult = await _signInManager.ExternalLoginSignInAsync(
-                info.LoginProvider,
-                info.ProviderKey,
-                isPersistent: false);
-
-            if (signInResult.Succeeded)
-            {
-                return LocalRedirect(returnUrl);
-            }
-
-            //Lấy info từ Google
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             var name = info.Principal.FindFirstValue(ClaimTypes.Name);
 
@@ -102,7 +91,6 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return RedirectToAction("Login");
             }
 
-            //Kiểm tra user đã tồn tại theo Email chưa
             var user = await _signInManager.UserManager.FindByEmailAsync(email);
 
             if (user == null)
@@ -120,19 +108,46 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 {
                     return RedirectToAction("Login");
                 }
-
-                // GÁN ROLE MẶC ĐỊNH
-                await _signInManager.UserManager.AddToRoleAsync(user, RolesEnum.Student);
             }
 
-            //liên kết Google ↔ User
-            await _signInManager.UserManager.AddLoginAsync(user, info);
+            // ensure role
+            if (!await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Student))
+            {
+                await _signInManager.UserManager.AddToRoleAsync(user, RolesNames.Student);
+            }
 
-            //Sign in
+            // ensure external login linked
+            var logins = await _signInManager.UserManager.GetLoginsAsync(user);
+            if (!logins.Any(l => l.LoginProvider == info.LoginProvider))
+            {
+                await _signInManager.UserManager.AddLoginAsync(user, info);
+            }
+
+            // SIGN IN SAU KHI ROLE OK
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return LocalRedirect(returnUrl);
+            
+            return await RedirectByRoleAsync(user);
         }
+
+        private async Task<IActionResult> RedirectByRoleAsync(ApplicationUser user)
+        {
+            if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Admin))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
+            if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Instructor))
+            {
+                return RedirectToAction("Index", "Instructor");
+            }
+
+            // default: Student
+            return RedirectToAction("Index", "RoleTest");
+        }
+
+
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -168,12 +183,11 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public async Task<IActionResult>   Logout()
+        public async Task<IActionResult> Logout()
         {
             await _authService.LogoutAsync();
-            Console.WriteLine("User logged out successfully.");
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
 
         }
     }
-   }
+}
