@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OnlineLearningPlatform.Mvc.Models;
-using OnlineLearningPlatform.Services.DTO;
+using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Mvc.Controllers
@@ -73,14 +72,14 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return View(model); 
             }
 
-            var dto = new RegisterDto
+            var request = new RegisterRequest
             {
                 FullName = model.FullName,
                 Email = model.Email,
                 Password = model.Password,
             };
 
-            var result = await _authService.RegisterAsync(dto);
+            var result = await _authService.RegisterAsync(request);
 
             if (!result.Succeeded)
             {

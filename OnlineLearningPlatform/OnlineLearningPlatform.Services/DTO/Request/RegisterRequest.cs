@@ -1,6 +1,6 @@
-﻿namespace OnlineLearningPlatform.Services.DTO
+﻿namespace OnlineLearningPlatform.Services.DTO.Request
 {
-    public class RegisterDto
+    public class RegisterRequest
     {
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
