@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OnlineLearningPlatform.Mvc.Models;
+using OnlineLearningPlatform.Services.DTO;
 using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Mvc.Controllers
@@ -19,7 +20,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> Login()
         {
-            return  View();
+            return View();
         }
 
         [HttpPost]
@@ -58,6 +59,40 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model); 
+            }
+
+            var dto = new RegisterDto
+            {
+                FullName = model.FullName,
+                Email = model.Email,
+                Password = model.Password,
+            };
+
+            var result = await _authService.RegisterAsync(dto);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
+
+            return RedirectToAction("Login", "Account");
+        }
 
         public async Task<IActionResult>   Logout()
         {

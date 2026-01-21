@@ -1,16 +1,12 @@
-﻿using OnlineLearningPlatform.Models.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using OnlineLearningPlatform.Models.Identity;
 
 namespace OnlineLearningPlatform.Repositories.Interfaces
 {
     public interface IAuthRepository
     {
-        Task<ApplicationUser> GetByEmailAsync(string email);
+        Task<ApplicationUser?> GetByEmailAsync(string email);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
-        
+        Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password);
     }
 }

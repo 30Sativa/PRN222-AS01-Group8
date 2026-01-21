@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OnlineLearningPlatform.Repositories.Implements
 {
@@ -23,9 +18,14 @@ namespace OnlineLearningPlatform.Repositories.Implements
             return _userManager.CheckPasswordAsync(user, password);
         }
 
-        public async Task<ApplicationUser> GetByEmailAsync(string email)
+        public async Task<ApplicationUser?> GetByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
+        }
+
+        public async Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password)
+        {
+            return await _userManager.CreateAsync(user, password);
         }
     }
 }
