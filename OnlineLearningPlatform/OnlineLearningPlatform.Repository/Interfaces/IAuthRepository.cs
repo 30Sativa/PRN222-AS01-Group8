@@ -8,5 +8,6 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
         Task<ApplicationUser?> GetByEmailAsync(string email);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
         Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password);
+        Task<List<ApplicationUser?>> GetAllUsersAsync();
     }
 }

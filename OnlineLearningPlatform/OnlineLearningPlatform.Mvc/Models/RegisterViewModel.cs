@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using OnlineLearningPlatform.Models.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace OnlineLearningPlatform.Mvc.Models
 {
@@ -23,5 +24,8 @@ namespace OnlineLearningPlatform.Mvc.Models
         [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         [Display(Name = "Xác nhận mật khẩu")]
         public string ConfirmPassword { get; set; }
+        [Required]         
+        public string Role { get; set; }
+
     }
 }

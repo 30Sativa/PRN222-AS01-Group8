@@ -167,7 +167,10 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 FullName = model.FullName,
                 Email = model.Email,
                 Password = model.Password,
+                Role = model.Role
             };
+
+
 
             var result = await _authService.RegisterAsync(request);
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Repositories.Interfaces;
 
@@ -26,6 +27,11 @@ namespace OnlineLearningPlatform.Repositories.Implements
         public async Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUsersAsync()
+        {
+            return await _userManager.Users.ToListAsync();
         }
     }
 }

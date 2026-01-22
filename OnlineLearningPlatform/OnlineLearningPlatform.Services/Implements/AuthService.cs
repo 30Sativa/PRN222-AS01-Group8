@@ -17,7 +17,10 @@ namespace OnlineLearningPlatform.Services.Implements
             _signInManager = signInManager;
         }
 
-
+        public async Task<List<ApplicationUser>> GetAllAccount()
+        {
+           return await _authRepository.GetAllUsersAsync();
+        }
 
         public async Task<SignInResult> LoginAsync(string email, string password, bool rememberMe)
         {
@@ -45,7 +48,10 @@ namespace OnlineLearningPlatform.Services.Implements
             {
                 UserName = request.Email,
                 Email = request.Email,
-                FullName = request.FullName
+                FullName = request.FullName,
+                
+                
+                
             };
 
             var result = await _authRepository.CreateUserAsync(user, request.Password);
@@ -53,9 +59,9 @@ namespace OnlineLearningPlatform.Services.Implements
             {
                 return result;
             }
-            //gán role mặc định
-            await _signInManager.UserManager.AddToRoleAsync(user, RolesNames.Student);
-            return result;
+            return await _signInManager.UserManager.AddToRoleAsync(user, request.Role);
+
+
         }
     }
 }
