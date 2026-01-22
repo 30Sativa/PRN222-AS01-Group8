@@ -10,7 +10,7 @@ namespace OnlineLearningPlatform.Services.Implements
     {
         private readonly IAuthRepository _authRepository;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        
+
         public AuthService(IAuthRepository authRepository, SignInManager<ApplicationUser> signInManager)
         {
             _authRepository = authRepository;
@@ -19,13 +19,13 @@ namespace OnlineLearningPlatform.Services.Implements
 
         public async Task<List<ApplicationUser>> GetAllAccount()
         {
-           return await _authRepository.GetAllUsersAsync();
+            return await _authRepository.GetAllUsersAsync();
         }
 
         public async Task<SignInResult> LoginAsync(string email, string password, bool rememberMe)
         {
             var user = await _authRepository.GetByEmailAsync(email);
-            if(user == null)
+            if (user == null)
             {
                 return SignInResult.Failed;
             }
@@ -44,24 +44,28 @@ namespace OnlineLearningPlatform.Services.Implements
 
         public async Task<IdentityResult> RegisterAsync(RegisterRequest request)
         {
-            var user = new ApplicationUser
+            try
             {
-                UserName = request.Email,
-                Email = request.Email,
-                FullName = request.FullName,
-                
-                
-                
-            };
+                var user = new ApplicationUser
+                {
+                    UserName = request.Email,
+                    Email = request.Email,
+                    FullName = request.FullName
+                };
 
-            var result = await _authRepository.CreateUserAsync(user, request.Password);
-            if(!result.Succeeded)
-            {
-                return result;
+                var result = await _authRepository.CreateUserAsync(user, request.Password);
+                if (!result.Succeeded)
+                {
+                    return result;
+                }
+                return await _signInManager.UserManager.AddToRoleAsync(user, request.Role);
             }
-            return await _signInManager.UserManager.AddToRoleAsync(user, request.Role);
+            catch (Exception ex)
+            {
 
+                throw new ApplicationException("An error occurred while registering the user.", ex);
 
+            }
         }
     }
 }
