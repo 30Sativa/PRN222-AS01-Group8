@@ -42,8 +42,8 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             if (result.Succeeded)
             {
-
-                return RedirectToAction("Index", "RoleTest");
+                var user = await _signInManager.UserManager.FindByEmailAsync(model.Email);
+                return await RedirectByRoleAsync(user);
             }
 
             if (result.IsNotAllowed)
@@ -142,8 +142,8 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return RedirectToAction("Index", "Instructor");
             }
 
-            // default: Student
-            return RedirectToAction("Index", "RoleTest");
+            // Student redirect to Student/Index
+            return RedirectToAction("Index", "Student");
         }
 
 
