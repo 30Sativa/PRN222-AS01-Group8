@@ -1,6 +1,6 @@
 @model OnlineLearningPlatform.Mvc.Models.CourseListViewModel
 @{
-    ViewData["Title"] = "Danh sách khóa học";
+    ViewData["Title"] = "Khóa học của tôi";
 }
 
 @section Styles {
@@ -9,13 +9,14 @@
 
 <div class="courses-container">
     <div class="courses-header">
-        <h1>Danh sách khóa học</h1>
+        <h1>Khóa học của tôi</h1>
     </div>
 
     @if (Model.Courses == null || !Model.Courses.Any())
     {
         <div class="no-courses">
-            <p>Hiện tại chưa có khóa học nào.</p>
+            <p>Bạn chưa đăng ký khóa học nào.</p>
+            <a asp-action="Index" class="btn-view" style="margin-top: 20px; display: inline-block;">Xem danh sách khóa học</a>
         </div>
     }
     else
@@ -26,10 +27,7 @@
                 <div class="course-card">
                     <div class="course-header">
                         <h3 class="course-title">@course.Title</h3>
-                        @if (course.IsEnrolled)
-                        {
-                            <span class="badge enrolled">Đã đăng ký</span>
-                        }
+                        <span class="badge enrolled">Đã đăng ký</span>
                     </div>
                     
                     <div class="course-body">

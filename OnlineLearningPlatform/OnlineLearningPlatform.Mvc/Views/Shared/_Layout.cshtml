@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Online Learning Platform</title>
+    <link rel="stylesheet" href="~/css/Student/navbar.css" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a asp-controller="Student" asp-action="Index">Online Learning</a>
+            </div>
+            <div class="navbar-menu">
+                <a asp-controller="Student" asp-action="Index" class="nav-link">Danh sách khóa học</a>
+                <a asp-controller="Student" asp-action="MyCourses" class="nav-link">Khóa học của tôi</a>
+            </div>
+            <div class="navbar-user">
+                <span class="user-name">@User.Identity?.Name</span>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="logout-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-logout">Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <script>
+        // Highlight active menu item
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname.toLowerCase();
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href').toLowerCase();
+                if (currentPath.includes(linkPath) || 
+                    (currentPath.includes('/student/index') && linkPath.includes('/student/index')) ||
+                    (currentPath.includes('/student/mycourses') && linkPath.includes('/student/mycourses'))) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

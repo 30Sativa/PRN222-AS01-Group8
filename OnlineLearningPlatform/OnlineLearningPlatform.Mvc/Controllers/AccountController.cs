@@ -142,7 +142,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return RedirectToAction("Index", "Instructor");
             }
 
-            // Student redirect to Student/Index
+            // Student redirect to Student/Index (có navbar)
             return RedirectToAction("Index", "Student");
         }
 

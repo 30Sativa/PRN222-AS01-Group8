@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models;
+using OnlineLearningPlatform.Models.Entities;
 using OnlineLearningPlatform.Repositories.Interfaces;
 
 namespace OnlineLearningPlatform.Repositories.Implements
@@ -17,6 +18,18 @@ namespace OnlineLearningPlatform.Repositories.Implements
         {
             return await _context.Enrollments
                 .AnyAsync(e => e.UserId == userId && e.CourseId == courseId);
+        }
+
+        public async Task<List<Enrollment>> GetUserEnrollmentsAsync(string userId)
+        {
+            return await _context.Enrollments
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Teacher)
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Category)
+                .Where(e => e.UserId == userId)
+                .OrderByDescending(e => e.EnrolledAt)
+                .ToListAsync();
         }
     }
 }

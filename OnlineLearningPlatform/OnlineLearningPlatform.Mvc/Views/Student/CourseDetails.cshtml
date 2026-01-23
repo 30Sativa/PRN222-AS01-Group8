@@ -3,7 +3,9 @@
     ViewData["Title"] = Model.Course?.Title ?? "Chi tiết khóa học";
 }
 
-<link rel="stylesheet" href="~/css/Student/course-details.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/course-details.css" />
+}
 
 @if (Model.Course == null)
 {
@@ -49,6 +51,69 @@ else
             <p>@Model.Course.Description</p>
         </div>
 
+        <!-- Course Content (Sections & Lessons) -->
+        <div class="course-content-section">
+            <h2>Nội dung khóa học</h2>
+            @if (Model.Course.Sections == null || !Model.Course.Sections.Any())
+            {
+                <p class="no-content">Khóa học chưa có nội dung.</p>
+            }
+            else
+            {
+                <div class="sections-list">
+                    @foreach (var section in Model.Course.Sections)
+                    {
+                        <div class="section-card">
+                            <div class="section-header" onclick="toggleSection(@(section.SectionId))">
+                                <h3>@(section.Title)</h3>
+                                <div class="section-header-right">
+                                    <span class="lesson-count">@(section.Lessons.Count) bài học</span>
+                                    <span class="section-toggle" id="toggle-@(section.SectionId)">▼</span>
+                                </div>
+                            </div>
+                            <div class="section-content" id="content-@(section.SectionId)">
+                                @if (section.Lessons != null && section.Lessons.Any())
+                                {
+                                    <ul class="lessons-list">
+                                        @foreach (var lesson in section.Lessons)
+                                        {
+                                            <li class="lesson-item">
+                                                <span class="lesson-icon">
+                                                    @if (lesson.LessonType?.ToLower() == "video")
+                                                    {
+                                                        <span>▶</span>
+                                                    }
+                                                    else if (lesson.LessonType?.ToLower() == "reading")
+                                                    {
+                                                        <span>📄</span>
+                                                    }
+                                                    else if (lesson.LessonType?.ToLower() == "quiz")
+                                                    {
+                                                        <span>❓</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>📝</span>
+                                                    }
+                                                </span>
+                                                <span class="lesson-title">@lesson.Title</span>
+                                                @if (Model.Course.IsEnrolled)
+                                                {
+                                                    <a asp-action="WatchLesson" asp-route-lessonId="@lesson.LessonId" class="btn-watch">
+                                                        Xem
+                                                    </a>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
         <!-- Action Buttons -->
         <div class="course-actions">
             @if (Model.CanEnroll)
@@ -62,3 +127,18 @@ else
         </div>
     </div>
 }
+
+<script>
+    function toggleSection(sectionId) {
+        const content = document.getElementById('content-' + sectionId);
+        const toggle = document.getElementById('toggle-' + sectionId);
+        
+        if (content.classList.contains('active')) {
+            content.classList.remove('active');
+            toggle.textContent = '▼';
+        } else {
+            content.classList.add('active');
+            toggle.textContent = '▲';
+        }
+    }
+</script>

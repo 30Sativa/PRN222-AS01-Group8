@@ -142,6 +142,19 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+}
+
+.section-header:hover {
+    background: #e9ecef;
+}
+
+.section-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .section-header h3 {
@@ -154,6 +167,27 @@ body {
 .lesson-count {
     color: #666;
     font-size: 14px;
+}
+
+.section-toggle {
+    font-size: 14px;
+    color: #667eea;
+    transition: transform 0.3s ease;
+    font-weight: bold;
+}
+
+.section-content {
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease, padding 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+    padding: 0 20px;
+}
+
+.section-content.active {
+    max-height: 2000px;
+    opacity: 1;
+    padding: 20px;
 }
 
 .lessons-list {

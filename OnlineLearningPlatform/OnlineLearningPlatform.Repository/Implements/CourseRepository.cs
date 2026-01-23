@@ -37,7 +37,7 @@ namespace OnlineLearningPlatform.Repositories.Implements
                 .Include(c => c.Teacher)
                 .Include(c => c.Category)
                 .Include(c => c.Sections)
-                    .ThenInclude(s => s.Lessons.OrderBy(l => l.OrderIndex))
+                    .ThenInclude(s => s.Lessons)
                 .FirstOrDefaultAsync(c => c.CourseId == courseId);
         }
 

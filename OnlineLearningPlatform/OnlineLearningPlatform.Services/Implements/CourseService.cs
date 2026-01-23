@@ -46,6 +46,29 @@ namespace OnlineLearningPlatform.Services.Implements
             return coursesDto;
         }
 
+        public async Task<List<CourseDto>> GetUserEnrolledCoursesAsync(string userId)
+        {
+            var enrollments = await _enrollmentRepository.GetUserEnrollmentsAsync(userId);
+            var coursesDto = new List<CourseDto>();
+
+            foreach (var enrollment in enrollments)
+            {
+                coursesDto.Add(new CourseDto
+                {
+                    CourseId = enrollment.Course.CourseId,
+                    Title = enrollment.Course.Title,
+                    Description = enrollment.Course.Description ?? string.Empty,
+                    TeacherName = enrollment.Course.Teacher?.FullName ?? "Unknown",
+                    CategoryName = enrollment.Course.Category?.CategoryName,
+                    Price = enrollment.Course.Price,
+                    CreatedAt = enrollment.Course.CreatedAt,
+                    IsEnrolled = true
+                });
+            }
+
+            return coursesDto;
+        }
+
         public async Task<CourseDetailDto?> GetCourseDetailAsync(Guid courseId, string? userId = null)
         {
             var course = await _courseRepository.GetCourseWithDetailsAsync(courseId);
