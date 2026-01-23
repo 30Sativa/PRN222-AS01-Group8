@@ -116,14 +116,28 @@ else
 
         <!-- Action Buttons -->
         <div class="course-actions">
-            @if (Model.CanEnroll)
+            @if (TempData["SuccessMessage"] != null)
             {
-                <form asp-action="Enroll" asp-route-courseId="@Model.Course.CourseId" method="post" class="enroll-form">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn-enroll">Đăng ký khóa học</button>
-                </form>
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
             }
-            <a asp-action="Index" class="btn-back">Quay lại danh sách</a>
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-error">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+            <div class="action-buttons-group">
+                @if (Model.CanEnroll)
+                {
+                    <form asp-action="Enroll" asp-route-courseId="@Model.Course.CourseId" method="post" class="enroll-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-enroll">Đăng ký khóa học</button>
+                    </form>
+                }
+                <a asp-action="Index" class="btn-back">Quay lại danh sách</a>
+            </div>
         </div>
     </div>
 }

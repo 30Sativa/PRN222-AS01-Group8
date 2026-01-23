@@ -6,5 +6,6 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
     {
         Task<bool> IsUserEnrolledAsync(string userId, Guid courseId);
         Task<List<Enrollment>> GetUserEnrollmentsAsync(string userId);
+        Task<Enrollment> CreateEnrollmentAsync(Enrollment enrollment);
     }
 }

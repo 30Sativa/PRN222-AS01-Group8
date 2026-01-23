@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Mvc.Models;

@@ -45,6 +45,7 @@ namespace OnlineLearningPlatform.Mvc
             // Đăng ký các dịch vụ tùy chỉnh - Service
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

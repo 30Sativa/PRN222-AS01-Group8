@@ -31,5 +31,12 @@ namespace OnlineLearningPlatform.Repositories.Implements
                 .OrderByDescending(e => e.EnrolledAt)
                 .ToListAsync();
         }
+
+        public async Task<Enrollment> CreateEnrollmentAsync(Enrollment enrollment)
+        {
+            _context.Enrollments.Add(enrollment);
+            await _context.SaveChangesAsync();
+            return enrollment;
+        }
     }
 }

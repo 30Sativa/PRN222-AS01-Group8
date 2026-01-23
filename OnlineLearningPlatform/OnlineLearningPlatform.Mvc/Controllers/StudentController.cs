@@ -11,10 +11,14 @@ namespace OnlineLearningPlatform.Mvc.Controllers
     public class StudentController : Controller
     {
         private readonly ICourseService _courseService;
+        private readonly IEnrollmentService _enrollmentService;
 
-        public StudentController(ICourseService courseService)
+        public StudentController(
+            ICourseService courseService,
+            IEnrollmentService enrollmentService)
         {
             _courseService = courseService;
+            _enrollmentService = enrollmentService;
         }
 
         // GET: Student/Index - Xem danh sách khóa học
@@ -22,6 +26,20 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var courses = await _courseService.GetAllCoursesAsync(userId);
+
+            var viewModel = new CourseListViewModel
+            {
+                Courses = courses
+            };
+
+            return View(viewModel);
+        }
+
+        // GET: Student/MyCourses - Xem khóa học đã đăng ký
+        public async Task<IActionResult> MyCourses()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var courses = await _courseService.GetUserEnrolledCoursesAsync(userId);
 
             var viewModel = new CourseListViewModel
             {
@@ -49,6 +67,32 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             };
 
             return View(viewModel);
+        }
+
+        // POST: Student/Enroll/{courseId} - Đăng ký khóa học
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Enroll(Guid courseId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await _enrollmentService.EnrollInCourseAsync(userId, courseId);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Đăng ký khóa học thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể đăng ký khóa học. Có thể bạn đã đăng ký rồi hoặc khóa học không tồn tại.";
+            }
+
+            return RedirectToAction(nameof(CourseDetails), new { id = courseId });
         }
     }
 }

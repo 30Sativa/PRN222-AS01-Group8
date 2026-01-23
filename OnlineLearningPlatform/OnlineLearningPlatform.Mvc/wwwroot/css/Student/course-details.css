@@ -247,13 +247,45 @@ body {
 /* Action Buttons */
 .course-actions {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.action-buttons-group {
+    display: flex;
+    flex-direction: row;
     gap: 15px;
+    align-items: center;
     justify-content: center;
     flex-wrap: wrap;
 }
 
+.alert {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
 .enroll-form {
     margin: 0;
+    display: inline-block;
 }
 
 .btn-enroll {
@@ -346,6 +378,11 @@ body {
 
     .course-actions {
         flex-direction: column;
+    }
+
+    .action-buttons-group {
+        flex-direction: column;
+        width: 100%;
     }
 
     .btn-enroll,
