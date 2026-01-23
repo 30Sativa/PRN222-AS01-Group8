@@ -63,51 +63,59 @@ else
                 <div class="sections-list">
                     @foreach (var section in Model.Course.Sections)
                     {
-                        <div class="section-card">
-                            <div class="section-header" onclick="toggleSection(@(section.SectionId))">
+                        <div class="section-card @(Model.Course.IsEnrolled ? "" : "locked")">
+                            <div class="section-header @(Model.Course.IsEnrolled ? "" : "locked")" 
+                                 @if (Model.Course.IsEnrolled) { <text>onclick="toggleSection(@(section.SectionId))"</text> }>
                                 <h3>@(section.Title)</h3>
                                 <div class="section-header-right">
                                     <span class="lesson-count">@(section.Lessons.Count) bài học</span>
-                                    <span class="section-toggle" id="toggle-@(section.SectionId)">▼</span>
+                                    @if (Model.Course.IsEnrolled)
+                                    {
+                                        <span class="section-toggle" id="toggle-@(section.SectionId)">▼</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="lock-icon">🔒</span>
+                                    }
                                 </div>
                             </div>
-                            <div class="section-content" id="content-@(section.SectionId)">
-                                @if (section.Lessons != null && section.Lessons.Any())
-                                {
-                                    <ul class="lessons-list">
-                                        @foreach (var lesson in section.Lessons)
-                                        {
-                                            <li class="lesson-item">
-                                                <span class="lesson-icon">
-                                                    @if (lesson.LessonType?.ToLower() == "video")
-                                                    {
-                                                        <span>▶</span>
-                                                    }
-                                                    else if (lesson.LessonType?.ToLower() == "reading")
-                                                    {
-                                                        <span>📄</span>
-                                                    }
-                                                    else if (lesson.LessonType?.ToLower() == "quiz")
-                                                    {
-                                                        <span>❓</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span>📝</span>
-                                                    }
-                                                </span>
-                                                <span class="lesson-title">@lesson.Title</span>
-                                                @if (Model.Course.IsEnrolled)
-                                                {
+                            @if (Model.Course.IsEnrolled)
+                            {
+                                <div class="section-content" id="content-@(section.SectionId)">
+                                    @if (section.Lessons != null && section.Lessons.Any())
+                                    {
+                                        <ul class="lessons-list">
+                                            @foreach (var lesson in section.Lessons)
+                                            {
+                                                <li class="lesson-item">
+                                                    <span class="lesson-icon">
+                                                        @if (lesson.LessonType?.ToLower() == "video")
+                                                        {
+                                                            <span>▶</span>
+                                                        }
+                                                        else if (lesson.LessonType?.ToLower() == "reading")
+                                                        {
+                                                            <span>📄</span>
+                                                        }
+                                                        else if (lesson.LessonType?.ToLower() == "quiz")
+                                                        {
+                                                            <span>❓</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>📝</span>
+                                                        }
+                                                    </span>
+                                                    <span class="lesson-title">@lesson.Title</span>
                                                     <a asp-action="WatchLesson" asp-route-lessonId="@lesson.LessonId" class="btn-watch">
                                                         Xem
                                                     </a>
-                                                }
-                                            </li>
-                                        }
-                                    </ul>
-                                }
-                            </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                            }
                         </div>
                     }
                 </div>

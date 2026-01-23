@@ -1,0 +1,154 @@
+@model OnlineLearningPlatform.Services.DTO.Response.LessonDto
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/watch-lesson.css" />
+}
+
+<div class="lesson-container">
+    <!-- Lesson Header -->
+    <div class="lesson-header">
+        <div class="breadcrumb">
+            <a asp-action="Index">Danh sách khóa học</a>
+            @if (Model.CourseId.HasValue)
+            {
+                <span> / </span>
+                <a asp-action="CourseDetails" asp-route-id="@Model.CourseId.Value">@Model.CourseTitle</a>
+            }
+            @if (!string.IsNullOrEmpty(Model.SectionTitle))
+            {
+                <span> / </span>
+                <span>@Model.SectionTitle</span>
+            }
+            <span> / </span>
+            <span class="current">@Model.Title</span>
+        </div>
+        <h1>@Model.Title</h1>
+        <div class="lesson-meta">
+            <span class="course-name">Khóa học: @Model.CourseTitle</span>
+            <span class="section-name">Phần: @Model.SectionTitle</span>
+        </div>
+    </div>
+
+    <!-- Video Player -->
+    <div class="video-container">
+        @if (Model.LessonType?.ToLower() == "video")
+        {
+            @if (!string.IsNullOrEmpty(Model.Content))
+            {
+                var isYouTube = Model.Content.Contains("youtube.com") || Model.Content.Contains("youtu.be");
+                var isVimeo = Model.Content.Contains("vimeo.com");
+                
+                @if (isYouTube)
+                {
+                    var videoId = "";
+                    if (Model.Content.Contains("youtube.com/watch?v="))
+                    {
+                        videoId = Model.Content.Split(new[] { "watch?v=" }, StringSplitOptions.None)[1].Split('&')[0];
+                    }
+                    else if (Model.Content.Contains("youtu.be/"))
+                    {
+                        videoId = Model.Content.Split(new[] { "youtu.be/" }, StringSplitOptions.None)[1].Split('?')[0];
+                    }
+                    else if (Model.Content.Contains("youtube.com/embed/"))
+                    {
+                        videoId = Model.Content.Split(new[] { "embed/" }, StringSplitOptions.None)[1].Split('?')[0];
+                    }
+
+                    @if (!string.IsNullOrEmpty(videoId))
+                    {
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/@videoId?rel=0" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                class="video-player">
+                            </iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="video-error">
+                            <p>URL video không hợp lệ. Vui lòng kiểm tra lại.</p>
+                        </div>
+                    }
+                }
+                else if (isVimeo)
+                {
+                    var videoId = "";
+                    if (Model.Content.Contains("vimeo.com/"))
+                    {
+                        var parts = Model.Content.Split(new[] { "vimeo.com/" }, StringSplitOptions.None);
+                        if (parts.Length > 1)
+                        {
+                            videoId = parts[1].Split('?')[0].Split('/')[0];
+                        }
+                    }
+
+                    @if (!string.IsNullOrEmpty(videoId))
+                    {
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://player.vimeo.com/video/@videoId" 
+                                frameborder="0" 
+                                allow="autoplay; fullscreen; picture-in-picture" 
+                                allowfullscreen
+                                class="video-player">
+                            </iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="video-error">
+                            <p>URL video không hợp lệ. Vui lòng kiểm tra lại.</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="video-wrapper">
+                        <video controls class="video-player" width="100%" height="auto">
+                            <source src="@Model.Content" type="video/mp4">
+                            <source src="@Model.Content" type="video/webm">
+                            <source src="@Model.Content" type="video/ogg">
+                            Trình duyệt của bạn không hỗ trợ thẻ video.
+                        </video>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="video-error">
+                    <p>Video chưa được cập nhật.</p>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="content-display">
+                <div class="content-text">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Navigation -->
+    <div class="lesson-navigation">
+        @if (Model.CourseId.HasValue)
+        {
+            <a asp-action="CourseDetails" asp-route-id="@Model.CourseId.Value" class="btn-back">
+                ← Quay lại khóa học
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn-back">
+                ← Quay lại danh sách khóa học
+            </a>
+        }
+    </div>
+</div>

@@ -12,13 +12,16 @@ namespace OnlineLearningPlatform.Mvc.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly IEnrollmentService _enrollmentService;
+        private readonly ILessonService _lessonService;
 
         public StudentController(
             ICourseService courseService,
-            IEnrollmentService enrollmentService)
+            IEnrollmentService enrollmentService,
+            ILessonService lessonService)
         {
             _courseService = courseService;
             _enrollmentService = enrollmentService;
+            _lessonService = lessonService;
         }
 
         // GET: Student/Index - Xem danh sách khóa học
@@ -93,6 +96,24 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             }
 
             return RedirectToAction(nameof(CourseDetails), new { id = courseId });
+        }
+
+        // GET: Student/WatchLesson/{lessonId} - Xem video bài học
+        public async Task<IActionResult> WatchLesson(int lessonId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var lesson = await _lessonService.GetLessonDetailAsync(lessonId, userId);
+            if (lesson == null)
+            {
+                return NotFound();
+            }
+
+            return View(lesson);
         }
     }
 }

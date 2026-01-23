@@ -151,6 +151,26 @@ body {
     background: #e9ecef;
 }
 
+.section-header.locked {
+    cursor: not-allowed;
+    opacity: 0.7;
+    background: #f0f0f0;
+}
+
+.section-header.locked:hover {
+    background: #f0f0f0;
+}
+
+.lock-icon {
+    font-size: 18px;
+    color: #999;
+    margin-left: 10px;
+}
+
+.section-card.locked {
+    opacity: 0.8;
+}
+
 .section-header-right {
     display: flex;
     align-items: center;

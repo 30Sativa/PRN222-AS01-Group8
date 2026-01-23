@@ -26,6 +26,11 @@ namespace OnlineLearningPlatform.Services.DTO.Response
         public int LessonId { get; set; }
         public string Title { get; set; } = null!;
         public string LessonType { get; set; } = null!;
+        public string Content { get; set; } = null!; // Video URL hoặc content
         public int? OrderIndex { get; set; }
+        // Các properties bổ sung cho WatchLesson view
+        public string? CourseTitle { get; set; }
+        public Guid? CourseId { get; set; }
+        public string? SectionTitle { get; set; }
     }
 }
