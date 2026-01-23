@@ -26,7 +26,7 @@ body {
 
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-top: 30px;
 }
@@ -39,6 +39,8 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    min-height: 400px;
 }
 
 .course-card:hover {
@@ -53,6 +55,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-shrink: 0;
 }
 
 .course-title {
@@ -83,6 +86,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .course-description {
@@ -95,6 +99,7 @@ body {
 
 .course-info {
     margin-top: auto;
+    padding-top: 10px;
 }
 
 .info-item {
@@ -122,6 +127,8 @@ body {
     padding: 15px 20px;
     background: #f8f9fa;
     border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .btn-view {
@@ -136,6 +143,7 @@ body {
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-sizing: border-box;
 }
 
 .btn-view:hover {
@@ -160,6 +168,13 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
 @media (max-width: 768px) {
     .courses-grid {
         grid-template-columns: 1fr;
@@ -173,5 +188,6 @@ body {
     .course-card {
         margin: 0 auto;
         max-width: 100%;
+        min-height: auto;
     }
 }
