@@ -37,9 +37,17 @@ namespace OnlineLearningPlatform.Mvc
             {
                 op.ExpireTimeSpan = TimeSpan.FromMinutes(30);
             });
-            // Đăng ký các dịch vụ tùy chỉnh
+            // Đăng ký các dịch vụ tùy chỉnh - Repository
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+            builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+            builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+
+            // Đăng ký các dịch vụ tùy chỉnh - Service
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+            builder.Services.AddScoped<ILessonService, LessonService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

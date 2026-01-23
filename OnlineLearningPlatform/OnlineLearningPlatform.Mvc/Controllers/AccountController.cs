@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Mvc.Models;
@@ -42,8 +42,8 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             if (result.Succeeded)
             {
-
-                return RedirectToAction("Index", "RoleTest");
+                var user = await _signInManager.UserManager.FindByEmailAsync(model.Email);
+                return await RedirectByRoleAsync(user);
             }
 
             if (result.IsNotAllowed)
@@ -134,16 +134,16 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         {
             if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Admin))
             {
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "RoleTest");
             }
 
             if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Instructor))
             {
-                return RedirectToAction("Index", "Instructor");
+                return RedirectToAction("Index", "RoleTest");
             }
 
-            // default: Student
-            return RedirectToAction("Index", "RoleTest");
+            // Student redirect to Student/Index (có navbar)
+            return RedirectToAction("Index", "Student");
         }
 
 

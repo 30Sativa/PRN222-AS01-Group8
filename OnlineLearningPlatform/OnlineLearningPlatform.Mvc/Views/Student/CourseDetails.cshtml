@@ -1,0 +1,166 @@
+@model OnlineLearningPlatform.Mvc.Models.CourseDetailViewModel
+@{
+    ViewData["Title"] = Model.Course?.Title ?? "Chi tiết khóa học";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/course-details.css" />
+}
+
+@if (Model.Course == null)
+{
+    <div class="error-container">
+        <h2>Khóa học không tồn tại</h2>
+        <a asp-action="Index" class="btn-back">Quay lại danh sách</a>
+    </div>
+}
+else
+{
+    <div class="course-details-container">
+        <!-- Course Header -->
+        <div class="course-header-section">
+            <div class="course-header-content">
+                <h1>@Model.Course.Title</h1>
+                <div class="course-meta">
+                    <span class="teacher">Giảng viên: @Model.Course.TeacherName</span>
+                    @if (!string.IsNullOrEmpty(Model.Course.CategoryName))
+                    {
+                        <span class="category">Danh mục: @Model.Course.CategoryName</span>
+                    }
+                    <span class="price">
+                        @if (Model.Course.Price == 0)
+                        {
+                            <span class="price-free">Miễn phí</span>
+                        }
+                        else
+                        {
+                            <span>@Model.Course.Price.ToString("N0") VNĐ</span>
+                        }
+                    </span>
+                </div>
+                @if (Model.Course.IsEnrolled)
+                {
+                    <span class="badge enrolled-badge">Đã đăng ký</span>
+                }
+            </div>
+        </div>
+
+        <!-- Course Description -->
+        <div class="course-description-section">
+            <h2>Mô tả khóa học</h2>
+            <p>@Model.Course.Description</p>
+        </div>
+
+        <!-- Course Content (Sections & Lessons) -->
+        <div class="course-content-section">
+            <h2>Nội dung khóa học</h2>
+            @if (Model.Course.Sections == null || !Model.Course.Sections.Any())
+            {
+                <p class="no-content">Khóa học chưa có nội dung.</p>
+            }
+            else
+            {
+                <div class="sections-list">
+                    @foreach (var section in Model.Course.Sections)
+                    {
+                        <div class="section-card @(Model.Course.IsEnrolled ? "" : "locked")">
+                            <div class="section-header @(Model.Course.IsEnrolled ? "" : "locked")" 
+                                 @if (Model.Course.IsEnrolled) { <text>onclick="toggleSection(@(section.SectionId))"</text> }>
+                                <h3>@(section.Title)</h3>
+                                <div class="section-header-right">
+                                    <span class="lesson-count">@(section.Lessons.Count) bài học</span>
+                                    @if (Model.Course.IsEnrolled)
+                                    {
+                                        <span class="section-toggle" id="toggle-@(section.SectionId)">▼</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="lock-icon">🔒</span>
+                                    }
+                                </div>
+                            </div>
+                            @if (Model.Course.IsEnrolled)
+                            {
+                                <div class="section-content" id="content-@(section.SectionId)">
+                                    @if (section.Lessons != null && section.Lessons.Any())
+                                    {
+                                        <ul class="lessons-list">
+                                            @foreach (var lesson in section.Lessons)
+                                            {
+                                                <li class="lesson-item">
+                                                    <span class="lesson-icon">
+                                                        @if (lesson.LessonType?.ToLower() == "video")
+                                                        {
+                                                            <span>▶</span>
+                                                        }
+                                                        else if (lesson.LessonType?.ToLower() == "reading")
+                                                        {
+                                                            <span>📄</span>
+                                                        }
+                                                        else if (lesson.LessonType?.ToLower() == "quiz")
+                                                        {
+                                                            <span>❓</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>📝</span>
+                                                        }
+                                                    </span>
+                                                    <span class="lesson-title">@lesson.Title</span>
+                                                    <a asp-action="WatchLesson" asp-route-lessonId="@lesson.LessonId" class="btn-watch">
+                                                        Xem
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="course-actions">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-error">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+            <div class="action-buttons-group">
+                @if (Model.CanEnroll)
+                {
+                    <form asp-action="Enroll" asp-route-courseId="@Model.Course.CourseId" method="post" class="enroll-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-enroll">Đăng ký khóa học</button>
+                    </form>
+                }
+                <a asp-action="Index" class="btn-back">Quay lại danh sách</a>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function toggleSection(sectionId) {
+        const content = document.getElementById('content-' + sectionId);
+        const toggle = document.getElementById('toggle-' + sectionId);
+        
+        if (content.classList.contains('active')) {
+            content.classList.remove('active');
+            toggle.textContent = '▼';
+        } else {
+            content.classList.add('active');
+            toggle.textContent = '▲';
+        }
+    }
+</script>
