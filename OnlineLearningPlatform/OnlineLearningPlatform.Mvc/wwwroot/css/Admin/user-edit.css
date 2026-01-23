@@ -1,0 +1,44 @@
+﻿.edit-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.readonly {
+    background: #f3f3f3;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-save {
+    background: #4CAF50;
+    color: white;
+    padding: 8px 14px;
+}
+
+.btn-cancel {
+    background: #aaa;
+    color: white;
+    padding: 8px 14px;
+}

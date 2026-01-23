@@ -40,6 +40,7 @@ namespace OnlineLearningPlatform.Mvc
             // Đăng ký các dịch vụ tùy chỉnh
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -56,11 +57,15 @@ namespace OnlineLearningPlatform.Mvc
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            // Area route (Admin, Manager, ...)
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
 
+            // Default route (Login page)
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
-
             // Seed admin user khi khởi động ứng dụng
             await ApplicationDbContext.SeedAdminUserAsync(app.Services);
 
