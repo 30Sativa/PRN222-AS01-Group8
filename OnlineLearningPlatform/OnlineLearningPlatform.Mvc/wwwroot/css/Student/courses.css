@@ -89,14 +89,6 @@ body {
     min-height: 0;
 }
 
-.course-description {
-    color: #666;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 15px;
-    flex: 1;
-}
-
 .course-info {
     margin-top: auto;
     padding-top: 10px;

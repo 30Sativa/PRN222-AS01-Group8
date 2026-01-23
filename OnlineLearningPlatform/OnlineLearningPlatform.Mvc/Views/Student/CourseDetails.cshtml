@@ -1,0 +1,64 @@
+@model OnlineLearningPlatform.Mvc.Models.CourseDetailViewModel
+@{
+    ViewData["Title"] = Model.Course?.Title ?? "Chi tiết khóa học";
+}
+
+<link rel="stylesheet" href="~/css/Student/course-details.css" />
+
+@if (Model.Course == null)
+{
+    <div class="error-container">
+        <h2>Khóa học không tồn tại</h2>
+        <a asp-action="Index" class="btn-back">Quay lại danh sách</a>
+    </div>
+}
+else
+{
+    <div class="course-details-container">
+        <!-- Course Header -->
+        <div class="course-header-section">
+            <div class="course-header-content">
+                <h1>@Model.Course.Title</h1>
+                <div class="course-meta">
+                    <span class="teacher">Giảng viên: @Model.Course.TeacherName</span>
+                    @if (!string.IsNullOrEmpty(Model.Course.CategoryName))
+                    {
+                        <span class="category">Danh mục: @Model.Course.CategoryName</span>
+                    }
+                    <span class="price">
+                        @if (Model.Course.Price == 0)
+                        {
+                            <span class="price-free">Miễn phí</span>
+                        }
+                        else
+                        {
+                            <span>@Model.Course.Price.ToString("N0") VNĐ</span>
+                        }
+                    </span>
+                </div>
+                @if (Model.Course.IsEnrolled)
+                {
+                    <span class="badge enrolled-badge">Đã đăng ký</span>
+                }
+            </div>
+        </div>
+
+        <!-- Course Description -->
+        <div class="course-description-section">
+            <h2>Mô tả khóa học</h2>
+            <p>@Model.Course.Description</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="course-actions">
+            @if (Model.CanEnroll)
+            {
+                <form asp-action="Enroll" asp-route-courseId="@Model.Course.CourseId" method="post" class="enroll-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-enroll">Đăng ký khóa học</button>
+                </form>
+            }
+            <a asp-action="Index" class="btn-back">Quay lại danh sách</a>
+        </div>
+    </div>
+}

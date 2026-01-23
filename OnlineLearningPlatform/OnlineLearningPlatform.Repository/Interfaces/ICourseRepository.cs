@@ -6,6 +6,7 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
     {
         Task<List<Course>> GetAllCoursesAsync();
         Task<Course?> GetCourseByIdAsync(Guid courseId);
+        Task<Course?> GetCourseWithDetailsAsync(Guid courseId);
         Task<bool> CourseExistsAsync(Guid courseId);
     }
 }

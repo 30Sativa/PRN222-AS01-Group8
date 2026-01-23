@@ -1,0 +1,321 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #a8d8ff 0%, #7db9e8 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+.course-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Course Header Section */
+.course-header-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.course-header-content {
+    padding: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    position: relative;
+}
+
+.course-header-content h1 {
+    margin: 0 0 20px 0;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.course-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.course-meta .price {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.price-free {
+    color: #90EE90;
+}
+
+.badge.enrolled-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* Course Description Section */
+.course-description-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.course-description-section h2 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.course-description-section p {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* Course Content Section */
+.course-content-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.course-content-section h2 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.no-content {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 40px;
+}
+
+.sections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.section-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.lesson-count {
+    color: #666;
+    font-size: 14px;
+}
+
+.lessons-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lesson-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.lesson-item:last-child {
+    border-bottom: none;
+}
+
+.lesson-item:hover {
+    background-color: #f8f9fa;
+}
+
+.lesson-icon {
+    width: 30px;
+    text-align: center;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+.lesson-title {
+    flex: 1;
+    color: #333;
+    font-size: 15px;
+}
+
+.btn-watch {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-watch:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Action Buttons */
+.course-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.enroll-form {
+    margin: 0;
+}
+
+.btn-enroll {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-enroll:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-back {
+    padding: 15px 40px;
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-back:hover {
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+}
+
+.error-container {
+    max-width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.error-container h2 {
+    color: #e74c3c;
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .course-header-content {
+        padding: 25px;
+    }
+
+    .course-header-content h1 {
+        font-size: 24px;
+    }
+
+    .course-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .course-description-section,
+    .course-content-section {
+        padding: 20px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .lesson-item {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-watch {
+        width: 100%;
+        text-align: center;
+    }
+
+    .course-actions {
+        flex-direction: column;
+    }
+
+    .btn-enroll,
+    .btn-back {
+        width: 100%;
+    }
+}

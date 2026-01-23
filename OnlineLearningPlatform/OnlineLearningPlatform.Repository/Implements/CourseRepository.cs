@@ -31,6 +31,16 @@ namespace OnlineLearningPlatform.Repositories.Implements
                 .FirstOrDefaultAsync(c => c.CourseId == courseId);
         }
 
+        public async Task<Course?> GetCourseWithDetailsAsync(Guid courseId)
+        {
+            return await _context.Courses
+                .Include(c => c.Teacher)
+                .Include(c => c.Category)
+                .Include(c => c.Sections)
+                    .ThenInclude(s => s.Lessons.OrderBy(l => l.OrderIndex))
+                .FirstOrDefaultAsync(c => c.CourseId == courseId);
+        }
+
         public async Task<bool> CourseExistsAsync(Guid courseId)
         {
             return await _context.Courses.AnyAsync(c => c.CourseId == courseId);

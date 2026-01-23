@@ -30,5 +30,25 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             return View(viewModel);
         }
+
+        // GET: Student/CourseDetails/{id} - Xem chi tiết khóa học
+        public async Task<IActionResult> CourseDetails(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var course = await _courseService.GetCourseDetailAsync(id, userId);
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new CourseDetailViewModel
+            {
+                Course = course,
+                CanEnroll = !course.IsEnrolled
+            };
+
+            return View(viewModel);
+        }
     }
 }
