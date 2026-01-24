@@ -33,5 +33,15 @@ namespace OnlineLearningPlatform.Repositories.Implements
         {
             return await _userManager.Users.ToListAsync();
         }
+
+        public async Task<ApplicationUser?> GetByIdAsync(string id)
+        {
+            return await _userManager.FindByIdAsync(id);
+        }
+
+        public async Task UpdateAsync(ApplicationUser user)
+        {
+            await _userManager.UpdateAsync(user);
+        }
     }
 }

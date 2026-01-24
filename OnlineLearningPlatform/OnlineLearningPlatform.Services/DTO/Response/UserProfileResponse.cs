@@ -1,6 +1,6 @@
-﻿namespace OnlineLearningPlatform.Mvc.Models
+﻿namespace OnlineLearningPlatform.Services.DTO.Response
 {
-    public class ProfileViewModel
+    public class UserProfileResponse
     {
         public string Email { get; set; }
         public string FullName { get; set; }

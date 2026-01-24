@@ -42,7 +42,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             builder.Services.AddScoped<ILessonRepository, LessonRepository>();
-            builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+
 
             // Đăng ký các dịch vụ tùy chỉnh - Service
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -52,7 +52,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             builder.Services.AddScoped<ILessonService, LessonService>();
-            builder.Services.AddScoped<IProfileService, ProfileService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
