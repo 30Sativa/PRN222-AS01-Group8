@@ -42,6 +42,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+            builder.Services.AddScoped<ITeacherRepository, TeacherRepository>(); // Teacher Repository
 
 
             // Đăng ký các dịch vụ tùy chỉnh - Service
@@ -52,6 +53,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             builder.Services.AddScoped<ILessonService, LessonService>();
+            builder.Services.AddScoped<ITeacherService, TeacherService>(); // Teacher Service
 
             var app = builder.Build();
 
