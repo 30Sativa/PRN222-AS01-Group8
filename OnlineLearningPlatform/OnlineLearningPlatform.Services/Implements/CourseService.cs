@@ -115,5 +115,30 @@ namespace OnlineLearningPlatform.Services.Implements
                 Sections = sectionsDto
             };
         }
+
+        // Teacher methods
+        public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId)
+        {
+            var courses = await _courseRepository.GetCoursesByTeacherIdAsync(teacherId);
+            var teacherCoursesDto = new List<TeacherCourseDto>();
+
+            foreach (var course in courses)
+            {
+                teacherCoursesDto.Add(new TeacherCourseDto
+                {
+                    CourseId = course.CourseId,
+                    Title = course.Title,
+                    Description = course.Description ?? string.Empty,
+                    CategoryName = course.Category?.CategoryName,
+                    Price = course.Price,
+                    CreatedAt = course.CreatedAt,
+                    TotalEnrollments = course.Enrollments?.Count ?? 0,
+                    TotalSections = course.Sections?.Count ?? 0,
+                    TotalLessons = course.Sections?.Sum(s => s.Lessons?.Count ?? 0) ?? 0
+                });
+            }
+
+            return teacherCoursesDto;
+        }
     }
 }
