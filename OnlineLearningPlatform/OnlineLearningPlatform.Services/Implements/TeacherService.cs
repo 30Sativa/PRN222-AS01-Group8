@@ -1,4 +1,6 @@
+using OnlineLearningPlatform.Models.Entities;
 using OnlineLearningPlatform.Repositories.Interfaces;
+using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
 using OnlineLearningPlatform.Services.Interfaces;
 
@@ -10,10 +12,14 @@ namespace OnlineLearningPlatform.Services.Implements
     public class TeacherService : ITeacherService
     {
         private readonly ITeacherRepository _teacherRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public TeacherService(ITeacherRepository teacherRepository)
+        public TeacherService(
+            ITeacherRepository teacherRepository,
+            ICategoryRepository categoryRepository)
         {
             _teacherRepository = teacherRepository;
+            _categoryRepository = categoryRepository;
         }
 
         public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId)
@@ -59,6 +65,58 @@ namespace OnlineLearningPlatform.Services.Implements
                 TotalSections = course.Sections?.Count ?? 0,
                 TotalLessons = course.Sections?.Sum(s => s.Lessons?.Count ?? 0) ?? 0
             };
+        }
+
+        public async Task<List<CategoryDto>> GetCategoriesAsync()
+        {
+            var categories = await _categoryRepository.GetAllCategoriesAsync();
+            return categories.Select(c => new CategoryDto
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName
+            }).ToList();
+        }
+
+        public async Task<Guid> CreateCourseAsync(CreateCourseRequest request, string teacherId)
+        {
+            var course = new Course
+            {
+                CourseId = Guid.NewGuid(),
+                Title = request.Title,
+                Description = request.Description,
+                Price = request.Price,
+                CategoryId = request.CategoryId,
+                TeacherId = teacherId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var createdCourse = await _teacherRepository.CreateCourseAsync(course);
+            return createdCourse.CourseId;
+        }
+
+        public async Task<bool> UpdateCourseAsync(Guid courseId, UpdateCourseRequest request, string teacherId)
+        {
+            // Kiểm tra quyền sở hữu
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(courseId, teacherId);
+            if (!isOwner)
+                return false;
+
+            var course = await _teacherRepository.GetCourseWithStatisticsAsync(courseId, teacherId);
+            if (course == null)
+                return false;
+
+            // Cập nhật thông tin
+            course.Title = request.Title;
+            course.Description = request.Description;
+            course.Price = request.Price;
+            course.CategoryId = request.CategoryId;
+
+            return await _teacherRepository.UpdateCourseAsync(course);
+        }
+
+        public async Task<bool> DeleteCourseAsync(Guid courseId, string teacherId)
+        {
+            return await _teacherRepository.DeleteCourseAsync(courseId, teacherId);
         }
     }
 }
