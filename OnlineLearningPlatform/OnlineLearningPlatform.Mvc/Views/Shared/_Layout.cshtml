@@ -16,6 +16,7 @@
             <div class="navbar-menu">
                 <a asp-controller="Student" asp-action="Index" class="nav-link">Danh sách khóa học</a>
                 <a asp-controller="Student" asp-action="MyCourses" class="nav-link">Khóa học của tôi</a>
+                <a asp-controller="Profile" asp-action="Index" class="nav-link">Tài khoản</a>
             </div>
             <div class="navbar-user">
                 <span class="user-name">@User.Identity?.Name</span>
@@ -41,7 +42,8 @@
                 const linkPath = link.getAttribute('href').toLowerCase();
                 if (currentPath.includes(linkPath) || 
                     (currentPath.includes('/student/index') && linkPath.includes('/student/index')) ||
-                    (currentPath.includes('/student/mycourses') && linkPath.includes('/student/mycourses'))) {
+                    (currentPath.includes('/student/mycourses') && linkPath.includes('/student/mycourses')) ||
+                    (currentPath.includes('/profile') && linkPath.includes('/profile'))) {
                     link.classList.add('active');
                 }
             });
