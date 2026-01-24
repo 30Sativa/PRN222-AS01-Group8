@@ -38,5 +38,48 @@ namespace OnlineLearningPlatform.Repositories.Implements
             return await _context.Enrollments
                 .AnyAsync(e => e.UserId == userId && e.CourseId == courseId);
         }
+
+        public async Task<LessonProgress?> GetLessonProgressAsync(string userId, int lessonId)
+        {
+            return await _context.LessonProgresses
+                .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
+        }
+
+        public async Task MarkLessonCompleteAsync(string userId, int lessonId)
+        {
+            var progress = await _context.LessonProgresses
+                .FirstOrDefaultAsync(p => p.UserId == userId && p.LessonId == lessonId);
+
+            if (progress == null)
+            {
+                progress = new LessonProgress
+                {
+                    ProgressId = Guid.NewGuid(),
+                    UserId = userId,
+                    LessonId = lessonId,
+                    IsCompleted = true,
+                    CompletedAt = DateTime.UtcNow
+                };
+                await _context.LessonProgresses.AddAsync(progress);
+            }
+            else
+            {
+                progress.IsCompleted = true;
+                progress.CompletedAt = DateTime.UtcNow;
+                _context.LessonProgresses.Update(progress);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<int>> GetCompletedLessonIdsAsync(string userId, Guid courseId)
+        {
+            return await _context.LessonProgresses
+                .Where(p => p.UserId == userId && 
+                           p.IsCompleted && 
+                           p.Lesson.Section.CourseId == courseId)
+                .Select(p => p.LessonId ?? 0)
+                .ToListAsync();
+        }
     }
 }

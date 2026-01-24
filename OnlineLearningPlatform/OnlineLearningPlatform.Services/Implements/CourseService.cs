@@ -12,13 +12,16 @@ namespace OnlineLearningPlatform.Services.Implements
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IEnrollmentRepository _enrollmentRepository;
+        private readonly ILessonRepository _lessonRepository;
 
         public CourseService(
             ICourseRepository courseRepository,
-            IEnrollmentRepository enrollmentRepository)
+            IEnrollmentRepository enrollmentRepository,
+            ILessonRepository lessonRepository)
         {
             _courseRepository = courseRepository;
             _enrollmentRepository = enrollmentRepository;
+            _lessonRepository = lessonRepository;
         }
 
         public async Task<List<CourseDto>> GetAllCoursesAsync(string? userId = null)
@@ -79,31 +82,53 @@ namespace OnlineLearningPlatform.Services.Implements
             if (course == null) return null;
 
             var isEnrolled = false;
+            var completedLessonIds = new List<int>();
             if (!string.IsNullOrEmpty(userId))
             {
                 isEnrolled = await _enrollmentRepository.IsUserEnrolledAsync(userId, courseId);
+                if (isEnrolled)
+                {
+                    completedLessonIds = await _lessonRepository.GetCompletedLessonIdsAsync(userId, courseId);
+                }
             }
 
             var sectionsDto = new List<SectionDto>();
+            int totalLessonsCount = 0;
+            int completedLessonsCount = 0;
+
             foreach (var section in course.Sections.OrderBy(s => s.OrderIndex))
             {
-                var lessonsDto = section.Lessons
-                    .OrderBy(l => l.OrderIndex)
-                    .Select(l => new LessonDto
+                var lessonsDto = new List<LessonDto>();
+                foreach (var l in section.Lessons.OrderBy(l => l.OrderIndex))
+                {
+                    totalLessonsCount++;
+                    var isCompleted = completedLessonIds.Contains(l.LessonId);
+                    if (isCompleted) completedLessonsCount++;
+
+                    lessonsDto.Add(new LessonDto
                     {
                         LessonId = l.LessonId,
                         Title = l.Title,
                         LessonType = l.LessonType,
-                        OrderIndex = l.OrderIndex
-                    }).ToList();
+                        OrderIndex = l.OrderIndex,
+                        IsCompleted = isCompleted
+                    });
+                }
 
                 sectionsDto.Add(new SectionDto
                 {
                     SectionId = section.SectionId,
                     Title = section.Title,
                     OrderIndex = section.OrderIndex,
-                    Lessons = lessonsDto
+                    Lessons = lessonsDto,
+                    TotalLessons = lessonsDto.Count
                 });
+            }
+
+            double progressPercentage = 0;
+            if (totalLessonsCount > 0)
+            {
+                progressPercentage = Math.Round((double)completedLessonsCount / totalLessonsCount * 100, 1);
             }
 
             return new CourseDetailDto
@@ -116,6 +141,7 @@ namespace OnlineLearningPlatform.Services.Implements
                 Price = course.Price,
                 CreatedAt = course.CreatedAt,
                 IsEnrolled = isEnrolled,
+                ProgressPercentage = progressPercentage,
                 Sections = sectionsDto
             };
         }
