@@ -11,8 +11,10 @@
                     @foreach (var a in q.QuizAnswers.Where(x => x.AttemptId == null))
                     {
                         <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="q_@q.QuestionId" value="@a.UserAnswer" required>
-                            <label class="form-check-label">@a.UserAnswer</label>
+                            <input class="form-check-input" type="radio"
+                                   name="q_@q.QuestionId"
+                                   value="@a.UserAnswer" required>
+                            <label class="form-check-label ms-2">@a.UserAnswer</label>
                         </div>
                     }
                 </div>

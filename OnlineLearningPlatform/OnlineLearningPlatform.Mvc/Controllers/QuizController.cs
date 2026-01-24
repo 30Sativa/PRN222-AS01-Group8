@@ -39,19 +39,40 @@ public class QuizController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Instructor")]
+    [HttpPost]
+    [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Create(Quiz quiz, IFormCollection form)
     {
-        for (int i = 0; i < quiz.Questions.Count; i++)
+        try
         {
-            var q = quiz.Questions.ElementAt(i);
-            q.QuestionType = "mcq";
-            if (int.TryParse(form[$"correct_{i}"], out int idx))
-                q.CorrectAnswer = q.QuizAnswers.ElementAt(idx).UserAnswer;
-            foreach (var ans in q.QuizAnswers) ans.AnswerId = Guid.NewGuid();
+            for (int i = 0; i < quiz.Questions.Count; i++)
+            {
+                var question = quiz.Questions.ElementAt(i);
+                question.QuestionType = "mcq";
+                if (int.TryParse(form[$"correct_{i}"], out int correctIdx))
+                {
+                    var answers = question.QuizAnswers.ToList();
+                    if (correctIdx < answers.Count)
+                    {
+                        question.CorrectAnswer = answers.ElementAt(correctIdx).UserAnswer;
+                    }
+                }
+                foreach (var ans in question.QuizAnswers)
+                {
+                    ans.AnswerId = Guid.NewGuid();
+                    ans.AttemptId = null;
+                }
+            }
+
+            _context.Quizzes.Add(quiz);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Menu", "Instructor");
         }
-        await _unitOfWork.Quizzes.AddAsync(quiz);
-        await _unitOfWork.SaveAsync();
-        return RedirectToAction("Menu", "Instructor");
+        catch (Exception ex)
+        {
+            return View(quiz);
+        }
     }
 
     // --- PHẦN HỌC SINH ---
