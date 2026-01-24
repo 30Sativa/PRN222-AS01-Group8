@@ -18,8 +18,4 @@
     <ProjectReference Include="..\OnlineLearningPlatform.Services\OnlineLearningPlatform.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Shared\" />
-  </ItemGroup>
-
 </Project>

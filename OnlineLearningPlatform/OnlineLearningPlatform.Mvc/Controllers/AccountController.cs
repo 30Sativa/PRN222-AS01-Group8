@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineLearningPlatform.Models.Identity;
-using OnlineLearningPlatform.Mvc.Models;
+using OnlineLearningPlatform.Mvc.Models.Account;
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.Interfaces;
 using System.Security.Claims;
@@ -42,6 +42,10 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             if (result.Succeeded)
             {
+
+
+
+
                 var user = await _signInManager.UserManager.FindByEmailAsync(model.Email);
                 return await RedirectByRoleAsync(user);
             }
@@ -134,6 +138,9 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         {
             if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Admin))
             {
+
+                return RedirectToAction("Index", "Admin", new { area = "Admin" });
+
                 return RedirectToAction("Index", "RoleTest");
             }
 

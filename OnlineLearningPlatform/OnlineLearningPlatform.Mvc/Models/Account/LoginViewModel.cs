@@ -1,4 +1,4 @@
-﻿namespace OnlineLearningPlatform.Mvc.Models
+﻿namespace OnlineLearningPlatform.Mvc.Models.Account
 {
     public class LoginViewModel
     {

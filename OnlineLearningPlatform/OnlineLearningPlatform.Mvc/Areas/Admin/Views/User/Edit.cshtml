@@ -1,0 +1,34 @@
+﻿@model OnlineLearningPlatform.Mvc.Models.Admin.UserEditViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/user-edit.css" />
+}
+
+<div class="edit-container">
+
+    <h2>Edit User</h2>
+
+    <form asp-action="Edit" method="post" class="edit-form">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input asp-for="FullName" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <label>Email (readonly)</label>
+            <input asp-for="Email" readonly class="form-input readonly" />
+        </div>
+
+      
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Save</button>
+            <a asp-action="Index" class="btn-cancel">Cancel</a>
+        </div>
+
+    </form>
+
+</div>

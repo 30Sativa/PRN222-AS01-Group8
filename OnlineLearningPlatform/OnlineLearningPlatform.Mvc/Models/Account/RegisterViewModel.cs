@@ -1,7 +1,7 @@
 ﻿using OnlineLearningPlatform.Models.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace OnlineLearningPlatform.Mvc.Models
+namespace OnlineLearningPlatform.Mvc.Models.Account
 {
     public class RegisterViewModel
     {
