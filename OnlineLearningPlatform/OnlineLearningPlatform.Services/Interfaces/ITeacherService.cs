@@ -1,3 +1,4 @@
+using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
 
 namespace OnlineLearningPlatform.Services.Interfaces
@@ -13,13 +14,16 @@ namespace OnlineLearningPlatform.Services.Interfaces
         // Lấy chi tiết khóa học để chỉnh sửa
         Task<TeacherCourseDto?> GetTeacherCourseByIdAsync(Guid courseId, string teacherId);
 
-        // Tạo khóa học mới (sẽ dùng ở phần 2)
-        // Task<TeacherCourseDto> CreateCourseAsync(CreateCourseRequest request, string teacherId);
+        // Lấy danh sách categories
+        Task<List<CategoryDto>> GetCategoriesAsync();
 
-        // Cập nhật khóa học (sẽ dùng ở phần 2)
-        // Task<bool> UpdateCourseAsync(Guid courseId, UpdateCourseRequest request, string teacherId);
+        // Tạo khóa học mới
+        Task<Guid> CreateCourseAsync(CreateCourseRequest request, string teacherId);
+
+        // Cập nhật khóa học
+        Task<bool> UpdateCourseAsync(Guid courseId, UpdateCourseRequest request, string teacherId);
 
         // Xóa khóa học
-        // Task<bool> DeleteCourseAsync(Guid courseId, string teacherId);
+        Task<bool> DeleteCourseAsync(Guid courseId, string teacherId);
     }
 }
