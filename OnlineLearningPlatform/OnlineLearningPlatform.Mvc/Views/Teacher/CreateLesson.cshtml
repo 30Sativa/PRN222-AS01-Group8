@@ -1,0 +1,71 @@
+@model OnlineLearningPlatform.Mvc.Models.Teacher.CreateLessonViewModel
+
+@{
+    ViewData["Title"] = "Tạo bài học mới";
+    Layout = "~/Views/Shared/_LayoutTeacher.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Tạo bài học mới
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateLesson" method="post">
+                        <input type="hidden" asp-for="SectionId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" placeholder="Nhập tên bài học" autofocus />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LessonType" class="form-label"></label>
+                            <select asp-for="LessonType" asp-items="Model.LessonTypes" class="form-select">
+                                <option value="">-- Chọn loại bài học --</option>
+                            </select>
+                            <span asp-validation-for="LessonType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label"></label>
+                            <textarea asp-for="Content" class="form-control" rows="6"
+                                placeholder="Nhập nội dung bài học (URL video, text, v.v.)"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                            <small class="text-muted">
+                                Video: URL YouTube hoặc Vimeo<br />
+                                Tài liệu: Nội dung text hoặc HTML<br />
+                                Bài kiểm tra/Bài tập: Mô tả hoặc link
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="OrderIndex" class="form-label"></label>
+                            <input asp-for="OrderIndex" type="number" class="form-control" placeholder="0" />
+                            <span asp-validation-for="OrderIndex" class="text-danger"></span>
+                            <small class="text-muted">Thứ tự hiển thị của bài học</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" onclick="history.back()" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Hủy
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Tạo bài học
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

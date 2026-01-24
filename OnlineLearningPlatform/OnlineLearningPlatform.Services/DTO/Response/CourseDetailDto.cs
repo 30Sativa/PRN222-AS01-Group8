@@ -16,14 +16,17 @@ namespace OnlineLearningPlatform.Services.DTO.Response
     public class SectionDto
     {
         public int SectionId { get; set; }
+        public Guid CourseId { get; set; }
         public string Title { get; set; } = null!;
         public int? OrderIndex { get; set; }
+        public int TotalLessons { get; set; }
         public List<LessonDto> Lessons { get; set; } = new();
     }
 
     public class LessonDto
     {
         public int LessonId { get; set; }
+        public int SectionId { get; set; }
         public string Title { get; set; } = null!;
         public string LessonType { get; set; } = null!;
         public string Content { get; set; } = null!; // Video URL hoặc content

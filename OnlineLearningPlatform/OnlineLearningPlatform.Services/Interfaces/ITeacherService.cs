@@ -25,5 +25,34 @@ namespace OnlineLearningPlatform.Services.Interfaces
 
         // Xóa khóa học
         Task<bool> DeleteCourseAsync(Guid courseId, string teacherId);
+
+        // ===== QUẢN LÝ SECTIONS =====
+        // Lấy danh sách sections và lessons của khóa học
+        Task<List<SectionDto>> GetCourseSectionsAsync(Guid courseId, string teacherId);
+
+        // Lấy chi tiết section
+        Task<SectionDto?> GetSectionByIdAsync(int sectionId);
+
+        // Tạo section mới
+        Task<int> CreateSectionAsync(Guid courseId, CreateSectionRequest request, string teacherId);
+
+        // Cập nhật section
+        Task<bool> UpdateSectionAsync(int sectionId, UpdateSectionRequest request, string teacherId);
+
+        // Xóa section
+        Task<bool> DeleteSectionAsync(int sectionId, string teacherId);
+
+        // ===== QUẢN LÝ LESSONS =====
+        // Lấy chi tiết lesson
+        Task<LessonDto?> GetLessonByIdAsync(int lessonId);
+
+        // Tạo lesson mới
+        Task<int> CreateLessonAsync(int sectionId, CreateLessonRequest request, string teacherId);
+
+        // Cập nhật lesson
+        Task<bool> UpdateLessonAsync(int lessonId, UpdateLessonRequest request, string teacherId);
+
+        // Xóa lesson
+        Task<bool> DeleteLessonAsync(int lessonId, string teacherId);
     }
 }
