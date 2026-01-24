@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Mvc.Models.Admin;
 using OnlineLearningPlatform.Services.DTO.Request.User;
 using OnlineLearningPlatform.Services.Implements;
 using OnlineLearningPlatform.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
 {
@@ -13,6 +15,7 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _service;
+       
 
         public UserController(IUserService service)
         {
@@ -119,6 +122,42 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+
+
+        public async Task<IActionResult> Create()
+        {
+            var roles = await _service.GetRolesAsync();
+
+            var vm = new CreateUserViewModel
+            {
+                Roles = roles
+            };
+
+            return View(vm);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateUserViewModel vm)
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            var request = new CreateUserRequest
+            {
+                FullName = vm.FullName,
+                Email = vm.Email,
+                Password = vm.Password,
+                Role = vm.Role,
+            
+            };
+
+            await _service.CreateAsync(request);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
 
     }
 }

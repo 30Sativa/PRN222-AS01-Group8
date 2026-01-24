@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Services.DTO.Request.User;
 using OnlineLearningPlatform.Services.DTO.Response.User;
@@ -14,10 +15,39 @@ namespace OnlineLearningPlatform.Services.Implements
     public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public UserService(UserManager<ApplicationUser> userManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
+        }
+
+        public async Task CreateAsync(CreateUserRequest request)
+        {
+            var user = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                FullName = request.FullName,
+                LockoutEnabled = true
+            };
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+
+            if (!result.Succeeded)
+                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            // Add role
+            if (!string.IsNullOrEmpty(request.Role))
+            {
+                await _userManager.AddToRoleAsync(user, request.Role);
+            }
+
+            //// Lock nếu cần
+            //if (request.IsLocked)
+            //{
+            //    await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+            //}
         }
 
         public async Task<List<GetUserResponse>> GetAllAsync()
@@ -61,6 +91,11 @@ namespace OnlineLearningPlatform.Services.Implements
                 EmailConfirmed = user.EmailConfirmed,
                 IsLocked = user.LockoutEnd > DateTimeOffset.Now
             };
+        }
+
+        public async Task<List<string>> GetRolesAsync()
+        {
+            return await _roleManager.Roles.Select(r => r.Name).ToListAsync();
         }
 
         public async Task LockAsync(LockUserRequest request)
