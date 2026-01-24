@@ -7,6 +7,7 @@ namespace OnlineLearningPlatform.Services.Interfaces
     {
         Task<ProfileDto?> GetProfileAsync(string userId);
         Task<IdentityResult> UpdateFullNameAsync(string userId, string fullName);
+        Task<IdentityResult> UpdatePhoneAsync(string userId, string phoneNumber);
     }
 }
 

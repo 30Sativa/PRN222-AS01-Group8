@@ -36,6 +36,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             {
                 FullName = profile.FullName,
                 Email = profile.Email,
+                PhoneNumber = profile.PhoneNumber,
                 CourseCount = profile.CourseCount,
                 ArticleCount = profile.ArticleCount,
                 UserId = profile.UserId
@@ -58,6 +59,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                     if (profile != null)
                     {
                         model.Email = profile.Email;
+                        model.PhoneNumber = profile.PhoneNumber;
                         model.CourseCount = profile.CourseCount;
                         model.ArticleCount = profile.ArticleCount;
                         model.UserId = profile.UserId;
@@ -72,25 +74,29 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return Unauthorized();
             }
 
-            // Cập nhật thông tin (chỉ cập nhật FullName theo ApplicationUser hiện tại)
-            var result = await _profileService.UpdateFullNameAsync(userId2, model.FullName);
-            if (result.Succeeded)
+            // Cập nhật thông tin (FullName và PhoneNumber)
+            var fullNameResult = await _profileService.UpdateFullNameAsync(userId2, model.FullName);
+            var phoneResult = await _profileService.UpdatePhoneAsync(userId2, model.PhoneNumber ?? "");
+
+            if (fullNameResult.Succeeded && phoneResult.Succeeded)
             {
                 TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
             }
             else
             {
-                foreach (var error in result.Errors)
+                var allErrors = fullNameResult.Errors.Concat(phoneResult.Errors);
+                foreach (var error in allErrors)
                 {
                     ModelState.AddModelError("", error.Description);
                 }
             }
 
-            // Reload statistics và đảm bảo Email được set lại
+            // Reload statistics và đảm bảo Email, PhoneNumber được set lại
             var profileAfter = await _profileService.GetProfileAsync(userId2);
             if (profileAfter != null)
             {
                 model.Email = profileAfter.Email;
+                model.PhoneNumber = profileAfter.PhoneNumber;
                 model.CourseCount = profileAfter.CourseCount;
                 model.ArticleCount = profileAfter.ArticleCount;
                 model.UserId = profileAfter.UserId;
