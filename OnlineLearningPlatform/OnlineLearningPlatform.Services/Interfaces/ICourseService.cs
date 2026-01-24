@@ -7,8 +7,5 @@ namespace OnlineLearningPlatform.Services.Interfaces
         Task<List<CourseDto>> GetAllCoursesAsync(string? userId = null);
         Task<List<CourseDto>> GetUserEnrolledCoursesAsync(string userId);
         Task<CourseDetailDto?> GetCourseDetailAsync(Guid courseId, string? userId = null);
-
-        // Teacher methods
-        Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId);
     }
 }

@@ -9,11 +9,11 @@ namespace OnlineLearningPlatform.Mvc.Controllers
     [Authorize(Roles = RolesNames.Instructor)]
     public class TeacherController : Controller
     {
-        private readonly ICourseService _courseService;
+        private readonly ITeacherService _teacherService;
 
-        public TeacherController(ICourseService courseService)
+        public TeacherController(ITeacherService teacherService)
         {
-            _courseService = courseService;
+            _teacherService = teacherService;
         }
 
         // GET: Teacher/Index - Quản lý danh sách khóa học của giảng viên
@@ -26,7 +26,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return Unauthorized();
             }
 
-            var courses = await _courseService.GetTeacherCoursesAsync(teacherId);
+            var courses = await _teacherService.GetTeacherCoursesAsync(teacherId);
 
             return View(courses);
         }
