@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Instructor Menu";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group shadow-sm">
+                <a href="#" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-speedometer2 me-2"></i> Bảng điều khiển
+                </a>
+                <a href="/Course/MyCourses" class="list-group-item list-group-item-action">
+                    <i class="bi bi-book me-2"></i> Khóa học của tôi
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people me-2"></i> Quản lý học sinh
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="card-title text-primary">Chào mừng Giáo viên!</h3>
+                    <p class="text-muted">Tại đây bạn có thể quản lý nội dung giảng dạy và các bài kiểm tra.</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card border-primary mb-3">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-patch-question text-primary" style="font-size: 3rem;"></i>
+                                    <h5 class="mt-2">Bài kiểm tra (Quiz)</h5>
+                                    <p class="small text-muted">Tạo các câu hỏi trắc nghiệm cho bài học.</p>
+
+                                    <a href="/Quiz/Create?lessonId=1" class="btn btn-primary w-100">
+                                        <i class="bi bi-plus-circle me-1"></i> Tạo bài Quiz mới
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-success mb-3">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-plus-square text-success" style="font-size: 3rem;"></i>
+                                    <h5 class="mt-2">Khóa học</h5>
+                                    <p class="small text-muted">Đăng tải khóa học mới lên hệ thống.</p>
+                                    <button class="btn btn-success w-100">Tạo khóa học mới</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

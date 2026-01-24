@@ -5,6 +5,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Student/watch-lesson.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 }
 
 <div class="lesson-container">
@@ -32,19 +33,37 @@
         </div>
     </div>
 
-    <!-- Video Player -->
+    <!-- Video Player / Quiz Player -->
     <div class="video-container">
-        @if (Model.LessonType?.ToLower() == "video")
+        @if (Model.LessonType?.ToLower() == "quiz")
+        {
+            @* Giao diện nút bấm to rõ cho học sinh làm Quiz của bạn *@
+            <div class="text-center p-5 bg-white shadow-sm rounded border border-warning my-3">
+                <div class="mb-3">
+                    <i class="bi bi-pencil-square text-warning" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="fw-bold mt-3">Bài kiểm tra: @Model.Title</h2>
+                <p class="text-muted">Vui lòng nhấn nút bên dưới để bắt đầu làm bài trắc nghiệm để củng cố kiến thức.</p>
+                <div class="mt-4">
+                    <a asp-controller="Quiz" asp-action="TakeByLesson" asp-route-lessonId="@Model.LessonId"
+                       class="btn btn-warning btn-lg px-5 fw-bold shadow-sm rounded-pill">
+                        <i class="bi bi-play-fill"></i> BẮT ĐẦU LÀM QUIZ
+                    </a>
+                </div>
+                <p class="small text-muted mt-3 italic text-decoration-underline">Lưu ý: Bạn có tối đa 3 lần thực hiện bài kiểm tra này.</p>
+            </div>
+        }
+        else if (Model.LessonType?.ToLower() == "video")
         {
             @if (!string.IsNullOrEmpty(Model.Content))
             {
                 var isYouTube = Model.Content.Contains("youtube.com") || Model.Content.Contains("youtu.be");
                 var isVimeo = Model.Content.Contains("vimeo.com");
-                
+
                 @if (isYouTube)
                 {
                     var videoId = "";
-                    if (Model.Content.Contains("youtube.com/watch?v="))
+                    if (Model.Content.Contains("watch?v="))
                     {
                         videoId = Model.Content.Split(new[] { "watch?v=" }, StringSplitOptions.None)[1].Split('&')[0];
                     }
@@ -52,7 +71,7 @@
                     {
                         videoId = Model.Content.Split(new[] { "youtu.be/" }, StringSplitOptions.None)[1].Split('?')[0];
                     }
-                    else if (Model.Content.Contains("youtube.com/embed/"))
+                    else if (Model.Content.Contains("embed/"))
                     {
                         videoId = Model.Content.Split(new[] { "embed/" }, StringSplitOptions.None)[1].Split('?')[0];
                     }
@@ -60,12 +79,11 @@
                     @if (!string.IsNullOrEmpty(videoId))
                     {
                         <div class="video-wrapper">
-                            <iframe 
-                                src="https://www.youtube.com/embed/@videoId?rel=0" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                class="video-player">
+                            <iframe src="https://www.youtube.com/embed/@videoId"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    class="video-player">
                             </iframe>
                         </div>
                     }
@@ -91,12 +109,11 @@
                     @if (!string.IsNullOrEmpty(videoId))
                     {
                         <div class="video-wrapper">
-                            <iframe 
-                                src="https://player.vimeo.com/video/@videoId" 
-                                frameborder="0" 
-                                allow="autoplay; fullscreen; picture-in-picture" 
-                                allowfullscreen
-                                class="video-player">
+                            <iframe src="https://player.vimeo.com/video/@videoId"
+                                    frameborder="0"
+                                    allow="autoplay; fullscreen; picture-in-picture"
+                                    allowfullscreen
+                                    class="video-player">
                             </iframe>
                         </div>
                     }
