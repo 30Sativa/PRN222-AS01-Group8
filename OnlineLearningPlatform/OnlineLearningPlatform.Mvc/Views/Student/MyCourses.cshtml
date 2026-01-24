@@ -1,0 +1,67 @@
+@model OnlineLearningPlatform.Mvc.Models.CourseListViewModel
+@{
+    ViewData["Title"] = "Khóa học của tôi";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/courses.css" />
+}
+
+<div class="courses-container">
+    <div class="courses-header">
+        <h1>Khóa học của tôi</h1>
+    </div>
+
+    @if (Model.Courses == null || !Model.Courses.Any())
+    {
+        <div class="no-courses">
+            <p>Bạn chưa đăng ký khóa học nào.</p>
+            <a asp-action="Index" class="btn-view" style="margin-top: 20px; display: inline-block;">Xem danh sách khóa học</a>
+        </div>
+    }
+    else
+    {
+        <div class="courses-grid">
+            @foreach (var course in Model.Courses)
+            {
+                <div class="course-card">
+                    <div class="course-header">
+                        <h3 class="course-title">@course.Title</h3>
+                        <span class="badge enrolled">Đã đăng ký</span>
+                    </div>
+                    
+                    <div class="course-body">
+                        <div class="course-info">
+                            <div class="info-item">
+                                <strong>Giảng viên:</strong> @course.TeacherName
+                            </div>
+                            @if (!string.IsNullOrEmpty(course.CategoryName))
+                            {
+                                <div class="info-item">
+                                    <strong>Danh mục:</strong> @course.CategoryName
+                                </div>
+                            }
+                            <div class="info-item">
+                                <strong>Giá:</strong> 
+                                @if (course.Price == 0)
+                                {
+                                    <span class="price-free">Miễn phí</span>
+                                }
+                                else
+                                {
+                                    <span class="price">@course.Price.ToString("N0") VNĐ</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-footer">
+                        <a asp-action="CourseDetails" asp-route-id="@course.CourseId" class="btn-view">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -32,7 +32,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         [Authorize(Roles = RolesNames.Student)]
         public IActionResult StudentOnly()
         {
-            return View();
+            return RedirectToAction("Index", "Student");
         }
     }
 }
