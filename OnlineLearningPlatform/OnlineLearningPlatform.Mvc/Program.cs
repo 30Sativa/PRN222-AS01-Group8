@@ -43,6 +43,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 
+
             // Đăng ký các dịch vụ tùy chỉnh - Service
             builder.Services.AddScoped<IAuthService, AuthService>();
 

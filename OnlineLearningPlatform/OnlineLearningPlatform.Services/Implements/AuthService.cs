@@ -2,6 +2,7 @@
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Repositories.Interfaces;
 using OnlineLearningPlatform.Services.DTO.Request;
+using OnlineLearningPlatform.Services.DTO.Response;
 using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Services.Implements
@@ -20,6 +21,19 @@ namespace OnlineLearningPlatform.Services.Implements
         public async Task<List<ApplicationUser>> GetAllAccount()
         {
             return await _authRepository.GetAllUsersAsync();
+        }
+
+        public async Task<UserProfileResponse> GetMyProfileAsync(string userId)
+        {
+            var user = await _authRepository.GetByIdAsync(userId)
+                ?? throw new ApplicationException("User not found.");
+
+            return new UserProfileResponse
+            {
+                Email = user.Email,
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber
+            };
         }
 
         public async Task<SignInResult> LoginAsync(string email, string password, bool rememberMe)
@@ -66,6 +80,17 @@ namespace OnlineLearningPlatform.Services.Implements
                 throw new ApplicationException("An error occurred while registering the user.", ex);
 
             }
+        }
+
+        public async Task UpdateProfileAsync(string userId, UpdateUserProfileRequest request)
+        {
+            var user = await _authRepository.GetByIdAsync(userId)
+                ?? throw new ApplicationException("User not found.");
+
+            user.FullName = request.FullName;
+            user.PhoneNumber = request.PhoneNumber;
+
+            await _authRepository.UpdateAsync(user);
         }
     }
 }
