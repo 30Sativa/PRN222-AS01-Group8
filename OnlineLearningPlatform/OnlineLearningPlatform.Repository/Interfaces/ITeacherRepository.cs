@@ -24,5 +24,34 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
 
         // Kiểm tra quyền sở hữu khóa học
         Task<bool> IsTeacherOwnsCourseAsync(Guid courseId, string teacherId);
+
+        // ===== QUẢN LÝ SECTIONS =====
+        // Lấy danh sách sections và lessons của khóa học
+        Task<List<Section>> GetCourseSectionsAsync(Guid courseId, string teacherId);
+
+        // Lấy chi tiết section
+        Task<Section?> GetSectionByIdAsync(int sectionId);
+
+        // Tạo section mới
+        Task<Section> CreateSectionAsync(Section section);
+
+        // Cập nhật section
+        Task<bool> UpdateSectionAsync(Section section);
+
+        // Xóa section
+        Task<bool> DeleteSectionAsync(int sectionId);
+
+        // ===== QUẢN LÝ LESSONS =====
+        // Lấy chi tiết lesson
+        Task<Lesson?> GetLessonByIdAsync(int lessonId);
+
+        // Tạo lesson mới
+        Task<Lesson> CreateLessonAsync(Lesson lesson);
+
+        // Cập nhật lesson
+        Task<bool> UpdateLessonAsync(Lesson lesson);
+
+        // Xóa lesson
+        Task<bool> DeleteLessonAsync(int lessonId);
     }
 }
