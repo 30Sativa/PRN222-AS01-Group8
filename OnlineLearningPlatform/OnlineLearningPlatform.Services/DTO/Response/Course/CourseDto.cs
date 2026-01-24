@@ -1,4 +1,4 @@
-namespace OnlineLearningPlatform.Services.DTO.Response
+namespace OnlineLearningPlatform.Services.DTO.Response.Course
 {
     public class CourseDto
     {

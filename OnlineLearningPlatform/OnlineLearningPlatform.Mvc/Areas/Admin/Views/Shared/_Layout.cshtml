@@ -20,7 +20,7 @@
                     Dashboard
                 </a>
                 <a asp-area="Admin" asp-controller="User" asp-action="Index" class="nav-item">Manage Users</a>
-                <a asp-controller="Course" asp-action="Index" class="nav-item">Manage Courses</a>
+                <a asp-area="Admin" asp-controller="Course" asp-action="Index" class="nav-item">Manage Courses</a>
                 <a asp-controller="RoleTest" asp-action="Index" class="nav-item">Role Management</a>
             </nav>
         </aside>
@@ -32,7 +32,6 @@
             <header class="top-header">
                 <div>
                     <h1>@ViewData["Title"]</h1>
-                    <p class="text-muted">Sales Report</p>
                 </div>
 
                 <div class="header-actions">

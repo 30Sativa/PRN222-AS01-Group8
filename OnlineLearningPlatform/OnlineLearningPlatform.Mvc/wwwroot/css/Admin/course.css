@@ -1,0 +1,125 @@
+﻿/* ===== Course Page Wrapper ===== */
+.course-page {
+    padding: 24px;
+}
+
+/* ===== Card ===== */
+.card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    padding: 20px;
+}
+
+/* ===== Table ===== */
+.course-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+    .course-table thead {
+        background: #f5f7fb;
+    }
+
+    .course-table th {
+        text-align: left;
+        padding: 14px;
+        font-weight: 600;
+        color: #555;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .course-table td {
+        padding: 14px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Hover effect */
+    .course-table tbody tr:hover {
+        background: #fafbff;
+    }
+
+/* ===== Title bold ===== */
+.title {
+    font-weight: 600;
+}
+
+/* ===== Price ===== */
+.price {
+    font-weight: 600;
+    color: #4f46e5;
+}
+
+/* ===== Status badge ===== */
+.status {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Status colors */
+.status-pending {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.status-approved {
+    background: #ecfdf5;
+    color: #16a34a;
+}
+
+.status-rejected {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* ===== Actions ===== */
+.action-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ===== Buttons ===== */
+.btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-success {
+    background: #22c55e;
+    color: white;
+}
+
+    .btn-success:hover {
+        background: #16a34a;
+    }
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+/* Reject input */
+.reject-form input[name="reason"] {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    width: 120px;
+}
+
+/* Center text */
+.text-center {
+    text-align: center;
+}

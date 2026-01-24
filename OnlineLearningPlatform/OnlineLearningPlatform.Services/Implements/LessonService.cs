@@ -1,5 +1,5 @@
 using OnlineLearningPlatform.Repositories.Interfaces;
-using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Response.Course;
 using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Services.Implements
