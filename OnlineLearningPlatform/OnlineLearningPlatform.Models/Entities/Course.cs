@@ -1,4 +1,5 @@
-﻿using OnlineLearningPlatform.Models.Identity;
+﻿using OnlineLearningPlatform.Models.Enums;
+using OnlineLearningPlatform.Models.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,6 +23,8 @@ namespace OnlineLearningPlatform.Models.Entities
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; } = 0;
+        public CourseStatus Status { get; set; } = CourseStatus.Pending;
+        public string? RejectionReason { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

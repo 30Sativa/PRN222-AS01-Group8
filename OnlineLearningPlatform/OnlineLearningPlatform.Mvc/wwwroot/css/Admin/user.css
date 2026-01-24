@@ -69,6 +69,11 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: bolder;
 }
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+    display: inline-block;
+}
 
 .btn-lock {
     background: #ef4444;

@@ -1,4 +1,4 @@
-using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Response.Course;
 
 namespace OnlineLearningPlatform.Mvc.Models
 {
