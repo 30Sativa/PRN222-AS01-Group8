@@ -1,5 +1,9 @@
+using OnlineLearningPlatform.Models.Entities;
+using OnlineLearningPlatform.Models.Enums;
 using OnlineLearningPlatform.Repositories.Interfaces;
+using OnlineLearningPlatform.Services.DTO.Request.Course;
 using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Response.Course;
 using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Services.Implements
@@ -114,6 +118,53 @@ namespace OnlineLearningPlatform.Services.Implements
                 IsEnrolled = isEnrolled,
                 Sections = sectionsDto
             };
+        }
+
+
+        //new methods for admin course management
+        public async Task<List<CourseManagerDto>> GetCoursesAsync(CourseStatus? status, string? keyword)
+        {
+            var courses = await _courseRepository.GetAllAsync();
+
+            if (status != null)
+                courses = courses.Where(x => x.Status == status).ToList();
+
+            if (!string.IsNullOrEmpty(keyword))
+                courses = courses
+                    .Where(x => x.Title.Contains(keyword))
+                    .ToList();
+
+            return courses.Select(x => new CourseManagerDto
+            {
+                CourseId = x.CourseId,
+                Title = x.Title,
+                TeacherName = x.Teacher.UserName,
+                CategoryName = x.Category.CategoryName,
+                Price = x.Price,
+                Status = x.Status,
+                CreatedAt = x.CreatedAt,
+                RejectReason = x.RejectionReason
+            }).ToList();
+        }
+
+        public async Task ApproveAsync(ApproveCourseRequest request)
+        {
+            var course = await _courseRepository.GetByIdAsync(request.CourseId);
+
+            course!.Status = CourseStatus.Published;
+            course.RejectionReason = null;
+
+            await _courseRepository.SaveChangesAsync();
+        }
+
+        public async Task RejectAsync(RejectCourseRequest request)
+        {
+            var course = await _courseRepository.GetByIdAsync(request.CourseId);
+
+            course!.Status = CourseStatus.Rejected;
+            course.RejectionReason = request.Reason;
+
+            await _courseRepository.SaveChangesAsync();
         }
     }
 }

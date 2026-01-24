@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models;
 using OnlineLearningPlatform.Models.Entities;
+using OnlineLearningPlatform.Models.Enums;
 using OnlineLearningPlatform.Repositories.Interfaces;
 
 namespace OnlineLearningPlatform.Repositories.Implements
@@ -44,6 +45,28 @@ namespace OnlineLearningPlatform.Repositories.Implements
         public async Task<bool> CourseExistsAsync(Guid courseId)
         {
             return await _context.Courses.AnyAsync(c => c.CourseId == courseId);
+        }
+
+        // new methods to be implemented
+    
+
+        public Task<Course?> GetByIdAsync(Guid id)
+        {
+            return _context.Courses.FirstOrDefaultAsync(c => c.CourseId == id);
+        }
+
+      
+        public async Task<List<Course>> GetAllAsync()
+        {
+            return await _context.Courses
+                                         .Include(x => x.Teacher)
+                                         .Include(x => x.Category)
+                                         .ToListAsync();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }
