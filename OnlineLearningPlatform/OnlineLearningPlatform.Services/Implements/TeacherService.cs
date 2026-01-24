@@ -2,6 +2,7 @@ using OnlineLearningPlatform.Models.Entities;
 using OnlineLearningPlatform.Repositories.Interfaces;
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Teacher;
 using OnlineLearningPlatform.Services.Interfaces;
 
 namespace OnlineLearningPlatform.Services.Implements
@@ -120,14 +121,14 @@ namespace OnlineLearningPlatform.Services.Implements
         }
 
         // ===== QUẢN LÝ SECTIONS =====
-        public async Task<List<SectionDto>> GetCourseSectionsAsync(Guid courseId, string teacherId)
+        public async Task<List<TeacherSectionDto>> GetCourseSectionsAsync(Guid courseId, string teacherId)
         {
             var sections = await _teacherRepository.GetCourseSectionsAsync(courseId, teacherId);
-            var sectionDtos = new List<SectionDto>();
+            var sectionDtos = new List<TeacherSectionDto>();
 
             foreach (var section in sections)
             {
-                var sectionDto = new SectionDto
+                var sectionDto = new TeacherSectionDto
                 {
                     SectionId = section.SectionId,
                     CourseId = section.CourseId,
@@ -138,7 +139,7 @@ namespace OnlineLearningPlatform.Services.Implements
 
                 if (section.Lessons != null)
                 {
-                    sectionDto.Lessons = section.Lessons.Select(l => new LessonDto
+                    sectionDto.Lessons = section.Lessons.Select(l => new TeacherLessonDto
                     {
                         LessonId = l.LessonId,
                         SectionId = l.SectionId,
@@ -155,13 +156,13 @@ namespace OnlineLearningPlatform.Services.Implements
             return sectionDtos;
         }
 
-        public async Task<SectionDto?> GetSectionByIdAsync(int sectionId)
+        public async Task<TeacherSectionDto?> GetSectionByIdAsync(int sectionId)
         {
             var section = await _teacherRepository.GetSectionByIdAsync(sectionId);
             if (section == null)
                 return null;
 
-            var sectionDto = new SectionDto
+            var sectionDto = new TeacherSectionDto
             {
                 SectionId = section.SectionId,
                 CourseId = section.CourseId,
@@ -172,7 +173,7 @@ namespace OnlineLearningPlatform.Services.Implements
 
             if (section.Lessons != null)
             {
-                sectionDto.Lessons = section.Lessons.Select(l => new LessonDto
+                sectionDto.Lessons = section.Lessons.Select(l => new TeacherLessonDto
                 {
                     LessonId = l.LessonId,
                     SectionId = l.SectionId,
@@ -236,13 +237,13 @@ namespace OnlineLearningPlatform.Services.Implements
         }
 
         // ===== QUẢN LÝ LESSONS =====
-        public async Task<LessonDto?> GetLessonByIdAsync(int lessonId)
+        public async Task<TeacherLessonDto?> GetLessonByIdAsync(int lessonId)
         {
             var lesson = await _teacherRepository.GetLessonByIdAsync(lessonId);
             if (lesson == null)
                 return null;
 
-            return new LessonDto
+            return new TeacherLessonDto
             {
                 LessonId = lesson.LessonId,
                 SectionId = lesson.SectionId,

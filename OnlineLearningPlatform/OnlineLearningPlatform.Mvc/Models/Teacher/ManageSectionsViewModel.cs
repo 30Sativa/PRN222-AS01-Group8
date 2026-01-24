@@ -1,4 +1,4 @@
-using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Teacher;
 using System.ComponentModel.DataAnnotations;
 
 namespace OnlineLearningPlatform.Mvc.Models.Teacher
@@ -7,6 +7,6 @@ namespace OnlineLearningPlatform.Mvc.Models.Teacher
     {
         public Guid CourseId { get; set; }
         public string CourseTitle { get; set; }
-        public List<SectionDto> Sections { get; set; } = new List<SectionDto>();
+        public List<TeacherSectionDto> Sections { get; set; } = new List<TeacherSectionDto>();
     }
 }

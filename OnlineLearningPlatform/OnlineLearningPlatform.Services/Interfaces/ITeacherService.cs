@@ -1,5 +1,6 @@
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Teacher;
 
 namespace OnlineLearningPlatform.Services.Interfaces
 {
@@ -28,10 +29,10 @@ namespace OnlineLearningPlatform.Services.Interfaces
 
         // ===== QUẢN LÝ SECTIONS =====
         // Lấy danh sách sections và lessons của khóa học
-        Task<List<SectionDto>> GetCourseSectionsAsync(Guid courseId, string teacherId);
+        Task<List<TeacherSectionDto>> GetCourseSectionsAsync(Guid courseId, string teacherId);
 
         // Lấy chi tiết section
-        Task<SectionDto?> GetSectionByIdAsync(int sectionId);
+        Task<TeacherSectionDto?> GetSectionByIdAsync(int sectionId);
 
         // Tạo section mới
         Task<int> CreateSectionAsync(Guid courseId, CreateSectionRequest request, string teacherId);
@@ -44,7 +45,7 @@ namespace OnlineLearningPlatform.Services.Interfaces
 
         // ===== QUẢN LÝ LESSONS =====
         // Lấy chi tiết lesson
-        Task<LessonDto?> GetLessonByIdAsync(int lessonId);
+        Task<TeacherLessonDto?> GetLessonByIdAsync(int lessonId);
 
         // Tạo lesson mới
         Task<int> CreateLessonAsync(int sectionId, CreateLessonRequest request, string teacherId);
