@@ -2,6 +2,7 @@ using OnlineLearningPlatform.Models.Entities;
 using OnlineLearningPlatform.Repositories.Interfaces;
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Response.Teacher;
 using OnlineLearningPlatform.Services.DTO.Teacher;
 using OnlineLearningPlatform.Services.Interfaces;
 
@@ -14,13 +15,19 @@ namespace OnlineLearningPlatform.Services.Implements
     {
         private readonly ITeacherRepository _teacherRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IEnrollmentRepository _enrollmentRepository;
+        private readonly ILessonProgressRepository _lessonProgressRepository;
 
         public TeacherService(
             ITeacherRepository teacherRepository,
-            ICategoryRepository categoryRepository)
+            ICategoryRepository categoryRepository,
+            IEnrollmentRepository enrollmentRepository,
+            ILessonProgressRepository lessonProgressRepository)
         {
             _teacherRepository = teacherRepository;
             _categoryRepository = categoryRepository;
+            _enrollmentRepository = enrollmentRepository;
+            _lessonProgressRepository = lessonProgressRepository;
         }
 
         public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId)
@@ -309,6 +316,120 @@ namespace OnlineLearningPlatform.Services.Implements
                 return false;
 
             return await _teacherRepository.DeleteLessonAsync(lessonId);
+        }
+
+        // ===== QUẢN LÝ HỌC VIÊN =====
+        
+        public async Task<List<EnrollmentDto>> GetCourseEnrollmentsAsync(Guid courseId, string teacherId)
+        {
+            // Kiểm tra quyền sở hữu khóa học
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(courseId, teacherId);
+            if (!isOwner)
+                return new List<EnrollmentDto>();
+
+            var enrollments = await _enrollmentRepository.GetCourseEnrollmentsAsync(courseId);
+
+            return enrollments.Select(e => new EnrollmentDto
+            {
+                EnrollmentId = e.EnrollmentId,
+                StudentId = e.UserId,
+                StudentName = e.User?.FullName ?? "Unknown",
+                StudentEmail = e.User?.Email ?? "Unknown",
+                EnrolledAt = e.EnrolledAt
+            }).ToList();
+        }
+
+        public async Task<StudentProgressDto?> GetStudentProgressAsync(Guid courseId, string studentId, string teacherId)
+        {
+            // Kiểm tra quyền sở hữu khóa học
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(courseId, teacherId);
+            if (!isOwner)
+                return null;
+
+            // Lấy enrollment
+            var enrollment = await _enrollmentRepository.GetEnrollmentByStudentAndCourseAsync(studentId, courseId);
+            if (enrollment == null || enrollment.Course == null || enrollment.User == null)
+                return null;
+
+            // Lấy tiến độ bài học
+            var lessonProgresses = await _lessonProgressRepository.GetStudentProgressInCourseAsync(studentId, courseId);
+
+            // Tính tổng số lessons, quizzes, assignments
+            var allLessons = enrollment.Course.Sections?
+                .SelectMany(s => s.Lessons ?? new List<Lesson>())
+                .ToList() ?? new List<Lesson>();
+
+            var totalLessons = allLessons.Count;
+            var totalQuizzes = allLessons.Count(l => l.LessonType?.ToLower() == "quiz");
+            var totalAssignments = allLessons.Count(l => l.LessonType?.ToLower() == "assignment");
+
+            // Đếm số đã hoàn thành
+            var completedLessonIds = lessonProgresses.Where(lp => lp.IsCompleted).Select(lp => lp.LessonId).ToList();
+            var completedLessons = completedLessonIds.Count;
+            var completedQuizzes = allLessons.Count(l => l.LessonType?.ToLower() == "quiz" && completedLessonIds.Contains(l.LessonId));
+            var completedAssignments = allLessons.Count(l => l.LessonType?.ToLower() == "assignment" && completedLessonIds.Contains(l.LessonId));
+
+            // Tạo progress theo từng section
+            var sectionProgressList = new List<SectionProgressDto>();
+
+            if (enrollment.Course.Sections != null)
+            {
+                foreach (var section in enrollment.Course.Sections.OrderBy(s => s.OrderIndex))
+                {
+                    var sectionLessons = section.Lessons?.ToList() ?? new List<Lesson>();
+                    var sectionTotalLessons = sectionLessons.Count;
+                    var sectionCompletedLessons = sectionLessons.Count(l => completedLessonIds.Contains(l.LessonId));
+
+                    var lessonProgressList = sectionLessons
+                        .OrderBy(l => l.OrderIndex)
+                        .Select(lesson =>
+                        {
+                            var lessonProgress = lessonProgresses.FirstOrDefault(lp => lp.LessonId == lesson.LessonId);
+                            return new LessonProgressDto
+                            {
+                                LessonId = lesson.LessonId,
+                                LessonTitle = lesson.Title,
+                                OrderIndex = lesson.OrderIndex ?? 0,
+                                LessonType = lesson.LessonType ?? "text",
+                                IsCompleted = lessonProgress?.IsCompleted ?? false,
+                                CompletedAt = lessonProgress?.CompletedAt,
+                                ProgressPercentage = (lessonProgress?.IsCompleted ?? false) ? 100 : 0
+                            };
+                        }).ToList();
+
+                    sectionProgressList.Add(new SectionProgressDto
+                    {
+                        SectionId = section.SectionId,
+                        SectionTitle = section.Title,
+                        OrderIndex = section.OrderIndex ?? 0,
+                        TotalLessons = sectionTotalLessons,
+                        CompletedLessons = sectionCompletedLessons,
+                        Progress = sectionTotalLessons > 0 ? (decimal)sectionCompletedLessons / sectionTotalLessons * 100 : 0,
+                        LessonProgress = lessonProgressList
+                    });
+                }
+            }
+
+            // Tính phần trăm tổng thể
+            var overallProgress = totalLessons > 0 ? (decimal)completedLessons / totalLessons * 100 : 0;
+
+            return new StudentProgressDto
+            {
+                StudentId = enrollment.UserId,
+                StudentName = enrollment.User.FullName,
+                StudentEmail = enrollment.User.Email ?? "Unknown",
+                CourseId = enrollment.CourseId,
+                CourseTitle = enrollment.Course.Title,
+                EnrolledAt = enrollment.EnrolledAt,
+                OverallProgress = overallProgress,
+                TotalLessons = totalLessons,
+                CompletedLessons = completedLessons,
+                TotalQuizzes = totalQuizzes,
+                CompletedQuizzes = completedQuizzes,
+                TotalAssignments = totalAssignments,
+                CompletedAssignments = completedAssignments,
+                SectionProgress = sectionProgressList
+            };
         }
     }
 }

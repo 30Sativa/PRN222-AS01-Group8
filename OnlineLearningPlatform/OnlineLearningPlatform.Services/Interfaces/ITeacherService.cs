@@ -1,5 +1,6 @@
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
+using OnlineLearningPlatform.Services.DTO.Response.Teacher;
 using OnlineLearningPlatform.Services.DTO.Teacher;
 
 namespace OnlineLearningPlatform.Services.Interfaces
@@ -55,5 +56,16 @@ namespace OnlineLearningPlatform.Services.Interfaces
 
         // Xóa lesson
         Task<bool> DeleteLessonAsync(int lessonId, string teacherId);
+        
+        // ===== QUẢN LÝ HỌC VIÊN =====
+        /// <summary>
+        /// Lấy danh sách học viên đã đăng ký khóa học
+        /// </summary>
+        Task<List<EnrollmentDto>> GetCourseEnrollmentsAsync(Guid courseId, string teacherId);
+        
+        /// <summary>
+        /// Xem chi tiết tiến độ học tập của 1 học viên
+        /// </summary>
+        Task<StudentProgressDto?> GetStudentProgressAsync(Guid courseId, string studentId, string teacherId);
     }
 }

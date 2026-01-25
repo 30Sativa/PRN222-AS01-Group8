@@ -1,0 +1,25 @@
+﻿@model OnlineLearningPlatform.Models.Entities.Quiz
+<div class="container mt-5">
+    <div class="card shadow border-0 p-4">
+        <h2 class="mb-4">@Model.Title</h2>
+        <form asp-action="Submit" method="post">
+            <input type="hidden" name="quizId" value="@Model.QuizId" />
+            @foreach (var q in Model.Questions)
+            {
+                <div class="mb-4 p-3 border rounded bg-light">
+                    <h5>@q.Content</h5><hr />
+                    @foreach (var a in q.QuizAnswers.Where(x => x.AttemptId == null))
+                    {
+                        <div class="form-check my-2">
+                            <input class="form-check-input" type="radio"
+                                   name="q_@q.QuestionId"
+                                   value="@a.UserAnswer" required>
+                            <label class="form-check-label ms-2">@a.UserAnswer</label>
+                        </div>
+                    }
+                </div>
+            }
+            <button type="submit" class="btn btn-primary btn-lg w-100 shadow">NỘP BÀI</button>
+        </form>
+    </div>
+</div>
