@@ -1,27 +1,30 @@
+@model OnlineLearningPlatform.Services.DTO.Response.Admin.DashboardStatisticsDto
 @{
     ViewData["Title"] = "Bảng điều khiển";
+    var maxRevenue = Model.RevenueByMonth.Any() ? Model.RevenueByMonth.Max(x => x.Value) : 1m;
+    if (maxRevenue <= 0) { maxRevenue = 1; }
 }
 
 <!-- Stats Cards -->
 <div class="stats-row">
     <div class="stat-card card-blue">
         <div class="stat-content">
-            <h2>120</h2>
+            <h2>@Model.TotalUsers</h2>
             <p>Tổng người dùng</p>
         </div>
     </div>
 
     <div class="stat-card card-teal">
         <div class="stat-content">
-            <h2>35</h2>
+            <h2>@Model.TotalCourses</h2>
             <p>Tổng khóa học</p>
         </div>
     </div>
 
     <div class="stat-card card-purple">
         <div class="stat-content">
-            <h2>89</h2>
-            <p>Tổng đơn hàng</p>
+            <h2>@Model.TotalEnrollments</h2>
+            <p>Tổng đăng ký khóa học</p>
         </div>
     </div>
 </div>
@@ -29,39 +32,41 @@
 <!-- Content Grid -->
 <div class="content-grid">
     <div class="chart-section">
-        <h3>Tổng quan doanh thu</h3>
-
+        <h3>Tổng quan doanh thu (theo tháng)</h3>
         <div class="chart-placeholder">
-            <div class="bar-chart">
-                <div class="bar" style="height: 45%"></div>
-                <div class="bar" style="height: 68%"></div>
-                <div class="bar" style="height: 58%"></div>
-                <div class="bar" style="height: 82%"></div>
-                <div class="bar" style="height: 72%"></div>
-                <div class="bar" style="height: 95%"></div>
-                <div class="bar" style="height: 65%"></div>
-                <div class="bar" style="height: 78%"></div>
-            </div>
+            @if (Model.RevenueByMonth.Any())
+            {
+                <div class="bar-chart">
+                    @foreach (var item in Model.RevenueByMonth)
+                    {
+                        var pct = maxRevenue > 0 ? (double)(item.Value / maxRevenue) * 100 : 0;
+                        <div class="bar" style="height: @(pct)%" title="@item.Label: @(item.Value.ToString("N0")) VNĐ"></div>
+                    }
+                </div>
+                <div class="chart-labels">
+                    @foreach (var item in Model.RevenueByMonth)
+                    {
+                        <span>@item.Label</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="chart-empty">Chưa có dữ liệu doanh thu.</p>
+            }
         </div>
     </div>
 
     <div class="seller-card">
         <h3>Giảng viên hàng đầu</h3>
-        <p>George Martin - Thiết kế UI/UX</p>
-    </div>
-</div>
-
-<!-- Schedule Section -->
-<div class="schedule-section">
-    <h3>Lịch hàng ngày</h3>
-
-    <div class="schedule-row">
-        <span>Alison Burgers</span>
-        <span>09:00 - 13:00</span>
-    </div>
-
-    <div class="schedule-row">
-        <span>Saabir Mc</span>
-        <span>100% Hoàn thành</span>
+        @if (!string.IsNullOrEmpty(Model.TopTeacherName))
+        {
+            <p class="seller-info"><strong>@Model.TopTeacherName</strong></p>
+            <p class="seller-role">@Model.TopTeacherCourseCount khóa học</p>
+        }
+        else
+        {
+            <p class="chart-empty">Chưa có dữ liệu giảng viên.</p>
+        }
     </div>
 </div>

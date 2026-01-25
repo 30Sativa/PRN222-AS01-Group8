@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OnlineLearningPlatform.Repository\OnlineLearningPlatform.Repositories.csproj" />
     <ProjectReference Include="..\OnlineLearningPlatform.Services\OnlineLearningPlatform.Services.csproj" />
   </ItemGroup>
 

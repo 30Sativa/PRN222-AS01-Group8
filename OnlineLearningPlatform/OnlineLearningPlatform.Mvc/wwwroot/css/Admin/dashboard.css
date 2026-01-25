@@ -1,4 +1,4 @@
-﻿* {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -289,6 +289,13 @@ body {
 /* Bar Chart */
 .chart-placeholder {
     height: 280px;
+}
+
+.chart-empty {
+    color: #95a5a6;
+    font-size: 14px;
+    padding: 24px;
+    text-align: center;
 }
 
 .bar-chart {

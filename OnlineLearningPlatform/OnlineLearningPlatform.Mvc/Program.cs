@@ -45,7 +45,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ITeacherRepository, TeacherRepository>(); // Teacher Repository
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); // Category Repository
             builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>(); // Lesson Progress Repository
-
+            builder.Services.AddScoped<IStatisticsRepository, StatisticsRepository>();
 
             // Đăng ký các dịch vụ tùy chỉnh - Service
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -58,6 +58,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ITeacherService, TeacherService>();
             builder.Services.AddScoped<IQuizService, QuizService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IStatisticsService, StatisticsService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
