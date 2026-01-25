@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineLearningPlatform.Models.Identity;
@@ -40,6 +40,10 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
 
         public async Task<IActionResult> Lock(string id)
         {
+            var user = await _service.GetByIdAsync(id);
+            if (user == null || user.Role == RolesNames.Admin)
+                return NotFound();
+
             await _service.LockAsync(new LockUserRequest { UserId = id });
 
             return RedirectToAction(nameof(Index));
@@ -47,6 +51,10 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
 
         public async Task<IActionResult> Unlock(string id)
         {
+            var user = await _service.GetByIdAsync(id);
+            if (user == null || user.Role == RolesNames.Admin)
+                return NotFound();
+
             await _service.UnlockAsync(new UnlockUserRequest { UserId = id });
 
             return RedirectToAction(nameof(Index));
@@ -57,7 +65,7 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
         {
             var user = await _service.GetByIdAsync(id);
 
-            if (user == null) return NotFound();
+            if (user == null || user.Role == RolesNames.Admin) return NotFound();
 
             var vm = new UserEditViewModel
             {
@@ -75,6 +83,10 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
             if (!ModelState.IsValid)
                 return View(vm);
 
+            var user = await _service.GetByIdAsync(vm.Id);
+            if (user == null || user.Role == RolesNames.Admin)
+                return NotFound();
+
             var request = new UpdateUserRequest
             {
                 UserId = vm.Id,
@@ -91,9 +103,9 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> EditRole(string id)
         {
-            var users = await _service.GetAllAsync();
-
-            var user = users.FirstOrDefault(x => x.Id == id);
+            var user = await _service.GetByIdAsync(id);
+            if (user == null || user.Role == RolesNames.Admin)
+                return NotFound();
 
             var vm = new UpdateUserRoleViewModel
             {
@@ -112,6 +124,10 @@ namespace OnlineLearningPlatform.Mvc.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> EditRole(UpdateUserRoleViewModel model)
         {
+            var user = await _service.GetByIdAsync(model.Id);
+            if (user == null || user.Role == RolesNames.Admin)
+                return NotFound();
+
             var request = new UpdateUserRoleRequest
             {
                 UserId = model.Id,

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models.Identity;
 using OnlineLearningPlatform.Services.DTO.Request.User;
@@ -52,19 +52,27 @@ namespace OnlineLearningPlatform.Services.Implements
 
         public async Task<List<GetUserResponse>> GetAllAsync()
         {
-            var users = _userManager.Users.ToList();
+            var users = await _userManager.Users.ToListAsync();
             var result = new List<GetUserResponse>();
 
             foreach (var u in users)
             {
                 var roles = await _userManager.GetRolesAsync(u);
 
+                // Hide admin accounts from user management listing
+                if (roles.Contains(RolesNames.Admin))
+                {
+                    continue;
+                }
+
+                var primaryRole = roles.FirstOrDefault();
+
                 result.Add(new GetUserResponse
                 {
                     Id = u.Id,
                     FullName = u.FullName,
                     Email = u.Email,
-                    Role = roles.FirstOrDefault(),
+                    Role = primaryRole,
                     EmailConfirmed = u.EmailConfirmed,
                     IsLocked = u.LockoutEnd > DateTimeOffset.Now
                 });
@@ -81,13 +89,14 @@ namespace OnlineLearningPlatform.Services.Implements
                 return null;
 
             var roles = await _userManager.GetRolesAsync(user);
+            var primaryRole = roles.Contains(RolesNames.Admin) ? RolesNames.Admin : roles.FirstOrDefault();
 
             return new GetUserResponse
             {
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                Role = roles.FirstOrDefault(),
+                Role = primaryRole,
                 EmailConfirmed = user.EmailConfirmed,
                 IsLocked = user.LockoutEnd > DateTimeOffset.Now
             };
@@ -102,6 +111,13 @@ namespace OnlineLearningPlatform.Services.Implements
         {
             var user = await _userManager.FindByIdAsync(request.UserId);
 
+            if (user == null)
+                return;
+
+            // Prevent locking admin accounts
+            if (await _userManager.IsInRoleAsync(user, RolesNames.Admin))
+                return;
+
             user.LockoutEnd = DateTimeOffset.MaxValue;
 
             await _userManager.UpdateAsync(user);
@@ -110,6 +126,13 @@ namespace OnlineLearningPlatform.Services.Implements
         public async Task UnlockAsync(UnlockUserRequest request)
         {
             var user = await _userManager.FindByIdAsync(request.UserId);
+
+            if (user == null)
+                return;
+
+            // Prevent unlocking admin accounts (no-op for safety)
+            if (await _userManager.IsInRoleAsync(user, RolesNames.Admin))
+                return;
 
             user.LockoutEnd = null;
 
@@ -123,6 +146,10 @@ namespace OnlineLearningPlatform.Services.Implements
             if (user == null)
                 throw new Exception("User not found");
 
+            // Prevent editing admin accounts from management features
+            if (await _userManager.IsInRoleAsync(user, RolesNames.Admin))
+                return;
+
             user.FullName = request.FullName;
             user.Email = request.Email;
             user.UserName = request.Email;
@@ -134,6 +161,13 @@ namespace OnlineLearningPlatform.Services.Implements
         public async Task UpdateRoleAsync(UpdateUserRoleRequest request)
         {
             var user = await _userManager.FindByIdAsync(request.UserId);
+
+            if (user == null)
+                return;
+
+            // Prevent changing role of admin accounts
+            if (await _userManager.IsInRoleAsync(user, RolesNames.Admin))
+                return;
 
             var roles = await _userManager.GetRolesAsync(user);
 
