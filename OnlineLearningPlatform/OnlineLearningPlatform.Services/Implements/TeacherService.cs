@@ -90,6 +90,43 @@ namespace OnlineLearningPlatform.Services.Implements
             }).ToList();
         }
 
+        // ===== QUẢN LÝ DANH MỤC KHÓA HỌC =====
+        public async Task<List<CategoryDto>> GetCategoriesForManagementAsync()
+        {
+            return await GetCategoriesAsync();
+        }
+
+        public async Task<int> CreateCategoryAsync(string categoryName)
+        {
+            var category = new Category
+            {
+                CategoryName = categoryName.Trim()
+            };
+            var created = await _categoryRepository.CreateAsync(category);
+            return created.CategoryId;
+        }
+
+        public async Task<bool> UpdateCategoryAsync(int categoryId, string categoryName)
+        {
+            var category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+            if (category == null)
+                return false;
+            category.CategoryName = categoryName.Trim();
+            return await _categoryRepository.UpdateAsync(category);
+        }
+
+        public async Task<(bool Success, string Message)> DeleteCategoryAsync(int categoryId)
+        {
+            var category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+            if (category == null)
+                return (false, "Không tìm thấy danh mục.");
+            var courseCount = await _categoryRepository.GetCourseCountByCategoryIdAsync(categoryId);
+            if (courseCount > 0)
+                return (false, $"Không thể xóa danh mục \"{category.CategoryName}\" vì đang có {courseCount} khóa học sử dụng.");
+            var ok = await _categoryRepository.DeleteAsync(categoryId);
+            return ok ? (true, "Xóa danh mục thành công.") : (false, "Không thể xóa danh mục.");
+        }
+
         public async Task<Guid> CreateCourseAsync(CreateCourseRequest request, string teacherId)
         {
             var course = new Course

@@ -34,6 +34,81 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             return View(courses);
         }
 
+        // ===== QUẢN LÝ DANH MỤC KHÓA HỌC =====
+
+        // GET: Teacher/Categories - Danh sách danh mục khóa học
+        public async Task<IActionResult> Categories()
+        {
+            var list = await _teacherService.GetCategoriesForManagementAsync();
+            return View(list);
+        }
+
+        // GET: Teacher/CreateCategory
+        public IActionResult CreateCategory()
+        {
+            return View(new CreateCategoryViewModel());
+        }
+
+        // POST: Teacher/CreateCategory
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCategory(CreateCategoryViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+            var id = await _teacherService.CreateCategoryAsync(model.CategoryName);
+            TempData["SuccessMessage"] = "Tạo danh mục thành công!";
+            return RedirectToAction(nameof(Categories));
+        }
+
+        // GET: Teacher/EditCategory/{id}
+        public async Task<IActionResult> EditCategory(int id)
+        {
+            var categories = await _teacherService.GetCategoriesForManagementAsync();
+            var cat = categories.FirstOrDefault(c => c.CategoryId == id);
+            if (cat == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy danh mục.";
+                return RedirectToAction(nameof(Categories));
+            }
+            var viewModel = new EditCategoryViewModel
+            {
+                CategoryId = cat.CategoryId,
+                CategoryName = cat.CategoryName
+            };
+            return View(viewModel);
+        }
+
+        // POST: Teacher/EditCategory/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditCategory(int id, EditCategoryViewModel model)
+        {
+            if (id != model.CategoryId)
+                return NotFound();
+            if (!ModelState.IsValid)
+                return View(model);
+            var ok = await _teacherService.UpdateCategoryAsync(model.CategoryId, model.CategoryName);
+            if (ok)
+                TempData["SuccessMessage"] = "Cập nhật danh mục thành công!";
+            else
+                TempData["ErrorMessage"] = "Không thể cập nhật danh mục.";
+            return RedirectToAction(nameof(Categories));
+        }
+
+        // POST: Teacher/DeleteCategory/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var (success, message) = await _teacherService.DeleteCategoryAsync(id);
+            if (success)
+                TempData["SuccessMessage"] = message;
+            else
+                TempData["ErrorMessage"] = message;
+            return RedirectToAction(nameof(Categories));
+        }
+
         // GET: Teacher/Create - Hiển thị form tạo khóa học
         public async Task<IActionResult> Create()
         {

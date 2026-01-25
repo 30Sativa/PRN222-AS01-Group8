@@ -1,0 +1,34 @@
+@model OnlineLearningPlatform.Mvc.Models.Teacher.EditCategoryViewModel
+@{
+    ViewData["Title"] = "Sửa danh mục";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Chỉnh sửa danh mục</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditCategory" asp-route-id="@Model.CategoryId" method="post">
+                        <input type="hidden" asp-for="CategoryId" />
+                        <div class="mb-3">
+                            <label asp-for="CategoryName" class="form-label"></label>
+                            <input asp-for="CategoryName" class="form-control" placeholder="Tên danh mục" />
+                            <span asp-validation-for="CategoryName" class="text-danger"></span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Categories" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i>Quay lại</a>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check2 me-1"></i>Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

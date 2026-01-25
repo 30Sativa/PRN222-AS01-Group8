@@ -19,6 +19,16 @@ namespace OnlineLearningPlatform.Services.Interfaces
         // Lấy danh sách categories
         Task<List<CategoryDto>> GetCategoriesAsync();
 
+        // ===== QUẢN LÝ DANH MỤC KHÓA HỌC =====
+        /// <summary>Lấy danh sách danh mục (dùng cho trang quản lý danh mục).</summary>
+        Task<List<CategoryDto>> GetCategoriesForManagementAsync();
+        /// <summary>Tạo danh mục mới. Trả về CategoryId nếu thành công.</summary>
+        Task<int> CreateCategoryAsync(string categoryName);
+        /// <summary>Cập nhật danh mục. Trả về true nếu thành công.</summary>
+        Task<bool> UpdateCategoryAsync(int categoryId, string categoryName);
+        /// <summary>Xóa danh mục. Trả về (success, message).</summary>
+        Task<(bool Success, string Message)> DeleteCategoryAsync(int categoryId);
+
         // Tạo khóa học mới
         Task<Guid> CreateCourseAsync(CreateCourseRequest request, string teacherId);
 
