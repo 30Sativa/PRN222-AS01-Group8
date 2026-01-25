@@ -250,6 +250,147 @@ else
             }
         </div>
 
+        <!-- Reviews Section -->
+        <div class="course-reviews-section">
+            <div class="reviews-header-section">
+                <h2>Đánh giá khóa học</h2>
+                <a asp-action="CourseReviews" asp-route-courseId="@Model.Course.CourseId" class="btn-view-all-reviews">
+                    Xem tất cả đánh giá
+                </a>
+            </div>
+
+            @{
+                var reviewSummary = ViewBag.ReviewSummary as OnlineLearningPlatform.Services.DTO.Response.Review.CourseReviewSummaryDto;
+                var topReviews = ViewBag.TopReviews as List<OnlineLearningPlatform.Services.DTO.Response.Review.ReviewDto>;
+                var canReview = ViewBag.CanReview as bool? ?? false;
+            }
+
+            @if (reviewSummary != null)
+            {
+                <!-- Review Summary -->
+                <div class="review-summary-card">
+                    <div class="summary-left">
+                        <div class="average-rating-display">
+                            <span class="rating-number">@reviewSummary.AverageRating.ToString("0.0")</span>
+                            <div class="stars-display">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star @(i <= Math.Round(reviewSummary.AverageRating) ? "filled" : "")">★</span>
+                                }
+                            </div>
+                            <p class="total-reviews-text">@reviewSummary.TotalReviews đánh giá</p>
+                        </div>
+                    </div>
+                    <div class="summary-right">
+                        <div class="rating-breakdown">
+                            @for (int i = 5; i >= 1; i--)
+                            {
+                                var count = i == 5 ? reviewSummary.Rating5Count : 
+                                           i == 4 ? reviewSummary.Rating4Count : 
+                                           i == 3 ? reviewSummary.Rating3Count : 
+                                           i == 2 ? reviewSummary.Rating2Count : reviewSummary.Rating1Count;
+                                var percentage = reviewSummary.TotalReviews > 0 ? (count * 100.0 / reviewSummary.TotalReviews) : 0;
+                                <div class="rating-row">
+                                    <span class="rating-label">@i sao</span>
+                                    <div class="rating-bar-container">
+                                        <div class="rating-bar-bg">
+                                            <div class="rating-bar-progress" style="width: @percentage%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="rating-count-text">@count</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Review (if exists) -->
+                @if (reviewSummary.UserReview != null)
+                {
+                    <div class="user-review-card">
+                        <div class="user-review-header">
+                            <h3>Đánh giá của bạn</h3>
+                            <a asp-action="ReviewCourse" asp-route-courseId="@Model.Course.CourseId" class="btn-edit-review">Chỉnh sửa</a>
+                        </div>
+                        <div class="user-review-content">
+                            <div class="user-review-rating">
+                                @if (reviewSummary.UserReview.Rating.HasValue)
+                                {
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="star @(i <= reviewSummary.UserReview.Rating.Value ? "filled" : "")">★</span>
+                                    }
+                                }
+                            </div>
+                            <p class="user-review-comment">@reviewSummary.UserReview.Comment</p>
+                            <span class="user-review-date">@reviewSummary.UserReview.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                }
+                else if (canReview)
+                {
+                    <!-- Button to create review -->
+                    <div class="create-review-prompt">
+                        <p>Bạn đã đăng ký khóa học này. Hãy chia sẻ đánh giá của bạn!</p>
+                        <a asp-action="ReviewCourse" asp-route-courseId="@Model.Course.CourseId" class="btn-create-review">
+                            Viết đánh giá
+                        </a>
+                    </div>
+                }
+
+                <!-- Top Reviews List -->
+                @if (topReviews != null && topReviews.Any())
+                {
+                    <div class="reviews-list-preview">
+                        <h3>Đánh giá gần đây</h3>
+                        @foreach (var review in topReviews)
+                        {
+                            <div class="review-item-preview">
+                                <div class="review-item-header">
+                                    <div class="reviewer-name">@review.UserName</div>
+                                    <div class="review-item-rating">
+                                        @if (review.Rating.HasValue)
+                                        {
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <span class="star @(i <= review.Rating.Value ? "filled" : "")">★</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <p class="review-item-comment">@review.Comment</p>
+                                <span class="review-item-date">@review.CreatedAt.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (reviewSummary.TotalReviews == 0)
+                {
+                    <div class="no-reviews-message">
+                        <p>Chưa có đánh giá nào cho khóa học này.</p>
+                        @if (canReview)
+                        {
+                            <a asp-action="ReviewCourse" asp-route-courseId="@Model.Course.CourseId" class="btn-create-review">
+                                Viết đánh giá đầu tiên
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-reviews-message">
+                    <p>Chưa có đánh giá nào cho khóa học này.</p>
+                    @if (canReview)
+                    {
+                        <a asp-action="ReviewCourse" asp-route-courseId="@Model.Course.CourseId" class="btn-create-review">
+                            Viết đánh giá đầu tiên
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+
         <div class="course-actions">
             @if (TempData["SuccessMessage"] != null)
             {

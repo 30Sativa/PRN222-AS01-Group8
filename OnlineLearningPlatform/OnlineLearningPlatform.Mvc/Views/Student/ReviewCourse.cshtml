@@ -1,0 +1,153 @@
+@model OnlineLearningPlatform.Services.DTO.Request.Review.CreateReviewRequest
+@{
+    ViewData["Title"] = "Đánh giá khóa học";
+    var course = ViewBag.Course as OnlineLearningPlatform.Services.DTO.Response.Course.CourseDetailDto;
+    var existingReview = ViewBag.ExistingReview as OnlineLearningPlatform.Services.DTO.Response.Review.ReviewDto;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/review.css" />
+}
+
+<div class="review-container">
+    <div class="review-header">
+        <h2>Đánh giá khóa học</h2>
+        @if (course != null)
+        {
+            <div class="course-info">
+                <h3>@course.Title</h3>
+                <p class="course-description">@course.Description</p>
+            </div>
+        }
+    </div>
+
+    @if (existingReview != null)
+    {
+        <div class="alert alert-info">
+            <strong>Lưu ý:</strong> Bạn đã đánh giá khóa học này rồi. Bạn có thể cập nhật đánh giá của mình.
+        </div>
+    }
+
+    <form asp-action="@(existingReview != null ? "UpdateReview" : "CreateReview")" method="post" class="review-form">
+        @Html.AntiForgeryToken()
+        
+        @if (existingReview != null)
+        {
+            <input type="hidden" name="ReviewId" value="@existingReview.ReviewId" />
+        }
+        
+        @if (Model != null)
+        {
+            <input type="hidden" asp-for="CourseId" />
+        }
+        else
+        {
+            <input type="hidden" name="CourseId" value="@(course?.CourseId ?? Guid.Empty)" />
+        }
+
+        <div class="form-group">
+            <label class="form-label">Đánh giá sao *</label>
+            <div class="rating-input">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <label for="rating_@i" class="star-label" data-rating="@i">
+                        <input type="radio" asp-for="Rating" value="@i" id="rating_@i" name="Rating" required />
+                        <span class="star">★</span>
+                    </label>
+                }
+            </div>
+            <span asp-validation-for="Rating" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Comment" class="form-label">Bình luận *</label>
+            <textarea asp-for="Comment" class="form-control" rows="6" placeholder="Chia sẻ trải nghiệm của bạn về khóa học này...">@(Model?.Comment ?? "")</textarea>
+            <span asp-validation-for="Comment" class="text-danger"></span>
+            <small class="form-text text-muted">Tối thiểu 10 ký tự, tối đa 1000 ký tự</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                @(existingReview != null ? "Cập nhật đánh giá" : "Gửi đánh giá")
+            </button>
+            <a asp-action="CourseDetails" asp-route-id="@(Model?.CourseId ?? (course?.CourseId ?? Guid.Empty))" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ratingInputs = document.querySelectorAll('input[type="radio"][name="Rating"]');
+            const starLabels = document.querySelectorAll('.star-label');
+
+            function updateStars(rating) {
+                console.log('Updating stars to rating:', rating);
+                starLabels.forEach((label, index) => {
+                    const starValue = index + 1; // index 0 = 1 star, index 1 = 2 stars, etc.
+                    const starSpan = label.querySelector('.star');
+                    if (starValue <= rating) {
+                        label.classList.add('selected');
+                        label.style.color = '#ffc107';
+                        if (starSpan) {
+                            starSpan.style.color = '#ffc107';
+                        }
+                    } else {
+                        label.classList.remove('selected');
+                        label.style.color = '#ddd';
+                        if (starSpan) {
+                            starSpan.style.color = '#ddd';
+                        }
+                    }
+                });
+            }
+
+            // Handle radio button change
+            ratingInputs.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const selectedRating = parseInt(this.value);
+                    console.log('Radio changed to:', selectedRating);
+                    updateStars(selectedRating);
+                });
+                
+                // Also listen for click on radio
+                radio.addEventListener('click', function() {
+                    const selectedRating = parseInt(this.value);
+                    console.log('Radio clicked:', selectedRating);
+                    setTimeout(() => {
+                        updateStars(selectedRating);
+                    }, 10);
+                });
+            });
+
+            // Handle label click
+            starLabels.forEach(label => {
+                label.addEventListener('click', function(e) {
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        console.log('Label clicked, rating:', radio.value);
+                        // Let the default behavior check the radio
+                        setTimeout(() => {
+                            const rating = parseInt(radio.value);
+                            updateStars(rating);
+                        }, 50);
+                    }
+                });
+            });
+
+            // Set initial rating if editing
+            @if (existingReview != null && existingReview.Rating.HasValue)
+            {
+                <text>
+                const initialRating = @existingReview.Rating.Value;
+                const initialRadio = document.getElementById('rating_' + initialRating);
+                if (initialRadio) {
+                    initialRadio.checked = true;
+                    updateStars(initialRating);
+                }
+                </text>
+            }
+        });
+    </script>
+}

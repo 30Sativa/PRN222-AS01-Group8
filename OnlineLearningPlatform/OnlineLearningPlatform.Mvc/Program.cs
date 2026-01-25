@@ -47,6 +47,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>(); // Lesson Progress Repository
             builder.Services.AddScoped<IStatisticsRepository, StatisticsRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>(); // Payment Repository
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>(); // Review Repository
 
             // Đăng ký các dịch vụ tùy chỉnh - Service
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -61,6 +62,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IStatisticsService, StatisticsService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>(); // Payment Service
+            builder.Services.AddScoped<IReviewService, ReviewService>(); // Review Service
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
