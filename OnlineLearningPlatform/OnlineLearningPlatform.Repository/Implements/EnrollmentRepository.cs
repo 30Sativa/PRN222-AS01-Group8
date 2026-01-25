@@ -38,5 +38,24 @@ namespace OnlineLearningPlatform.Repositories.Implements
             await _context.SaveChangesAsync();
             return enrollment;
         }
+
+        public async Task<List<Enrollment>> GetCourseEnrollmentsAsync(Guid courseId)
+        {
+            return await _context.Enrollments
+                .Include(e => e.User)
+                .Where(e => e.CourseId == courseId)
+                .OrderByDescending(e => e.EnrolledAt)
+                .ToListAsync();
+        }
+
+        public async Task<Enrollment?> GetEnrollmentByStudentAndCourseAsync(string studentId, Guid courseId)
+        {
+            return await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Sections)
+                        .ThenInclude(s => s.Lessons)
+                .FirstOrDefaultAsync(e => e.UserId == studentId && e.CourseId == courseId);
+        }
     }
 }
