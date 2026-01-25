@@ -1,0 +1,65 @@
+@model OnlineLearningPlatform.Services.DTO.Response.TeacherCourseDto
+@using OnlineLearningPlatform.Models.Enums
+@{
+    var isPending = Model.Status == CourseStatus.Pending;
+}
+<div class="card h-100 @(isPending ? "border-warning" : "")">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <p class="card-text">
+            @(Model.Description != null && Model.Description.Length > 100 ? Model.Description.Substring(0, 100) + "..." : Model.Description ?? "")
+        </p>
+        <div class="mb-2">
+            @if (Model.Status == CourseStatus.Pending)
+            {
+                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
+            }
+            else if (Model.Status == CourseStatus.Rejected)
+            {
+                <span class="badge bg-danger">Bị từ chối</span>
+            }
+            else
+            {
+                <span class="badge bg-success">Đã xuất bản</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.CategoryName))
+            {
+                <span class="badge bg-secondary">@Model.CategoryName</span>
+            }
+            @if (Model.Price == 0)
+            {
+                <span class="badge bg-success">Miễn phí</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">@Model.Price.ToString("N0") VNĐ</span>
+            }
+        </div>
+        <div class="course-stats mb-3">
+            <div class="d-flex justify-content-between text-muted small">
+                <span><i class="bi bi-people"></i> @Model.TotalEnrollments học viên</span>
+                <span><i class="bi bi-book"></i> @Model.TotalSections chương</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mt-1">
+                <span><i class="bi bi-file-earmark-text"></i> @Model.TotalLessons bài học</span>
+                <span><i class="bi bi-calendar"></i> @Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+    </div>
+    @if (Model.Status != CourseStatus.Pending)
+    {
+        <div class="card-footer bg-transparent">
+            <div class="btn-group w-100" role="group">
+                <a asp-action="Edit" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Sửa
+                </a>
+                <a asp-action="ManageSections" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-list-ul"></i> Nội dung
+                </a>
+                <a asp-action="ViewEnrollments" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-people"></i> Học viên
+                </a>
+            </div>
+        </div>
+    }
+</div>

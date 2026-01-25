@@ -33,30 +33,32 @@ namespace OnlineLearningPlatform.Services.Implements
 
         public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId)
         {
-            var courses = await _teacherRepository.GetCoursesByTeacherIdAsync(teacherId);
-            
-            // Chỉ lấy courses đã được Published (đã approve)
-            courses = courses.Where(c => c.Status == CourseStatus.Published).ToList();
-            
-            var teacherCoursesDto = new List<TeacherCourseDto>();
+            var courses = await _teacherRepository.GetCoursesByTeacherIdAndStatusAsync(teacherId, CourseStatus.Published);
+            return MapCoursesToDtos(courses);
+        }
 
-            foreach (var course in courses)
+        public async Task<List<TeacherCourseDto>> GetTeacherPendingCoursesAsync(string teacherId)
+        {
+            var courses = await _teacherRepository.GetCoursesByTeacherIdAndStatusAsync(teacherId, CourseStatus.Pending);
+            return MapCoursesToDtos(courses);
+        }
+
+        private static List<TeacherCourseDto> MapCoursesToDtos(List<Course> courses)
+        {
+            return courses.Select(course => new TeacherCourseDto
             {
-                teacherCoursesDto.Add(new TeacherCourseDto
-                {
-                    CourseId = course.CourseId,
-                    Title = course.Title,
-                    Description = course.Description ?? string.Empty,
-                    CategoryName = course.Category?.CategoryName,
-                    Price = course.Price,
-                    CreatedAt = course.CreatedAt,
-                    TotalEnrollments = course.Enrollments?.Count ?? 0,
-                    TotalSections = course.Sections?.Count ?? 0,
-                    TotalLessons = course.Sections?.Sum(s => s.Lessons?.Count ?? 0) ?? 0
-                });
-            }
-
-            return teacherCoursesDto;
+                CourseId = course.CourseId,
+                Title = course.Title,
+                Description = course.Description ?? string.Empty,
+                CategoryName = course.Category?.CategoryName,
+                Price = course.Price,
+                CreatedAt = course.CreatedAt,
+                Status = course.Status,
+                RejectionReason = course.RejectionReason,
+                TotalEnrollments = course.Enrollments?.Count ?? 0,
+                TotalSections = course.Sections?.Count ?? 0,
+                TotalLessons = course.Sections?.Sum(s => s.Lessons?.Count ?? 0) ?? 0
+            }).ToList();
         }
 
         public async Task<TeacherCourseDto?> GetTeacherCourseByIdAsync(Guid courseId, string teacherId)
@@ -74,6 +76,8 @@ namespace OnlineLearningPlatform.Services.Implements
                 CategoryName = course.Category?.CategoryName,
                 Price = course.Price,
                 CreatedAt = course.CreatedAt,
+                Status = course.Status,
+                RejectionReason = course.RejectionReason,
                 TotalEnrollments = course.Enrollments?.Count ?? 0,
                 TotalSections = course.Sections?.Count ?? 0,
                 TotalLessons = course.Sections?.Sum(s => s.Lessons?.Count ?? 0) ?? 0

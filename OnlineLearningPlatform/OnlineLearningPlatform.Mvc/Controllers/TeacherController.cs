@@ -19,7 +19,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             _teacherService = teacherService;
         }
 
-        // GET: Teacher/Index - Quản lý danh sách khóa học của giảng viên
+        // GET: Teacher/Index - Quản lý danh sách khóa học của giảng viên (gồm khóa chờ duyệt + đã xuất bản)
         public async Task<IActionResult> Index()
         {
             var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -29,9 +29,16 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return Unauthorized();
             }
 
-            var courses = await _teacherService.GetTeacherCoursesAsync(teacherId);
+            var pending = await _teacherService.GetTeacherPendingCoursesAsync(teacherId);
+            var published = await _teacherService.GetTeacherCoursesAsync(teacherId);
 
-            return View(courses);
+            var viewModel = new TeacherIndexViewModel
+            {
+                PendingCourses = pending,
+                PublishedCourses = published
+            };
+
+            return View(viewModel);
         }
 
         // ===== QUẢN LÝ DANH MỤC KHÓA HỌC =====

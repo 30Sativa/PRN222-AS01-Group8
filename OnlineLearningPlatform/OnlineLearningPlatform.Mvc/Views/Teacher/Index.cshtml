@@ -1,6 +1,10 @@
-@model List<OnlineLearningPlatform.Services.DTO.Response.TeacherCourseDto>
+@model OnlineLearningPlatform.Mvc.Models.Teacher.TeacherIndexViewModel
+@using OnlineLearningPlatform.Models.Enums
 @{
     ViewData["Title"] = "Quản lý khóa học";
+    var hasPending = Model.PendingCourses != null && Model.PendingCourses.Any();
+    var hasPublished = Model.PublishedCourses != null && Model.PublishedCourses.Any();
+    var hasAny = hasPending || hasPublished;
 }
 
 @section Styles {
@@ -31,7 +35,7 @@
         </div>
     }
 
-    @if (Model == null || !Model.Any())
+    @if (!hasAny)
     {
         <div class="alert alert-info">
             <h4 class="alert-heading">Chưa có khóa học nào</h4>
@@ -40,67 +44,55 @@
     }
     else
     {
-        <div class="row">
-            @foreach (var course in Model)
-            {
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">@course.Title</h5>
-                            <p class="card-text">
-                                @(course.Description != null && course.Description.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description ?? "")
-                            </p>
-                            
-                            <div class="mb-2">
-                                @if (!string.IsNullOrEmpty(course.CategoryName))
-                                {
-                                    <span class="badge bg-secondary">@course.CategoryName</span>
-                                }
-                                @if (course.Price == 0)
-                                {
-                                    <span class="badge bg-success">Miễn phí</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">@course.Price.ToString("N0") VNĐ</span>
-                                }
-                            </div>
-
-                            <div class="course-stats mb-3">
-                                <div class="d-flex justify-content-between text-muted small">
-                                    <span><i class="bi bi-people"></i> @course.TotalEnrollments học viên</span>
-                                    <span><i class="bi bi-book"></i> @course.TotalSections chương</span>
-                                </div>
-                                <div class="d-flex justify-content-between text-muted small mt-1">
-                                    <span><i class="bi bi-file-earmark-text"></i> @course.TotalLessons bài học</span>
-                                    <span><i class="bi bi-calendar"></i> @course.CreatedAt.ToString("dd/MM/yyyy")</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card-footer bg-transparent">
-                            <div class="btn-group w-100" role="group">
-                                <a asp-action="Edit" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i> Sửa
-                                </a>
-                                <a asp-action="ManageSections" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-info">
-                                    <i class="bi bi-list-ul"></i> Nội dung
-                                </a>
-                                <a asp-action="ViewEnrollments" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-success">
-                                    <i class="bi bi-people"></i> Học viên
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+        @* Khóa đang chờ duyệt *@
+        @if (hasPending)
+        {
+            <div class="mb-5 pb-4 border-bottom">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="text-warning mb-0">
+                        <i class="bi bi-hourglass-split"></i> Khóa đang chờ duyệt
+                    </h4>
+                    <span class="badge bg-warning text-dark">@Model.PendingCourses.Count khóa</span>
                 </div>
-            }
-        </div>
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-info-circle"></i> Các khóa học dưới đây đang chờ quản trị viên phê duyệt. Sau khi được duyệt, bạn sẽ có thể quản lý và xem học viên.
+                </p>
+                <div class="row">
+                    @foreach (var course in Model.PendingCourses)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            @await Html.PartialAsync("_CourseCard", course)
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @* Khóa đã xuất bản *@
+        @if (hasPublished)
+        {
+            <div class="mt-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="text-success mb-0">
+                        <i class="bi bi-check-circle"></i> Khóa đã xuất bản
+                    </h4>
+                    <span class="badge bg-success">@Model.PublishedCourses.Count khóa</span>
+                </div>
+                <div class="row">
+                    @foreach (var course in Model.PublishedCourses)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            @await Html.PartialAsync("_CourseCard", course)
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     }
 </div>
 
 @section Scripts {
     <script>
-        // Auto hide alerts after 5 seconds
         setTimeout(function() {
             $('.alert').fadeOut('slow');
         }, 5000);

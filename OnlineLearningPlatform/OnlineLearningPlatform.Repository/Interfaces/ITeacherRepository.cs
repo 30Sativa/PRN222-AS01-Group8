@@ -1,4 +1,5 @@
 using OnlineLearningPlatform.Models.Entities;
+using OnlineLearningPlatform.Models.Enums;
 
 namespace OnlineLearningPlatform.Repositories.Interfaces
 {
@@ -9,6 +10,9 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
     {
         // Lấy danh sách khóa học của teacher
         Task<List<Course>> GetCoursesByTeacherIdAsync(string teacherId);
+
+        // Lấy danh sách khóa học của teacher theo trạng thái (null = tất cả)
+        Task<List<Course>> GetCoursesByTeacherIdAndStatusAsync(string teacherId, CourseStatus? status = null);
 
         // Lấy chi tiết khóa học với thống kê
         Task<Course?> GetCourseWithStatisticsAsync(Guid courseId, string teacherId);
