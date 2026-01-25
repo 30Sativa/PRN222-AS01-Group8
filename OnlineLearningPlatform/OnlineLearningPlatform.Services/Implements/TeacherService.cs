@@ -44,6 +44,12 @@ namespace OnlineLearningPlatform.Services.Implements
             return MapCoursesToDtos(courses);
         }
 
+        public async Task<List<TeacherCourseDto>> GetTeacherRejectedCoursesAsync(string teacherId)
+        {
+            var courses = await _teacherRepository.GetCoursesByTeacherIdAndStatusAsync(teacherId, CourseStatus.Rejected);
+            return MapCoursesToDtos(courses);
+        }
+
         private static List<TeacherCourseDto> MapCoursesToDtos(List<Course> courses)
         {
             return courses.Select(course => new TeacherCourseDto
