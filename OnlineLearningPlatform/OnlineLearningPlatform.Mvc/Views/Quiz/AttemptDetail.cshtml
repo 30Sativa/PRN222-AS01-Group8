@@ -1,0 +1,27 @@
+﻿@model OnlineLearningPlatform.Models.Entities.QuizAttempt
+@{
+    var userAnswers = (List<OnlineLearningPlatform.Models.Entities.QuizAnswer>)ViewBag.UserAnswers;
+}
+
+<div class="container mt-4">
+    <div class="card border-0 shadow">
+        <div class="card-body p-4">
+            <h3>Xem lại bài làm: @Model.Quiz.Title</h3>
+            <p class="text-muted">Điểm số: <strong>@Model.Score</strong> | Ngày làm: @Model.AttemptedAt</p>
+            <hr />
+
+            @foreach (var q in Model.Quiz.Questions)
+            {
+                var userAns = userAnswers.FirstOrDefault(x => x.QuestionId == q.QuestionId)?.UserAnswer;
+                bool isCorrect = userAns?.Trim().ToLower() == q.CorrectAnswer.Trim().ToLower();
+
+                <div class="mb-4 p-3 border rounded @(isCorrect ? "border-success bg-light" : "border-danger")">
+                    <h5 class="fw-bold">@q.Content</h5>
+                    <p class="mb-1">Câu trả lời của bạn: <span class="fw-bold @(isCorrect ? "text-success" : "text-danger")">@userAns</span></p>
+                    <p class="mb-0 text-muted">Đáp án đúng: <span class="text-success fw-bold">@q.CorrectAnswer</span></p>
+                </div>
+            }
+            <a asp-action="History" class="btn btn-secondary px-4 mt-3">Quay lại danh sách</a>
+        </div>
+    </div>
+</div>

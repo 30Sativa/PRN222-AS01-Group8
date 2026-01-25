@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OnlineLearningPlatform.Models.Migrations
 {
     /// <inheritdoc />
-    public partial class OLPDatabaseVer1 : Migration
+    public partial class ak : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
