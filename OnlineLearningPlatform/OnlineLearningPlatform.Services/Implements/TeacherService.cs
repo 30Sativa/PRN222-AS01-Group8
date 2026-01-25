@@ -1,4 +1,5 @@
 using OnlineLearningPlatform.Models.Entities;
+using OnlineLearningPlatform.Models.Enums;
 using OnlineLearningPlatform.Repositories.Interfaces;
 using OnlineLearningPlatform.Services.DTO.Request;
 using OnlineLearningPlatform.Services.DTO.Response;
@@ -33,6 +34,10 @@ namespace OnlineLearningPlatform.Services.Implements
         public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId)
         {
             var courses = await _teacherRepository.GetCoursesByTeacherIdAsync(teacherId);
+            
+            // Chỉ lấy courses đã được Published (đã approve)
+            courses = courses.Where(c => c.Status == CourseStatus.Published).ToList();
+            
             var teacherCoursesDto = new List<TeacherCourseDto>();
 
             foreach (var course in courses)

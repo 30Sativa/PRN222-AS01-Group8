@@ -1,10 +1,10 @@
-﻿@model List<OnlineLearningPlatform.Mvc.Models.CourseManagerViewModel>
+@model List<OnlineLearningPlatform.Mvc.Models.CourseManagerViewModel>
 @using OnlineLearningPlatform.Models.Enums
 
 
 
 @{
-    ViewData["Title"] = "Course Management";
+    ViewData["Title"] = "Quản lý khóa học";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 @section Styles {
@@ -19,11 +19,11 @@
         <table class="course-table">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Teacher</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th class="text-center">Action</th>
+                    <th>Tiêu đề</th>
+                    <th>Giảng viên</th>
+                    <th>Giá</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
                 </tr>
             </thead>
 
@@ -46,13 +46,13 @@
 
                                     <form asp-action="Approve" method="post">
                                         <input type="hidden" name="id" value="@c.CourseId" />
-                                        <button class="btn btn-success">Approve</button>
+                                        <button class="btn btn-success">Duyệt</button>
                                     </form>
 
                                     <form asp-action="Reject" method="post" class="reject-form">
-                                        <input name="reason" placeholder="Reason..." />
+                                        <input name="reason" placeholder="Lý do từ chối..." />
                                         <input type="hidden" name="id" value="@c.CourseId" />
-                                        <button class="btn btn-danger">Reject</button>
+                                        <button class="btn btn-danger">Từ chối</button>
                                     </form>
 
                                 </div>

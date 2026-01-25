@@ -55,6 +55,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             builder.Services.AddScoped<ILessonService, LessonService>();
+            builder.Services.AddScoped<ITeacherService, TeacherService>();
             builder.Services.AddScoped<IQuizService, QuizService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             var app = builder.Build();

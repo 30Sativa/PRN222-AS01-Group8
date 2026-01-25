@@ -1,10 +1,69 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/Admin/dashboard.css" />
     @RenderSection("Styles", required: false)
+    <style>
+        /* User Dropdown Styles */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            padding: 8px;
+        }
+
+        .user-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .logout-form-dropdown {
+            margin: 0;
+            width: 100%;
+        }
+
+        .dropdown-logout-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-logout-btn:hover {
+            background: #fee;
+            color: #c0392b;
+        }
+
+        .dropdown-logout-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
 </head>
 <body>
 
@@ -12,16 +71,16 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
-                <span>Logo Here</span>
+                <span>Học trực tuyến</span>
             </div>
 
             <nav class="nav-menu">
                 <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="nav-item">
-                    Dashboard
+                    Bảng điều khiển
                 </a>
-                <a asp-area="Admin" asp-controller="User" asp-action="Index" class="nav-item">Manage Users</a>
-                <a asp-area="Admin" asp-controller="Course" asp-action="Index" class="nav-item">Manage Courses</a>
-                <a asp-controller="RoleTest" asp-action="Index" class="nav-item">Role Management</a>
+                <a asp-area="Admin" asp-controller="User" asp-action="Index" class="nav-item">Quản lý người dùng</a>
+                <a asp-area="Admin" asp-controller="Course" asp-action="Index" class="nav-item">Quản lý khóa học</a>
+                <a asp-controller="RoleTest" asp-action="Index" class="nav-item">Quản lý vai trò</a>
             </nav>
         </aside>
 
@@ -50,12 +109,25 @@
                         </svg>
                     </button>
 
-                    <button class="user-btn">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="User">
-                        <span>Hi, Olivia Portal</span>
-                    </button>
-
-                    <button class="primary-btn">Payday</button>
+                    <div class="user-dropdown">
+                        <button class="user-btn" id="userMenuBtn">
+                            <img src="https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "Admin")&background=667eea&color=fff" alt="User">
+                            <span>Xin chào, @(User.Identity?.Name ?? "Admin")</span>
+                        </button>
+                        <div class="user-dropdown-menu" id="userDropdownMenu">
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="logout-form-dropdown">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-logout-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    Đăng xuất
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -64,6 +136,28 @@
 
         </main>
     </div>
+
+    <script>
+        // User dropdown toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const userBtn = document.getElementById('userMenuBtn');
+            const dropdownMenu = document.getElementById('userDropdownMenu');
+
+            if (userBtn && dropdownMenu) {
+                userBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

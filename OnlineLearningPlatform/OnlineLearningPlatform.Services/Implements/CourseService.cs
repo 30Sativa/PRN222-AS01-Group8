@@ -27,6 +27,10 @@ namespace OnlineLearningPlatform.Services.Implements
         public async Task<List<CourseDto>> GetAllCoursesAsync(string? userId = null)
         {
             var courses = await _courseRepository.GetAllCoursesAsync();
+            
+            // Chỉ lấy courses đã được Published (đã approve)
+            courses = courses.Where(c => c.Status == CourseStatus.Published).ToList();
+            
             var coursesDto = new List<CourseDto>();
 
             foreach (var course in courses)
@@ -60,6 +64,12 @@ namespace OnlineLearningPlatform.Services.Implements
 
             foreach (var enrollment in enrollments)
             {
+                // Chỉ hiển thị courses đã Published (đã approve)
+                if (enrollment.Course.Status != CourseStatus.Published)
+                {
+                    continue;
+                }
+                
                 coursesDto.Add(new CourseDto
                 {
                     CourseId = enrollment.Course.CourseId,
@@ -80,6 +90,12 @@ namespace OnlineLearningPlatform.Services.Implements
         {
             var course = await _courseRepository.GetCourseWithDetailsAsync(courseId);
             if (course == null) return null;
+            
+            // Student chỉ được xem courses đã Published (đã approve)
+            if (course.Status != CourseStatus.Published)
+            {
+                return null;
+            }
 
             var isEnrolled = false;
             var completedLessonIds = new List<int>();

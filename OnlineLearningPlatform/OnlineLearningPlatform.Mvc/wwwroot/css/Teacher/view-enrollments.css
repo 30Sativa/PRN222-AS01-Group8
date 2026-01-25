@@ -2,14 +2,18 @@
 
 .card {
     border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
     margin-bottom: 20px;
+    background: white;
 }
 
 .card-header {
-    border-bottom: 2px solid #f0f0f0;
-    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 20px;
     font-weight: 600;
 }
 
@@ -42,6 +46,9 @@
 .btn-outline-primary:hover {
     transform: translateY(-2px);
     transition: all 0.2s;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 /* Statistics Cards */
