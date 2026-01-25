@@ -27,6 +27,13 @@
             <p>Tổng đăng ký khóa học</p>
         </div>
     </div>
+
+    <div class="stat-card card-orange">
+        <div class="stat-content">
+            <h2>@((Model.RevenueByMonth.Sum(x => x.Value)).ToString("N0"))</h2>
+            <p>Tổng doanh thu (VNĐ)</p>
+        </div>
+    </div>
 </div>
 
 <!-- Content Grid -->
@@ -40,7 +47,10 @@
                     @foreach (var item in Model.RevenueByMonth)
                     {
                         var pct = maxRevenue > 0 ? (double)(item.Value / maxRevenue) * 100 : 0;
-                        <div class="bar" style="height: @(pct)%" title="@item.Label: @(item.Value.ToString("N0")) VNĐ"></div>
+                        <div class="bar-container">
+                            <div class="bar-value">@(item.Value > 0 ? item.Value.ToString("N0") : "")</div>
+                            <div class="bar" style="height: @(pct)%" title="@item.Label: @(item.Value.ToString("N0")) VNĐ"></div>
+                        </div>
                     }
                 </div>
                 <div class="chart-labels">
