@@ -21,13 +21,16 @@
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
 
-        <div class="login-divider" style="text-align: center; margin-bottom: 15px; color: black">
+        <div class="login-divider">
              <span>hoặc</span>
         </div>
 
 
         <form asp-action="LoginWithGoogle" method="post">
-            <button type="submit">Login with Google</button>
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-google">
+                <i class="fab fa-google"></i> Đăng nhập với Google
+            </button>
         </form>
 
         <div class="mt-3">

@@ -1,8 +1,197 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Trang chủ - Online Learning Platform";
+    Layout = null;
+}
+@using OnlineLearningPlatform.Services.DTO.Response.Course
+@{
+    var featuredCourses = ViewBag.FeaturedCourses as List<CourseDto> ?? new List<CourseDto>();
+    var totalCourses = ViewBag.TotalCourses as int? ?? 0;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/Home/landing.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/">Online Learning</a>
+            </div>
+            <div class="nav-menu">
+                <a href="#courses" class="nav-link">Khóa học</a>
+                <a href="#about" class="nav-link">Về chúng tôi</a>
+            </div>
+            <div class="nav-actions">
+                <a asp-controller="Account" asp-action="Login" class="btn-login">Đăng nhập</a>
+                <a asp-controller="Account" asp-action="Register" class="btn-register">Đăng ký</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Học Lập Trình<br />
+                    <span class="gradient-text">Trực Tuyến Hiện Đại</span>
+                </h1>
+                <p class="hero-description">
+                    Nâng cao kỹ năng lập trình của bạn với hơn <strong>@totalCourses+</strong> khóa học chất lượng cao từ các chuyên gia hàng đầu
+                </p>
+                <div class="hero-actions">
+                    <a asp-controller="Account" asp-action="Register" class="btn-primary">Đăng ký miễn phí</a>
+                    <a href="#courses" class="btn-secondary">Khám phá khóa học</a>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">@totalCourses+</div>
+                    <div class="stat-label">Khóa học</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Học viên</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4.8/5</div>
+                    <div class="stat-label">Đánh giá</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Courses Section -->
+    <section id="courses" class="courses-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Khóa Học Nổi Bật</h2>
+                <p class="section-subtitle">Những khóa học được yêu thích nhất</p>
+            </div>
+            <div class="courses-grid">
+                @if (featuredCourses.Any())
+                {
+                    @foreach (var course in featuredCourses)
+                    {
+                        <div class="course-card">
+                            <div class="course-badge">
+                                @if (course.Price == 0)
+                                {
+                                    <span class="badge-free">Miễn phí</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-paid">@course.Price.ToString("N0")đ</span>
+                                }
+                            </div>
+                            <div class="course-content">
+                                <div class="course-category">@(course.CategoryName ?? "Khóa học")</div>
+                                <h3 class="course-title">@course.Title</h3>
+                                <p class="course-description">@(course.Description.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description)</p>
+                                <div class="course-meta">
+                                    <div class="course-teacher">
+                                        <i class="fas fa-user"></i>
+                                        <span>@course.TeacherName</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-footer">
+                                <a asp-controller="Account" asp-action="Login" class="btn-course">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-courses">
+                        <p>Chưa có khóa học nào. Hãy quay lại sau!</p>
+                    </div>
+                }
+            </div>
+            <div class="section-footer">
+                <a asp-controller="Account" asp-action="Login" class="btn-view-all">Xem tất cả khóa học</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="feature-title">Giảng viên chất lượng</h3>
+                    <p class="feature-description">Đội ngũ giảng viên giàu kinh nghiệm thực tế</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3 class="feature-title">Học mọi lúc mọi nơi</h3>
+                    <p class="feature-description">Truy cập khóa học trọn đời trên mọi thiết bị</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature-title">Hỗ trợ 24/7</h3>
+                    <p class="feature-description">Đội ngũ hỗ trợ sẵn sàng giúp đỡ bạn</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Bắt đầu hành trình học lập trình của bạn ngay hôm nay</h2>
+                <p class="cta-description">Tham gia cùng hàng nghìn học viên đã thay đổi sự nghiệp của họ</p>
+                <a asp-controller="Account" asp-action="Register" class="btn-cta">Đăng ký miễn phí ngay</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Online Learning Platform</h3>
+                    <p>Nền tảng học lập trình trực tuyến hàng đầu. Học mọi lúc, mọi nơi với hơn 100+ khóa học chất lượng cao.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liên kết nhanh</h4>
+                    <ul>
+                        <li><a href="#courses">Khóa học</a></li>
+                        <li><a href="#about">Về chúng tôi</a></li>
+                        <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                        <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Hỗ trợ</h4>
+                    <ul>
+                        <li><a href="#">Liên hệ</a></li>
+                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Online Learning Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

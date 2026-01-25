@@ -80,10 +80,10 @@ namespace OnlineLearningPlatform.Mvc
                 name: "areas",
                 pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
 
-            // Default route (Login page)
+            // Default route (Home page - Landing page)
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Account}/{action=Login}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
             // Seed admin user khi khởi động ứng dụng
             await ApplicationDbContext.SeedAdminUserAsync(app.Services);
 
