@@ -1,4 +1,4 @@
-﻿using OnlineLearningPlatform.Models.Identity;
+using OnlineLearningPlatform.Models.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,6 +15,8 @@ namespace OnlineLearningPlatform.Models.Entities
         [Required]
         public Guid CourseId { get; set; }
 
+        public Guid? PaymentId { get; set; }
+
         public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
@@ -23,5 +25,8 @@ namespace OnlineLearningPlatform.Models.Entities
 
         [ForeignKey("CourseId")]
         public virtual Course Course { get; set; }
+
+        [ForeignKey("PaymentId")]
+        public virtual Payment? Payment { get; set; }
     }
 }

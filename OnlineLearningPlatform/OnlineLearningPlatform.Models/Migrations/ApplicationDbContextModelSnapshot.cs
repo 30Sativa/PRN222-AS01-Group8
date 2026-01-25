@@ -478,6 +478,9 @@ namespace OnlineLearningPlatform.Models.Migrations
                     b.Property<DateTime>("EnrolledAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -485,6 +488,10 @@ namespace OnlineLearningPlatform.Models.Migrations
                     b.HasKey("EnrollmentId");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("PaymentId")
+                        .IsUnique()
+                        .HasFilter("[PaymentId] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -590,23 +597,42 @@ namespace OnlineLearningPlatform.Models.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal?>("Amount")
+                    b.Property<decimal>("Amount")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("EnrollmentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("PaymentId");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("UserId");
 
@@ -1045,6 +1071,11 @@ namespace OnlineLearningPlatform.Models.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("OnlineLearningPlatform.Models.Entities.Payment", "Payment")
+                        .WithOne("Enrollment")
+                        .HasForeignKey("OnlineLearningPlatform.Models.Entities.Enrollment", "PaymentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("OnlineLearningPlatform.Models.Identity.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1052,6 +1083,8 @@ namespace OnlineLearningPlatform.Models.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+
+                    b.Navigation("Payment");
 
                     b.Navigation("User");
                 });
@@ -1097,11 +1130,19 @@ namespace OnlineLearningPlatform.Models.Migrations
 
             modelBuilder.Entity("OnlineLearningPlatform.Models.Entities.Payment", b =>
                 {
+                    b.HasOne("OnlineLearningPlatform.Models.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("OnlineLearningPlatform.Models.Identity.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("User");
                 });
@@ -1228,6 +1269,11 @@ namespace OnlineLearningPlatform.Models.Migrations
                     b.Navigation("LessonProgresses");
 
                     b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("OnlineLearningPlatform.Models.Entities.Payment", b =>
+                {
+                    b.Navigation("Enrollment");
                 });
 
             modelBuilder.Entity("OnlineLearningPlatform.Models.Entities.Question", b =>

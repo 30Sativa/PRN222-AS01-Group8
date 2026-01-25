@@ -34,9 +34,9 @@ namespace OnlineLearningPlatform.Repositories.Implements
             var now = DateTime.UtcNow;
             var start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-lastMonths);
             var list = await _context.Payments
-                .Where(p => p.PaymentDate >= start && p.Status == "success" && p.Amount != null)
+                .Where(p => p.PaymentDate >= start && p.Status == "success")
                 .GroupBy(p => new { p.PaymentDate.Year, p.PaymentDate.Month })
-                .Select(g => new { g.Key.Year, g.Key.Month, Total = g.Sum(p => p.Amount ?? 0) })
+                .Select(g => new { g.Key.Year, g.Key.Month, Total = g.Sum(p => p.Amount) })
                 .OrderBy(x => x.Year).ThenBy(x => x.Month)
                 .ToListAsync();
 
