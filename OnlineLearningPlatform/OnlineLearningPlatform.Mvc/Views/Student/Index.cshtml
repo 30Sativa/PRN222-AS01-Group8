@@ -12,6 +12,29 @@
         <h1>Danh sách khóa học</h1>
     </div>
 
+    <!-- Search Form -->
+    <div class="mb-4">
+        <form method="get" asp-action="Index">
+            <div class="input-group">
+                <input type="text" 
+                       name="searchString" 
+                       value="@ViewData["CurrentFilter"]" 
+                       class="form-control" 
+                       placeholder="Tìm kiếm khóa học theo tên hoặc mô tả..." 
+                       aria-label="Tìm kiếm khóa học">
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search"></i> Tìm kiếm
+                </button>
+                @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Xóa bộ lọc
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
     @if (Model.Courses == null || !Model.Courses.Any())
     {
         <div class="no-courses">

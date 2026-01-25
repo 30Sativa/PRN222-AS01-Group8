@@ -5,6 +5,7 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
     public interface ICourseRepository
     {
         Task<List<Course>> GetAllCoursesAsync();
+        Task<List<Course>> SearchCoursesAsync(string? keyword);
         Task<Course?> GetCourseByIdAsync(Guid courseId);
         Task<Course?> GetCourseWithDetailsAsync(Guid courseId);
         Task<bool> CourseExistsAsync(Guid courseId);

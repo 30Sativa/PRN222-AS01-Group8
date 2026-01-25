@@ -47,6 +47,26 @@ namespace OnlineLearningPlatform.Repositories.Implements
             return await _context.Courses.AnyAsync(c => c.CourseId == courseId);
         }
 
+        public async Task<List<Course>> SearchCoursesAsync(string? keyword)
+        {
+            var query = _context.Courses
+                .Include(c => c.Teacher)
+                .Include(c => c.Category)
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.Trim().ToLower();
+                query = query.Where(c => 
+                    c.Title.ToLower().Contains(keyword) || 
+                    (c.Description != null && c.Description.ToLower().Contains(keyword)));
+            }
+
+            return await query
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+        }
+
         // new methods to be implemented
     
 

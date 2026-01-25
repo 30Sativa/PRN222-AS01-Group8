@@ -11,7 +11,7 @@ namespace OnlineLearningPlatform.Services.Interfaces
     public interface ITeacherService
     {
         // Quản lý danh sách khóa học
-        Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId);
+        Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId, string? keyword = null);
 
         /// <summary>Lấy danh sách khóa học đang chờ duyệt của giáo viên.</summary>
         Task<List<TeacherCourseDto>> GetTeacherPendingCoursesAsync(string teacherId);

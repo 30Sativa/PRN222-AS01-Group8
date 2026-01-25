@@ -20,7 +20,7 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         }
 
         // GET: Teacher/Index - Quản lý danh sách khóa học của giảng viên (gồm khóa chờ duyệt + đã xuất bản)
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString)
         {
             var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -30,7 +30,9 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             }
 
             var pending = await _teacherService.GetTeacherPendingCoursesAsync(teacherId);
-            var published = await _teacherService.GetTeacherCoursesAsync(teacherId);
+            var published = await _teacherService.GetTeacherCoursesAsync(teacherId, searchString);
+
+            ViewData["CurrentFilter"] = searchString;
 
             var viewModel = new TeacherIndexViewModel
             {

@@ -78,6 +78,29 @@
                     </h4>
                     <span class="badge bg-success">@Model.PublishedCourses.Count khóa</span>
                 </div>
+
+                <!-- Search Form for Published Courses -->
+                <div class="mb-3">
+                    <form method="get" asp-action="Index">
+                        <div class="input-group">
+                            <input type="text" 
+                                   name="searchString" 
+                                   value="@ViewData["CurrentFilter"]" 
+                                   class="form-control" 
+                                   placeholder="Tìm kiếm khóa học của bạn theo tên hoặc mô tả..." 
+                                   aria-label="Tìm kiếm khóa học">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i> Tìm kiếm
+                            </button>
+                            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+                            {
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle"></i> Xóa bộ lọc
+                                </a>
+                            }
+                        </div>
+                    </form>
+                </div>
                 <div class="row">
                     @foreach (var course in Model.PublishedCourses)
                     {
