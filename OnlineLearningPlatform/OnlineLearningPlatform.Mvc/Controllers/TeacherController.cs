@@ -31,13 +31,15 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             var pending = await _teacherService.GetTeacherPendingCoursesAsync(teacherId);
             var published = await _teacherService.GetTeacherCoursesAsync(teacherId, searchString);
+            var rejected = await _teacherService.GetTeacherRejectedCoursesAsync(teacherId);
 
             ViewData["CurrentFilter"] = searchString;
 
             var viewModel = new TeacherIndexViewModel
             {
                 PendingCourses = pending,
-                PublishedCourses = published
+                PublishedCourses = published,
+                RejectedCourses = rejected
             };
 
             return View(viewModel);

@@ -2,13 +2,27 @@
 @using OnlineLearningPlatform.Models.Enums
 @{
     var isPending = Model.Status == CourseStatus.Pending;
+    var description = Model.Description ?? "";
+    var hasLongDescription = description.Length > 140;
+    var toggleId = $"toggle-desc-{Model.CourseId:N}";
 }
 <div class="card h-100 @(isPending ? "border-warning" : "")">
     <div class="card-body">
         <h5 class="card-title">@Model.Title</h5>
-        <p class="card-text">
-            @(Model.Description != null && Model.Description.Length > 100 ? Model.Description.Substring(0, 100) + "..." : Model.Description ?? "")
-        </p>
+        <div class="card-text">
+            @if (hasLongDescription)
+            {
+                <input type="checkbox" class="course-desc-toggle" id="@toggleId" />
+            }
+            <p class="course-desc-text mb-0">@description</p>
+            @if (hasLongDescription)
+            {
+                <label class="course-desc-btn" for="@toggleId">
+                    <span class="when-closed">Xem thêm</span>
+                    <span class="when-open">Thu gọn</span>
+                </label>
+            }
+        </div>
         <div class="mb-2">
             @if (Model.Status == CourseStatus.Pending)
             {
@@ -45,6 +59,14 @@
                 <span><i class="bi bi-calendar"></i> @Model.CreatedAt.ToString("dd/MM/yyyy")</span>
             </div>
         </div>
+
+        @if (Model.Status == CourseStatus.Rejected)
+        {
+            <div class="alert alert-danger py-2 px-2 small mb-0" role="alert">
+                <strong>Lý do từ chối:</strong>
+                @(string.IsNullOrWhiteSpace(Model.RejectionReason) ? "Không có thông tin." : Model.RejectionReason)
+            </div>
+        }
     </div>
     @if (Model.Status != CourseStatus.Pending)
     {
@@ -56,9 +78,12 @@
                 <a asp-action="ManageSections" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-info">
                     <i class="bi bi-list-ul"></i> Nội dung
                 </a>
-                <a asp-action="ViewEnrollments" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-success">
-                    <i class="bi bi-people"></i> Học viên
-                </a>
+                @if (Model.Status == CourseStatus.Published)
+                {
+                    <a asp-action="ViewEnrollments" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-people"></i> Học viên
+                    </a>
+                }
             </div>
         </div>
     }
