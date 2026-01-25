@@ -306,6 +306,11 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             var sections = await _teacherService.GetCourseSectionsAsync(id, teacherId);
 
+            // Lấy thông tin quiz cho tất cả lessons
+            var allLessonIds = sections.SelectMany(s => s.Lessons?.Select(l => l.LessonId) ?? Enumerable.Empty<int>()).ToList();
+            var quizzes = await _teacherService.GetQuizzesByLessonIdsAsync(allLessonIds);
+            ViewBag.Quizzes = quizzes;
+
             var viewModel = new ManageSectionsViewModel
             {
                 CourseId = id,
@@ -666,6 +671,311 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             }
 
             return View(progress);
+        }
+
+        // ===== QUẢN LÝ QUIZ =====
+
+        // GET: Teacher/CreateQuiz?lessonId=xxx
+        public async Task<IActionResult> CreateQuiz(int lessonId)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            var lesson = await _teacherService.GetLessonByIdAsync(lessonId);
+            if (lesson == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài học.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Lấy section để lấy courseId
+            var section = await _teacherService.GetSectionByIdAsync(lesson.SectionId);
+            if (section == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy chương.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra xem đã có quiz chưa
+            var hasQuiz = await _teacherService.HasQuizForLessonAsync(lessonId);
+            if (hasQuiz)
+            {
+                TempData["ErrorMessage"] = "Bài học này đã có quiz. Vui lòng xóa quiz cũ trước khi tạo mới.";
+                return RedirectToAction(nameof(ManageSections), new { id = section.CourseId });
+            }
+
+            ViewBag.LessonId = lessonId;
+            ViewBag.LessonTitle = lesson.Title;
+            ViewBag.CourseId = section.CourseId;
+
+            return View(new CreateQuizRequest());
+        }
+
+        // POST: Teacher/CreateQuiz
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateQuiz(int lessonId, CreateQuizRequest request)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var lesson = await _teacherService.GetLessonByIdAsync(lessonId);
+                if (lesson != null)
+                {
+                    ViewBag.LessonId = lessonId;
+                    ViewBag.LessonTitle = lesson.Title;
+                    var section = await _teacherService.GetSectionByIdAsync(lesson.SectionId);
+                    if (section != null)
+                    {
+                        ViewBag.CourseId = section.CourseId;
+                    }
+                }
+                return View(request);
+            }
+
+            try
+            {
+                var lesson = await _teacherService.GetLessonByIdAsync(lessonId);
+                if (lesson == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy bài học.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var section = await _teacherService.GetSectionByIdAsync(lesson.SectionId);
+                if (section == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy chương.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                await _teacherService.CreateQuizAsync(lessonId, request, teacherId);
+
+                TempData["SuccessMessage"] = "Tạo quiz thành công!";
+                return RedirectToAction(nameof(ManageSections), new { id = section.CourseId });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                var lesson = await _teacherService.GetLessonByIdAsync(lessonId);
+                if (lesson != null)
+                {
+                    var section = await _teacherService.GetSectionByIdAsync(lesson.SectionId);
+                    if (section != null)
+                    {
+                        return RedirectToAction(nameof(ManageSections), new { id = section.CourseId });
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi tạo quiz: " + ex.Message;
+                var lesson = await _teacherService.GetLessonByIdAsync(lessonId);
+                if (lesson != null)
+                {
+                    ViewBag.LessonId = lessonId;
+                    ViewBag.LessonTitle = lesson.Title;
+                    var section = await _teacherService.GetSectionByIdAsync(lesson.SectionId);
+                    if (section != null)
+                    {
+                        ViewBag.CourseId = section.CourseId;
+                    }
+                }
+                return View(request);
+            }
+        }
+
+        // GET: Teacher/ViewQuiz/{id}
+        public async Task<IActionResult> ViewQuiz(int id)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            var quiz = await _teacherService.GetQuizDetailsAsync(id, teacherId);
+            if (quiz == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy quiz hoặc bạn không có quyền xem.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(quiz);
+        }
+
+        // GET: Teacher/EditQuiz/{id}
+        public async Task<IActionResult> EditQuiz(int id)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            var quiz = await _teacherService.GetQuizDetailsAsync(id, teacherId);
+            if (quiz == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy quiz hoặc bạn không có quyền chỉnh sửa.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Convert QuizDetailDto sang UpdateQuizRequest
+            var request = new UpdateQuizRequest
+            {
+                Title = quiz.Title,
+                Questions = quiz.Questions.Select(q => 
+                {
+                    var correctIndex = q.Answers.FindIndex(a => a.IsCorrect);
+                    if (correctIndex < 0 && q.Answers.Count > 0)
+                    {
+                        // Nếu không tìm thấy đáp án đúng, tìm theo CorrectAnswer string
+                        correctIndex = q.Answers.FindIndex(a => a.UserAnswer == q.CorrectAnswer);
+                        if (correctIndex < 0) correctIndex = 0; // Default to first answer
+                    }
+                    return new CreateQuizQuestionRequest
+                    {
+                        Content = q.Content,
+                        Answers = q.Answers.Select(a => new CreateQuizAnswerRequest
+                        {
+                            UserAnswer = a.UserAnswer
+                        }).ToList(),
+                        CorrectAnswerIndex = correctIndex >= 0 ? correctIndex : 0
+                    };
+                }).ToList()
+            };
+
+            ViewBag.QuizId = id;
+            ViewBag.LessonTitle = quiz.LessonTitle;
+            ViewBag.CourseId = quiz.CourseId;
+            return View(request);
+        }
+
+        // POST: Teacher/EditQuiz/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditQuiz(int id, [FromForm] UpdateQuizRequest request)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            // Đảm bảo Questions không null
+            request.Questions ??= new List<CreateQuizQuestionRequest>();
+
+            // Debug: Log request data
+            System.Diagnostics.Debug.WriteLine($"EditQuiz POST - QuizId: {id}, Title: {request.Title}, Questions Count: {request.Questions.Count}");
+            foreach (var q in request.Questions)
+            {
+                System.Diagnostics.Debug.WriteLine($"  Question: {q.Content}, Answers: {q.Answers?.Count ?? 0}, CorrectIndex: {q.CorrectAnswerIndex}");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Log validation errors
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    if (state?.Errors.Count > 0)
+                    {
+                        foreach (var error in state.Errors)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Validation Error - {key}: {error.ErrorMessage}");
+                        }
+                    }
+                }
+
+                var quiz = await _teacherService.GetQuizDetailsAsync(id, teacherId);
+                if (quiz != null)
+                {
+                    ViewBag.QuizId = id;
+                    ViewBag.LessonTitle = quiz.LessonTitle;
+                    ViewBag.CourseId = quiz.CourseId;
+                }
+                return View(request);
+            }
+
+            try
+            {
+                var result = await _teacherService.UpdateQuizAsync(id, request, teacherId);
+                if (result)
+                {
+                    var quiz = await _teacherService.GetQuizDetailsAsync(id, teacherId);
+                    TempData["SuccessMessage"] = "Cập nhật quiz thành công!";
+                    return RedirectToAction(nameof(ManageSections), new { id = quiz?.CourseId });
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể cập nhật quiz. Vui lòng thử lại.";
+                    var quiz = await _teacherService.GetQuizDetailsAsync(id, teacherId);
+                    if (quiz != null)
+                    {
+                        ViewBag.QuizId = id;
+                        ViewBag.LessonTitle = quiz.LessonTitle;
+                        ViewBag.CourseId = quiz.CourseId;
+                    }
+                    return View(request);
+                }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật quiz: " + ex.Message;
+                System.Diagnostics.Debug.WriteLine($"EditQuiz Exception: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+                var quiz = await _teacherService.GetQuizDetailsAsync(id, teacherId);
+                if (quiz != null)
+                {
+                    ViewBag.QuizId = id;
+                    ViewBag.LessonTitle = quiz.LessonTitle;
+                    ViewBag.CourseId = quiz.CourseId;
+                }
+                return View(request);
+            }
+        }
+
+        // POST: Teacher/DeleteQuiz/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteQuiz(int id, Guid courseId)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await _teacherService.DeleteQuizAsync(id, teacherId);
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Xóa quiz thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể xóa quiz.";
+            }
+
+            return RedirectToAction(nameof(ManageSections), new { id = courseId });
         }
     }
 }

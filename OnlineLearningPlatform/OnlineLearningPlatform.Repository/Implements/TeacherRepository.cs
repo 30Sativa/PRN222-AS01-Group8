@@ -185,5 +185,127 @@ namespace OnlineLearningPlatform.Repositories.Implements
             await _context.SaveChangesAsync();
             return true;
         }
+
+        // ===== QUẢN LÝ QUIZ =====
+        public async Task<Quiz?> GetQuizByLessonIdAsync(int lessonId)
+        {
+            return await _context.Quizzes
+                .FirstOrDefaultAsync(q => q.LessonId == lessonId);
+        }
+
+        public async Task<List<Quiz>> GetQuizzesByLessonIdsAsync(List<int> lessonIds)
+        {
+            return await _context.Quizzes
+                .Where(q => lessonIds.Contains(q.LessonId))
+                .Select(q => new Quiz
+                {
+                    QuizId = q.QuizId,
+                    LessonId = q.LessonId,
+                    Title = q.Title
+                })
+                .ToListAsync();
+        }
+
+        public async Task<Quiz?> GetQuizWithDetailsAsync(int quizId)
+        {
+            return await _context.Quizzes
+                .Include(q => q.Questions)
+                    .ThenInclude(q => q.QuizAnswers)
+                .Include(q => q.Lesson)
+                    .ThenInclude(l => l.Section)
+                .FirstOrDefaultAsync(q => q.QuizId == quizId);
+        }
+
+        public async Task<Quiz> CreateQuizAsync(Quiz quiz)
+        {
+            _context.Quizzes.Add(quiz);
+            await _context.SaveChangesAsync();
+            return quiz;
+        }
+
+        public async Task<bool> UpdateQuizAsync(Quiz quiz)
+        {
+            try
+            {
+                _context.Quizzes.Update(quiz);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateQuizWithQuestionsAsync(Quiz quiz, List<Question> questionsToDelete, List<QuizAnswer> answersToDelete, List<Question> newQuestions)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Cập nhật title của quiz bằng raw SQL hoặc detach approach
+                var quizToUpdate = await _context.Quizzes.FindAsync(quiz.QuizId);
+                if (quizToUpdate == null) return false;
+                quizToUpdate.Title = quiz.Title;
+
+                // 2. Xóa template answers cũ trước (child records)
+                if (answersToDelete.Any())
+                {
+                    var answerIds = answersToDelete.Select(a => a.AnswerId).ToList();
+                    var answersInDb = await _context.QuizAnswers
+                        .Where(a => answerIds.Contains(a.AnswerId))
+                        .ToListAsync();
+                    _context.QuizAnswers.RemoveRange(answersInDb);
+                    await _context.SaveChangesAsync();
+                }
+
+                // 3. Xóa questions cũ (parent records)
+                if (questionsToDelete.Any())
+                {
+                    var questionIds = questionsToDelete.Select(q => q.QuestionId).ToList();
+                    var questionsInDb = await _context.Questions
+                        .Where(q => questionIds.Contains(q.QuestionId))
+                        .ToListAsync();
+                    _context.Questions.RemoveRange(questionsInDb);
+                    await _context.SaveChangesAsync();
+                }
+
+                // 4. Thêm questions mới với answers
+                if (newQuestions.Any())
+                {
+                    foreach (var question in newQuestions)
+                    {
+                        question.QuizId = quiz.QuizId;
+                    }
+                    _context.Questions.AddRange(newQuestions);
+                    await _context.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // Log exception for debugging
+                Console.WriteLine($"UpdateQuizWithQuestionsAsync Error: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteQuizAsync(int quizId)
+        {
+            var quiz = await _context.Quizzes
+                .Include(q => q.Questions)
+                    .ThenInclude(q => q.QuizAnswers)
+                .FirstOrDefaultAsync(q => q.QuizId == quizId);
+            
+            if (quiz == null)
+                return false;
+
+            _context.Quizzes.Remove(quiz);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

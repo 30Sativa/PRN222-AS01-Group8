@@ -57,5 +57,25 @@ namespace OnlineLearningPlatform.Repositories.Interfaces
 
         // Xóa lesson
         Task<bool> DeleteLessonAsync(int lessonId);
+
+        // ===== QUẢN LÝ QUIZ =====
+        // Lấy quiz theo lessonId
+        Task<Quiz?> GetQuizByLessonIdAsync(int lessonId);
+
+        // Lấy quiz với đầy đủ questions và answers
+        Task<Quiz?> GetQuizWithDetailsAsync(int quizId);
+
+        // Lấy danh sách quiz theo danh sách lessonIds
+        Task<List<Quiz>> GetQuizzesByLessonIdsAsync(List<int> lessonIds);
+
+        // Tạo quiz mới
+        Task<Quiz> CreateQuizAsync(Quiz quiz);
+
+        // Cập nhật quiz
+        Task<bool> UpdateQuizAsync(Quiz quiz);
+        Task<bool> UpdateQuizWithQuestionsAsync(Quiz quiz, List<Question> questionsToDelete, List<QuizAnswer> answersToDelete, List<Question> newQuestions);
+
+        // Xóa quiz
+        Task<bool> DeleteQuizAsync(int quizId);
     }
 }

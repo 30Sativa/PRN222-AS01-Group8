@@ -6,6 +6,7 @@ using OnlineLearningPlatform.Services.DTO.Response;
 using OnlineLearningPlatform.Services.DTO.Response.Teacher;
 using OnlineLearningPlatform.Services.DTO.Teacher;
 using OnlineLearningPlatform.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace OnlineLearningPlatform.Services.Implements
 {
@@ -476,6 +477,206 @@ namespace OnlineLearningPlatform.Services.Implements
                 CompletedAssignments = completedAssignments,
                 SectionProgress = sectionProgressList
             };
+        }
+
+        // ===== QUẢN LÝ QUIZ =====
+        public async Task<bool> HasQuizForLessonAsync(int lessonId)
+        {
+            var quiz = await _teacherRepository.GetQuizByLessonIdAsync(lessonId);
+            return quiz != null;
+        }
+
+        public async Task<Dictionary<int, (int QuizId, string Title)>> GetQuizzesByLessonIdsAsync(List<int> lessonIds)
+        {
+            var quizzes = await _teacherRepository.GetQuizzesByLessonIdsAsync(lessonIds);
+            return quizzes.ToDictionary(
+                q => q.LessonId,
+                q => (q.QuizId, q.Title ?? string.Empty)
+            );
+        }
+
+        public async Task<int> CreateQuizAsync(int lessonId, CreateQuizRequest request, string teacherId)
+        {
+            // Kiểm tra lesson tồn tại và quyền sở hữu
+            var lesson = await _teacherRepository.GetLessonByIdAsync(lessonId);
+            if (lesson == null || lesson.Section == null)
+                throw new ArgumentException("Không tìm thấy bài học");
+
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(lesson.Section.CourseId, teacherId);
+            if (!isOwner)
+                throw new UnauthorizedAccessException("Bạn không có quyền tạo quiz cho bài học này");
+
+            // Kiểm tra xem đã có quiz chưa
+            var existingQuiz = await _teacherRepository.GetQuizByLessonIdAsync(lessonId);
+            if (existingQuiz != null)
+                throw new InvalidOperationException("Bài học này đã có quiz. Vui lòng xóa quiz cũ trước khi tạo mới.");
+
+            // Tạo quiz entity
+            var quiz = new Quiz
+            {
+                LessonId = lessonId,
+                Title = request.Title,
+                Questions = new List<Question>()
+            };
+
+            // Tạo questions và answers
+            foreach (var questionRequest in request.Questions)
+            {
+                var question = new Question
+                {
+                    Content = questionRequest.Content,
+                    QuestionType = "mcq",
+                    QuizAnswers = new List<QuizAnswer>()
+                };
+
+                // Tạo answers
+                for (int i = 0; i < questionRequest.Answers.Count; i++)
+                {
+                    var answerRequest = questionRequest.Answers[i];
+                    var answer = new QuizAnswer
+                    {
+                        AnswerId = Guid.NewGuid(),
+                        UserAnswer = answerRequest.UserAnswer,
+                        AttemptId = null
+                    };
+                    question.QuizAnswers.Add(answer);
+
+                    // Set đáp án đúng
+                    if (i == questionRequest.CorrectAnswerIndex)
+                    {
+                        question.CorrectAnswer = answerRequest.UserAnswer;
+                    }
+                }
+
+                quiz.Questions.Add(question);
+            }
+
+            var createdQuiz = await _teacherRepository.CreateQuizAsync(quiz);
+            return createdQuiz.QuizId;
+        }
+
+        public async Task<QuizDetailDto?> GetQuizDetailsAsync(int quizId, string teacherId)
+        {
+            var quiz = await _teacherRepository.GetQuizWithDetailsAsync(quizId);
+            if (quiz == null || quiz.Lesson == null || quiz.Lesson.Section == null)
+                return null;
+
+            // Kiểm tra quyền sở hữu
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(quiz.Lesson.Section.CourseId, teacherId);
+            if (!isOwner)
+                return null;
+
+            var questions = new List<QuestionDetailDto>();
+            if (quiz.Questions != null)
+            {
+                foreach (var question in quiz.Questions)
+                {
+                    var answers = new List<AnswerDetailDto>();
+                    if (question.QuizAnswers != null)
+                    {
+                        foreach (var answer in question.QuizAnswers.Where(a => a.AttemptId == null))
+                        {
+                            answers.Add(new AnswerDetailDto
+                            {
+                                AnswerId = answer.AnswerId,
+                                UserAnswer = answer.UserAnswer ?? string.Empty,
+                                IsCorrect = answer.UserAnswer == question.CorrectAnswer
+                            });
+                        }
+                    }
+
+                    questions.Add(new QuestionDetailDto
+                    {
+                        QuestionId = question.QuestionId,
+                        Content = question.Content ?? string.Empty,
+                        QuestionType = question.QuestionType ?? "mcq",
+                        CorrectAnswer = question.CorrectAnswer ?? string.Empty,
+                        Answers = answers
+                    });
+                }
+            }
+
+            return new QuizDetailDto
+            {
+                QuizId = quiz.QuizId,
+                LessonId = quiz.LessonId,
+                LessonTitle = quiz.Lesson.Title ?? string.Empty,
+                CourseId = quiz.Lesson.Section.CourseId,
+                CourseTitle = quiz.Lesson.Section.Course?.Title ?? string.Empty,
+                Title = quiz.Title ?? string.Empty,
+                Questions = questions
+            };
+        }
+
+        public async Task<bool> UpdateQuizAsync(int quizId, UpdateQuizRequest request, string teacherId)
+        {
+            var quiz = await _teacherRepository.GetQuizWithDetailsAsync(quizId);
+            if (quiz == null || quiz.Lesson == null || quiz.Lesson.Section == null)
+                return false;
+
+            // Kiểm tra quyền sở hữu
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(quiz.Lesson.Section.CourseId, teacherId);
+            if (!isOwner)
+                return false;
+
+            // Cập nhật title
+            quiz.Title = request.Title;
+
+            // Thu thập danh sách questions và template answers cần xóa
+            var questionsToDelete = quiz.Questions?.ToList() ?? new List<Question>();
+            var templateAnswersToDelete = questionsToDelete
+                .SelectMany(q => q.QuizAnswers?.Where(a => a.AttemptId == null) ?? new List<QuizAnswer>())
+                .ToList();
+
+            // Tạo questions và answers mới
+            var newQuestions = new List<Question>();
+            foreach (var questionRequest in request.Questions)
+            {
+                var question = new Question
+                {
+                    QuizId = quizId,
+                    Content = questionRequest.Content,
+                    QuestionType = "mcq",
+                    QuizAnswers = new List<QuizAnswer>()
+                };
+
+                // Tạo answers
+                for (int i = 0; i < questionRequest.Answers.Count; i++)
+                {
+                    var answerRequest = questionRequest.Answers[i];
+                    var answer = new QuizAnswer
+                    {
+                        AnswerId = Guid.NewGuid(),
+                        UserAnswer = answerRequest.UserAnswer,
+                        AttemptId = null
+                    };
+                    question.QuizAnswers.Add(answer);
+
+                    // Set đáp án đúng
+                    if (i == questionRequest.CorrectAnswerIndex)
+                    {
+                        question.CorrectAnswer = answerRequest.UserAnswer;
+                    }
+                }
+
+                newQuestions.Add(question);
+            }
+
+            return await _teacherRepository.UpdateQuizWithQuestionsAsync(quiz, questionsToDelete, templateAnswersToDelete, newQuestions);
+        }
+
+        public async Task<bool> DeleteQuizAsync(int quizId, string teacherId)
+        {
+            var quiz = await _teacherRepository.GetQuizWithDetailsAsync(quizId);
+            if (quiz == null || quiz.Lesson == null || quiz.Lesson.Section == null)
+                return false;
+
+            // Kiểm tra quyền sở hữu
+            var isOwner = await _teacherRepository.IsTeacherOwnsCourseAsync(quiz.Lesson.Section.CourseId, teacherId);
+            if (!isOwner)
+                return false;
+
+            return await _teacherRepository.DeleteQuizAsync(quizId);
         }
     }
 }

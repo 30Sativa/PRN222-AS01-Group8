@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OnlineLearningPlatform.Models;
 using OnlineLearningPlatform.Models.Entities;
 using OnlineLearningPlatform.Repositories.Interfaces;
@@ -67,6 +67,61 @@ namespace OnlineLearningPlatform.Services.Implements
             await _context.SaveChangesAsync(); 
 
             return attempt;
+        }
+
+        // Methods for teacher
+        public async Task<List<Course>> GetCoursesByTeacherIdAsync(string teacherId)
+        {
+            return await _unitOfWork.Quizzes.GetCoursesByTeacherIdAsync(teacherId);
+        }
+
+        public async Task<List<object>> GetSectionsByCourseIdAsync(Guid courseId)
+        {
+            var sections = await _unitOfWork.Quizzes.GetSectionsByCourseIdAsync(courseId);
+            return sections.Select(s => (object)new { s.SectionId, s.Title }).ToList();
+        }
+
+        public async Task<List<object>> GetLessonsBySectionIdAsync(int sectionId)
+        {
+            var lessons = await _unitOfWork.Quizzes.GetLessonsBySectionIdAsync(sectionId);
+            return lessons.Select(l => (object)new { l.LessonId, l.Title }).ToList();
+        }
+
+        public async Task CreateQuizAsync(Quiz quiz)
+        {
+            await _unitOfWork.Quizzes.AddAsync(quiz);
+            await _unitOfWork.SaveAsync();
+        }
+
+        // Methods for student
+        public async Task<Quiz?> GetQuizByLessonIdAsync(int lessonId)
+        {
+            return await _unitOfWork.Quizzes.GetQuizByLessonIdAsync(lessonId);
+        }
+
+        public async Task<Quiz?> GetQuizWithQuestionsAsync(int quizId)
+        {
+            return await _unitOfWork.Quizzes.GetQuizWithQuestionsAsync(quizId);
+        }
+
+        public async Task<QuizAttempt?> GetQuizAttemptByIdAsync(Guid attemptId)
+        {
+            return await _unitOfWork.Quizzes.GetQuizAttemptByIdAsync(attemptId);
+        }
+
+        public async Task<List<QuizAttempt>> GetQuizAttemptHistoryByUserIdAsync(string userId)
+        {
+            return await _unitOfWork.Quizzes.GetQuizAttemptsByUserIdAsync(userId);
+        }
+
+        public async Task<QuizAttempt?> GetQuizAttemptWithDetailsAsync(Guid attemptId)
+        {
+            return await _unitOfWork.Quizzes.GetQuizAttemptWithDetailsAsync(attemptId);
+        }
+
+        public async Task<List<QuizAnswer>> GetQuizAnswersByAttemptIdAsync(Guid attemptId)
+        {
+            return await _unitOfWork.Quizzes.GetQuizAnswersByAttemptIdAsync(attemptId);
         }
     }
 }
