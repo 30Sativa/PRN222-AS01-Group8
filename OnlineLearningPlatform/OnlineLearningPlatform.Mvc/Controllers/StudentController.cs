@@ -33,10 +33,12 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         }
 
         // GET: Student/Index - Xem danh sách khóa học
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var courses = await _courseService.GetAllCoursesAsync(userId);
+            var courses = await _courseService.GetAllCoursesAsync(userId, searchString);
+
+            ViewData["CurrentFilter"] = searchString;
 
             var viewModel = new CourseListViewModel
             {

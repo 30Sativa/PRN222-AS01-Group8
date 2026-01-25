@@ -75,6 +75,54 @@
     flex: 1;
 }
 
+/* Description: "Xem thêm / Thu gọn" (no JS) */
+.course-desc-toggle {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.course-desc-text {
+    /* Clamp to ~3 lines by default */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.course-desc-toggle:checked ~ .course-desc-text {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+}
+
+.course-desc-btn {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #667eea;
+    cursor: pointer;
+    user-select: none;
+}
+
+.course-desc-btn:hover {
+    text-decoration: underline;
+}
+
+.course-desc-btn .when-open {
+    display: none;
+}
+
+.course-desc-toggle:checked ~ .course-desc-btn .when-closed {
+    display: none;
+}
+
+.course-desc-toggle:checked ~ .course-desc-btn .when-open {
+    display: inline;
+}
+
 /* Course Stats */
 .course-stats {
     padding: 0 20px 15px 20px;

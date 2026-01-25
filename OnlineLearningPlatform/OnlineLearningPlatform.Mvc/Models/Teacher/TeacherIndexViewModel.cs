@@ -9,5 +9,6 @@ namespace OnlineLearningPlatform.Mvc.Models.Teacher
     {
         public List<TeacherCourseDto> PendingCourses { get; set; } = new();
         public List<TeacherCourseDto> PublishedCourses { get; set; } = new();
+        public List<TeacherCourseDto> RejectedCourses { get; set; } = new();
     }
 }

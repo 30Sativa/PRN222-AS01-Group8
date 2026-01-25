@@ -32,15 +32,32 @@ namespace OnlineLearningPlatform.Services.Implements
             _lessonProgressRepository = lessonProgressRepository;
         }
 
-        public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId)
+        public async Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId, string? keyword = null)
         {
             var courses = await _teacherRepository.GetCoursesByTeacherIdAndStatusAsync(teacherId, CourseStatus.Published);
+            
+            // Lọc theo keyword nếu có
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                var searchTerm = keyword.Trim().ToLower();
+                courses = courses.Where(c => 
+                    c.Title.ToLower().Contains(searchTerm) || 
+                    (c.Description != null && c.Description.ToLower().Contains(searchTerm))
+                ).ToList();
+            }
+            
             return MapCoursesToDtos(courses);
         }
 
         public async Task<List<TeacherCourseDto>> GetTeacherPendingCoursesAsync(string teacherId)
         {
             var courses = await _teacherRepository.GetCoursesByTeacherIdAndStatusAsync(teacherId, CourseStatus.Pending);
+            return MapCoursesToDtos(courses);
+        }
+
+        public async Task<List<TeacherCourseDto>> GetTeacherRejectedCoursesAsync(string teacherId)
+        {
+            var courses = await _teacherRepository.GetCoursesByTeacherIdAndStatusAsync(teacherId, CourseStatus.Rejected);
             return MapCoursesToDtos(courses);
         }
 

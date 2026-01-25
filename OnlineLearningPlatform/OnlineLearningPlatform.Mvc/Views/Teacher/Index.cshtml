@@ -4,7 +4,8 @@
     ViewData["Title"] = "Quản lý khóa học";
     var hasPending = Model.PendingCourses != null && Model.PendingCourses.Any();
     var hasPublished = Model.PublishedCourses != null && Model.PublishedCourses.Any();
-    var hasAny = hasPending || hasPublished;
+    var hasRejected = Model.RejectedCourses != null && Model.RejectedCourses.Any();
+    var hasAny = hasPending || hasPublished || hasRejected;
 }
 
 @section Styles {
@@ -68,6 +69,30 @@
             </div>
         }
 
+        @* Khóa bị từ chối *@
+        @if (hasRejected)
+        {
+            <div class="mb-5 pb-4 border-bottom">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="text-danger mb-0">
+                        <i class="bi bi-x-circle"></i> Khóa bị từ chối
+                    </h4>
+                    <span class="badge bg-danger">@Model.RejectedCourses.Count khóa</span>
+                </div>
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-info-circle"></i> Các khóa học dưới đây đã bị quản trị viên từ chối. Bạn có thể xem lý do, chỉnh sửa nội dung và gửi lại sau.
+                </p>
+                <div class="row">
+                    @foreach (var course in Model.RejectedCourses)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            @await Html.PartialAsync("_CourseCard", course)
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
         @* Khóa đã xuất bản *@
         @if (hasPublished)
         {
@@ -77,6 +102,29 @@
                         <i class="bi bi-check-circle"></i> Khóa đã xuất bản
                     </h4>
                     <span class="badge bg-success">@Model.PublishedCourses.Count khóa</span>
+                </div>
+
+                <!-- Search Form for Published Courses -->
+                <div class="mb-3">
+                    <form method="get" asp-action="Index">
+                        <div class="input-group">
+                            <input type="text" 
+                                   name="searchString" 
+                                   value="@ViewData["CurrentFilter"]" 
+                                   class="form-control" 
+                                   placeholder="Tìm kiếm khóa học của bạn theo tên hoặc mô tả..." 
+                                   aria-label="Tìm kiếm khóa học">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i> Tìm kiếm
+                            </button>
+                            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+                            {
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle"></i> Xóa bộ lọc
+                                </a>
+                            }
+                        </div>
+                    </form>
                 </div>
                 <div class="row">
                     @foreach (var course in Model.PublishedCourses)
