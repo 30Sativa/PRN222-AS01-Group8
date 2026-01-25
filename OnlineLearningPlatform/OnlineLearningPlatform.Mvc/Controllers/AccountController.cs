@@ -138,15 +138,12 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         {
             if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Admin))
             {
-
                 return RedirectToAction("Index", "Admin", new { area = "Admin" });
-
-                return RedirectToAction("Index", "RoleTest");
             }
 
             if (await _signInManager.UserManager.IsInRoleAsync(user, RolesNames.Instructor))
             {
-                return RedirectToAction("Index", "RoleTest");
+                return RedirectToAction("Index", "Teacher");
             }
 
             // Student redirect to Student/Index (có navbar)
