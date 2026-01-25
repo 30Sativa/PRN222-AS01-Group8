@@ -11,7 +11,13 @@ namespace OnlineLearningPlatform.Services.Interfaces
     public interface ITeacherService
     {
         // Quản lý danh sách khóa học
-        Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId);
+        Task<List<TeacherCourseDto>> GetTeacherCoursesAsync(string teacherId, string? keyword = null);
+
+        /// <summary>Lấy danh sách khóa học đang chờ duyệt của giáo viên.</summary>
+        Task<List<TeacherCourseDto>> GetTeacherPendingCoursesAsync(string teacherId);
+
+        /// <summary>Lấy danh sách khóa học bị từ chối của giáo viên (kèm lý do).</summary>
+        Task<List<TeacherCourseDto>> GetTeacherRejectedCoursesAsync(string teacherId);
 
         // Lấy chi tiết khóa học để chỉnh sửa
         Task<TeacherCourseDto?> GetTeacherCourseByIdAsync(Guid courseId, string teacherId);
@@ -77,5 +83,36 @@ namespace OnlineLearningPlatform.Services.Interfaces
         /// Xem chi tiết tiến độ học tập của 1 học viên
         /// </summary>
         Task<StudentProgressDto?> GetStudentProgressAsync(Guid courseId, string studentId, string teacherId);
+
+        // ===== QUẢN LÝ QUIZ =====
+        /// <summary>
+        /// Kiểm tra xem lesson đã có quiz chưa
+        /// </summary>
+        Task<bool> HasQuizForLessonAsync(int lessonId);
+
+        /// <summary>
+        /// Lấy danh sách quiz theo danh sách lessonIds (dùng cho ManageSections)
+        /// </summary>
+        Task<Dictionary<int, (int QuizId, string Title)>> GetQuizzesByLessonIdsAsync(List<int> lessonIds);
+
+        /// <summary>
+        /// Tạo quiz mới cho lesson
+        /// </summary>
+        Task<int> CreateQuizAsync(int lessonId, CreateQuizRequest request, string teacherId);
+
+        /// <summary>
+        /// Lấy chi tiết quiz với questions và answers
+        /// </summary>
+        Task<QuizDetailDto?> GetQuizDetailsAsync(int quizId, string teacherId);
+
+        /// <summary>
+        /// Cập nhật quiz
+        /// </summary>
+        Task<bool> UpdateQuizAsync(int quizId, UpdateQuizRequest request, string teacherId);
+
+        /// <summary>
+        /// Xóa quiz
+        /// </summary>
+        Task<bool> DeleteQuizAsync(int quizId, string teacherId);
     }
 }

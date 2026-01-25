@@ -1,8 +1,10 @@
+@import url('~/css/common.css');
+
 /* Teacher Common Styles - Matching Student Theme */
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #a8d8ff 0%, #7db9e8 100%);
+    background: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
     color: #2c3e50;
@@ -41,15 +43,15 @@ main {
 /* Cards styling to match Student theme */
 .card {
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     background: white;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {

@@ -1,0 +1,223 @@
+@using OnlineLearningPlatform.Services.DTO.Response.Course
+@model CourseDetailDto
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/course-details.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .checkout-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .checkout-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .course-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .course-summary h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .total-amount {
+            font-size: 1.3em;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-methods h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .payment-method-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-method-option:hover {
+            border-color: #007bff;
+            background: #f0f7ff;
+        }
+
+        .payment-method-option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .payment-method-label {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-pay {
+            background: #28a745;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-pay:hover {
+            background: #218838;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            color: white;
+        }
+
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+
+        .demo-notice strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+}
+
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1><i class="bi bi-credit-card"></i> Thanh toán khóa học</h1>
+    </div>
+
+    <div class="demo-notice">
+        <strong><i class="bi bi-info-circle"></i> Lưu ý:</strong>
+        Đây là chế độ demo. Thanh toán sẽ được xử lý tự động và luôn thành công.
+    </div>
+
+    <div class="course-summary">
+        <h3><i class="bi bi-book"></i> Thông tin khóa học</h3>
+        <div class="summary-item">
+            <span class="summary-label">Tên khóa học:</span>
+            <span class="summary-value">@Model.Title</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Giảng viên:</span>
+            <span class="summary-value">@Model.TeacherName</span>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.CategoryName))
+        {
+            <div class="summary-item">
+                <span class="summary-label">Danh mục:</span>
+                <span class="summary-value">@Model.CategoryName</span>
+            </div>
+        }
+        <div class="summary-item">
+            <span class="summary-label">Giá khóa học:</span>
+            <span class="summary-value">@Model.Price.ToString("N0") VNĐ</span>
+        </div>
+        <div class="summary-item total-amount">
+            <span>Tổng thanh toán:</span>
+            <span>@Model.Price.ToString("N0") VNĐ</span>
+        </div>
+    </div>
+
+    <form asp-action="ProcessPayment" method="post" id="paymentForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="courseId" value="@Model.CourseId" />
+
+        <div class="payment-methods">
+            <h3><i class="bi bi-wallet2"></i> Phương thức thanh toán</h3>
+            <div class="payment-method-option">
+                <input type="radio" name="paymentMethod" value="demo" id="demo" checked />
+                <label for="demo" class="payment-method-label">
+                    <i class="bi bi-credit-card"></i> Thanh toán Demo (Tự động thành công)
+                </label>
+            </div>
+        </div>
+
+        <div class="payment-actions">
+            <button type="submit" class="btn-pay">
+                <i class="bi bi-check-circle"></i> Xác nhận thanh toán
+            </button>
+            <a asp-action="CourseDetails" asp-route-id="@Model.CourseId" class="btn-cancel">
+                <i class="bi bi-x-circle"></i> Hủy
+            </a>
+        </div>
+    </form>
+</div>

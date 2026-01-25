@@ -1,3 +1,5 @@
+using OnlineLearningPlatform.Models.Enums;
+
 namespace OnlineLearningPlatform.Services.DTO.Response
 {
     public class TeacherCourseDto
@@ -8,6 +10,8 @@ namespace OnlineLearningPlatform.Services.DTO.Response
         public string? CategoryName { get; set; }
         public decimal Price { get; set; }
         public DateTime CreatedAt { get; set; }
+        public CourseStatus Status { get; set; }
+        public string? RejectionReason { get; set; }
 
         // Statistics
         public int TotalEnrollments { get; set; }

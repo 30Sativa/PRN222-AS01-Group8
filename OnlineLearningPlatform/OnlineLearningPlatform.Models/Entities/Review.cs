@@ -1,4 +1,4 @@
-﻿using OnlineLearningPlatform.Models.Identity;
+using OnlineLearningPlatform.Models.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

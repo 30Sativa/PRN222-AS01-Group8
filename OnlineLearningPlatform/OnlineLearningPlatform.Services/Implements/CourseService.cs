@@ -24,9 +24,18 @@ namespace OnlineLearningPlatform.Services.Implements
             _lessonRepository = lessonRepository;
         }
 
-        public async Task<List<CourseDto>> GetAllCoursesAsync(string? userId = null)
+        public async Task<List<CourseDto>> GetAllCoursesAsync(string? userId = null, string? keyword = null)
         {
-            var courses = await _courseRepository.GetAllCoursesAsync();
+            List<Course> courses;
+            
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                courses = await _courseRepository.SearchCoursesAsync(keyword);
+            }
+            else
+            {
+                courses = await _courseRepository.GetAllCoursesAsync();
+            }
             
             // Chỉ lấy courses đã được Published (đã approve)
             courses = courses.Where(c => c.Status == CourseStatus.Published).ToList();

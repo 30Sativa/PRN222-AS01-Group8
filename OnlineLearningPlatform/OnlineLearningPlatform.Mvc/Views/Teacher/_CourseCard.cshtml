@@ -1,0 +1,96 @@
+@model OnlineLearningPlatform.Services.DTO.Response.TeacherCourseDto
+@using OnlineLearningPlatform.Models.Enums
+@{
+    var isPending = Model.Status == CourseStatus.Pending;
+    var description = Model.Description ?? "";
+    var hasLongDescription = description.Length > 140;
+    var toggleId = $"toggle-desc-{Model.CourseId:N}";
+}
+<div class="card h-100 @(isPending ? "border-warning" : "")">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <div class="card-text">
+            @if (hasLongDescription)
+            {
+                <input type="checkbox" class="course-desc-toggle" id="@toggleId" />
+            }
+            <p class="course-desc-text mb-0">@description</p>
+            @if (hasLongDescription)
+            {
+                <label class="course-desc-btn" for="@toggleId">
+                    <span class="when-closed">Xem thêm</span>
+                    <span class="when-open">Thu gọn</span>
+                </label>
+            }
+        </div>
+        <div class="mb-2">
+            @if (Model.Status == CourseStatus.Pending)
+            {
+                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
+            }
+            else if (Model.Status == CourseStatus.Rejected)
+            {
+                <span class="badge bg-danger">Bị từ chối</span>
+            }
+            else
+            {
+                <span class="badge bg-success">Đã xuất bản</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.CategoryName))
+            {
+                <span class="badge bg-secondary">@Model.CategoryName</span>
+            }
+            @if (Model.Price == 0)
+            {
+                <span class="badge bg-success">Miễn phí</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">@Model.Price.ToString("N0") VNĐ</span>
+            }
+        </div>
+        <div class="course-stats mb-3">
+            <div class="d-flex justify-content-between text-muted small">
+                <span><i class="bi bi-people"></i> @Model.TotalEnrollments học viên</span>
+                <span><i class="bi bi-book"></i> @Model.TotalSections chương</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mt-1">
+                <span><i class="bi bi-file-earmark-text"></i> @Model.TotalLessons bài học</span>
+                <span><i class="bi bi-calendar"></i> @Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+
+        @if (Model.Status == CourseStatus.Rejected)
+        {
+            <div class="alert alert-danger py-2 px-2 small mb-0" role="alert">
+                <strong>Lý do từ chối:</strong>
+                @(string.IsNullOrWhiteSpace(Model.RejectionReason) ? "Không có thông tin." : Model.RejectionReason)
+            </div>
+        }
+    </div>
+    @if (Model.Status != CourseStatus.Pending)
+    {
+        <div class="card-footer bg-transparent">
+            <div class="btn-group w-100" role="group">
+                <a asp-action="Edit" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Sửa
+                </a>
+                <a asp-action="ManageSections" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-list-ul"></i> Nội dung
+                </a>
+                <a asp-action="ViewEnrollments" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-people"></i> Học viên
+                </a>
+                <a asp-action="ViewCourseReviews" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-warning">
+                    <i class="bi bi-star"></i> Đánh giá
+                </a>
+                @if (Model.Status == CourseStatus.Published)
+                {
+                    <a asp-action="ViewEnrollments" asp-route-id="@Model.CourseId" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-people"></i> Học viên
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>

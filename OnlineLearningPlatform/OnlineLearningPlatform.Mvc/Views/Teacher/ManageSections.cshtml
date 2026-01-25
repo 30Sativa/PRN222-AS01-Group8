@@ -71,18 +71,18 @@
                         aria-labelledby="@headingId" data-bs-parent="#sectionsAccordion">
                         <div class="accordion-body">
                             <!-- Section Actions -->
-                            <div class="mb-3 d-flex gap-2">
+                            <div class="mb-4 d-flex gap-2 flex-wrap">
                                 <a asp-action="CreateLesson" asp-route-sectionId="@sec.SectionId"
-                                    class="btn btn-sm btn-success">
-                                    <i class="fas fa-plus me-1"></i>Thêm bài học
+                                    class="btn btn-success btn-lg">
+                                    <i class="fas fa-plus me-2"></i>Thêm bài học
                                 </a>
                                 <a asp-action="EditSection" asp-route-id="@sec.SectionId"
-                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-edit me-1"></i>Sửa chương
+                                    class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-edit me-2"></i>Sửa chương
                                 </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                <button type="button" class="btn btn-outline-danger btn-lg"
                                     onclick="confirmDeleteSection(@sec.SectionId, '@sec.Title')">
-                                    <i class="fas fa-trash me-1"></i>Xóa chương
+                                    <i class="fas fa-trash me-2"></i>Xóa chương
                                 </button>
                             </div>
 
@@ -98,30 +98,60 @@
                                 <div class="list-group">
                                     @foreach (var lesson in sec.Lessons.OrderBy(l => l.OrderIndex))
                                     {
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="mb-1">
-                                                        <i class="fas @GetLessonIcon(lesson.LessonType) me-2"></i>
+                                        <div class="list-group-item p-3 mb-2 border rounded shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="flex-grow-1 me-3">
+                                                    <h5 class="mb-2">
+                                                        <i class="fas @GetLessonIcon(lesson.LessonType) me-2 text-primary"></i>
                                                         @lesson.Title
-                                                    </h6>
-                                                    <small class="text-muted">
-                                                        <span
-                                                            class="badge bg-secondary me-2">@GetLessonTypeText(lesson.LessonType)</span>
+                                                    </h5>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="badge bg-secondary fs-6 px-3 py-2">@GetLessonTypeText(lesson.LessonType)</span>
                                                         @if (lesson.OrderIndex.HasValue)
                                                         {
-                                                            <span>Thứ tự: @lesson.OrderIndex</span>
+                                                            <span class="text-muted">Thứ tự: @lesson.OrderIndex</span>
                                                         }
-                                                    </small>
+                                                    </div>
                                                 </div>
-                                                <div class="btn-group btn-group-sm">
+                                                <div class="d-flex gap-2 flex-shrink-0">
+                                                    @{
+                                                        var hasQuiz = false;
+                                                        int quizId = 0;
+                                                        if (ViewBag.Quizzes != null)
+                                                        {
+                                                            var quizzesDict = (Dictionary<int, (int QuizId, string Title)>)ViewBag.Quizzes;
+                                                            hasQuiz = quizzesDict.ContainsKey(lesson.LessonId) && quizzesDict[lesson.LessonId].QuizId > 0;
+                                                            if (hasQuiz)
+                                                            {
+                                                                quizId = quizzesDict[lesson.LessonId].QuizId;
+                                                            }
+                                                        }
+                                                    }
+                                                    @if (hasQuiz)
+                                                    {
+                                                        <a asp-action="ViewQuiz" asp-route-id="@quizId"
+                                                            class="btn btn-info" title="Xem quiz">
+                                                            <i class="fas fa-eye me-2"></i>Xem Quiz
+                                                        </a>
+                                                        <a asp-action="EditQuiz" asp-route-id="@quizId"
+                                                            class="btn btn-warning" title="Sửa quiz">
+                                                            <i class="fas fa-edit me-2"></i>Sửa Quiz
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a asp-action="CreateQuiz" asp-route-lessonId="@lesson.LessonId"
+                                                            class="btn btn-success" title="Tạo quiz cho bài học này">
+                                                            <i class="fas fa-question-circle me-2"></i>Tạo Quiz
+                                                        </a>
+                                                    }
                                                     <a asp-action="EditLesson" asp-route-id="@lesson.LessonId"
-                                                        class="btn btn-outline-primary">
-                                                        <i class="fas fa-edit"></i>
+                                                        class="btn btn-primary" title="Sửa bài học">
+                                                        <i class="fas fa-edit me-2"></i>Sửa
                                                     </a>
-                                                    <button type="button" class="btn btn-outline-danger"
-                                                        onclick="confirmDeleteLesson(@lesson.LessonId, '@lesson.Title')">
-                                                        <i class="fas fa-trash"></i>
+                                                    <button type="button" class="btn btn-danger"
+                                                        onclick="confirmDeleteLesson(@lesson.LessonId, '@lesson.Title')" title="Xóa bài học">
+                                                        <i class="fas fa-trash me-2"></i>Xóa
                                                     </button>
                                                 </div>
                                             </div>

@@ -1,0 +1,217 @@
+@model OnlineLearningPlatform.Services.DTO.Request.UpdateQuizRequest
+@using OnlineLearningPlatform.Services.DTO.Request
+
+@{
+    ViewData["Title"] = "Chỉnh sửa Quiz";
+    Layout = "~/Views/Shared/_LayoutTeacher.cshtml";
+    var jsonOptions = new System.Text.Json.JsonSerializerOptions
+    {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    };
+    var questionsJson = Model.Questions != null ? System.Text.Json.JsonSerializer.Serialize(Model.Questions, jsonOptions) : "[]";
+}
+
+<div class="container py-4">
+    <div class="card shadow p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="text-primary mb-2"><i class="fas fa-edit me-2"></i>Chỉnh sửa Quiz</h3>
+                <p class="text-muted mb-0">Bài học: <strong>@ViewBag.LessonTitle</strong></p>
+            </div>
+            <a asp-action="ManageSections" asp-route-id="@ViewBag.CourseId" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i><strong>Lỗi validation:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form asp-action="EditQuiz" asp-route-id="@ViewBag.QuizId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="courseId" value="@ViewBag.CourseId" />
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Tiêu đề Quiz <span class="text-danger">*</span></label>
+                <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề quiz" required />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div id="qContainer" class="mb-3"></div>
+
+            <div class="d-flex gap-2 mb-3">
+                <button type="button" class="btn btn-outline-primary" onclick="addQuestion()">
+                    <i class="fas fa-plus me-2"></i>Thêm câu hỏi
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="ManageSections" asp-route-id="@ViewBag.CourseId" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Hủy
+                </a>
+                <button type="submit" class="btn btn-success px-5">
+                    <i class="fas fa-save me-2"></i>Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var existingQuestions = @Html.Raw(questionsJson);
+
+        function addQuestion(content = '', answers = [], correctAnswerIndex = 0) {
+            var qIdx = $('#qContainer .question-card').length;
+            let h = `<div class="card p-3 mb-3 border-start border-primary border-4 shadow-sm question-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-primary question-number">Câu hỏi ${qIdx + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQuestion(this)">
+                        <i class="fas fa-trash"></i> Xóa
+                    </button>
+                </div>
+                <input class="form-control mb-2 question-content" placeholder="Nội dung câu hỏi" required value="${escapeHtml(content)}" />
+                <div class="answers-container mb-2"></div>
+                <button type="button" class="btn btn-sm btn-link text-primary" onclick="addAnswer(this)">
+                    <i class="fas fa-plus me-1"></i>Thêm đáp án
+                </button>
+                <input type="hidden" class="correct-answer-index" value="${correctAnswerIndex}" />
+            </div>`;
+            $('#qContainer').append(h);
+            
+            var questionCard = $('#qContainer .question-card').last();
+            
+            // Add answers
+            if (answers.length > 0) {
+                answers.forEach(function(answer, idx) {
+                    addAnswerToCard(questionCard, answer.userAnswer || '', idx === correctAnswerIndex);
+                });
+            } else {
+                // Add 2 default empty answers
+                addAnswerToCard(questionCard, '', true);
+                addAnswerToCard(questionCard, '', false);
+            }
+            
+            reindexAllQuestions();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
+        function removeQuestion(btn) {
+            $(btn).closest('.question-card').remove();
+            reindexAllQuestions();
+        }
+
+        function addAnswer(btn) {
+            var questionCard = $(btn).closest('.question-card');
+            addAnswerToCard(questionCard, '', false);
+            reindexAllQuestions();
+        }
+
+        function addAnswerToCard(questionCard, answerText = '', isCorrect = false) {
+            var answersContainer = questionCard.find('.answers-container');
+            var answerIdx = answersContainer.find('.answer-row').length;
+            
+            let h = `<div class="input-group mb-2 answer-row">
+                <div class="input-group-text">
+                    <input type="radio" class="correct-radio" ${isCorrect ? 'checked' : ''} required>
+                </div>
+                <input class="form-control answer-input" placeholder="Đáp án ${answerIdx + 1}" required value="${escapeHtml(answerText)}" />
+                <button type="button" class="btn btn-outline-danger" onclick="removeAnswer(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>`;
+            answersContainer.append(h);
+            
+            // Add change handler for radio
+            answersContainer.find('.answer-row').last().find('.correct-radio').on('change', function() {
+                reindexAllQuestions();
+            });
+        }
+
+        function removeAnswer(btn) {
+            var questionCard = $(btn).closest('.question-card');
+            $(btn).closest('.answer-row').remove();
+            
+            // If no radio is selected, select the first one
+            var answersContainer = questionCard.find('.answers-container');
+            if (answersContainer.find('.correct-radio:checked').length === 0) {
+                answersContainer.find('.correct-radio').first().prop('checked', true);
+            }
+            
+            reindexAllQuestions();
+        }
+
+        function reindexAllQuestions() {
+            $('#qContainer .question-card').each(function(qIdx) {
+                var questionCard = $(this);
+                
+                // Update question number display
+                questionCard.find('.question-number').text('Câu hỏi ' + (qIdx + 1));
+                
+                // Update question content field name
+                questionCard.find('.question-content').attr('name', 'Questions[' + qIdx + '].Content');
+                
+                // Update correct answer index field name and find which radio is checked
+                var correctAnswerIndex = 0;
+                questionCard.find('.answers-container .answer-row').each(function(aIdx) {
+                    var answerRow = $(this);
+                    
+                    // Update answer field name
+                    answerRow.find('.answer-input').attr('name', 'Questions[' + qIdx + '].Answers[' + aIdx + '].UserAnswer');
+                    answerRow.find('.answer-input').attr('placeholder', 'Đáp án ' + (aIdx + 1));
+                    
+                    // Update radio name for grouping
+                    answerRow.find('.correct-radio').attr('name', 'correct_radio_' + qIdx);
+                    
+                    // Check if this radio is selected
+                    if (answerRow.find('.correct-radio').is(':checked')) {
+                        correctAnswerIndex = aIdx;
+                    }
+                });
+                
+                // Update hidden field for correct answer index
+                questionCard.find('.correct-answer-index').attr('name', 'Questions[' + qIdx + '].CorrectAnswerIndex');
+                questionCard.find('.correct-answer-index').val(correctAnswerIndex);
+            });
+        }
+
+        // Load existing questions when page loads
+        $(document).ready(function() {
+            console.log('Existing questions:', existingQuestions);
+            
+            if (existingQuestions && existingQuestions.length > 0) {
+                existingQuestions.forEach(function(question) {
+                    addQuestion(question.content || '', question.answers || [], question.correctAnswerIndex || 0);
+                });
+            } else {
+                // No existing questions, add one empty question
+                addQuestion();
+            }
+        });
+    </script>
+}

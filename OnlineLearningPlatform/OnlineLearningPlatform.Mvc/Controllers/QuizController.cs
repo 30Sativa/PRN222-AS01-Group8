@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OnlineLearningPlatform.Models;
 using OnlineLearningPlatform.Models.Entities;
-using OnlineLearningPlatform.Repositories.Interfaces;
 using OnlineLearningPlatform.Services.Interfaces;
 using System.Security.Claims;
 
@@ -11,12 +8,10 @@ using System.Security.Claims;
 public class QuizController : Controller
 {
     private readonly IQuizService _quizService;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ApplicationDbContext _context;
 
-    public QuizController(IQuizService quizService, IUnitOfWork unitOfWork, ApplicationDbContext context)
+    public QuizController(IQuizService quizService)
     {
-        _quizService = quizService; _unitOfWork = unitOfWork; _context = context;
+        _quizService = quizService;
     }
 
     // --- PHẦN GIÁO VIÊN ---
@@ -25,20 +20,18 @@ public class QuizController : Controller
     public async Task<IActionResult> Create()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        ViewBag.CourseList = await _context.Courses.Where(c => c.TeacherId == userId).ToListAsync();
+        ViewBag.CourseList = await _quizService.GetCoursesByTeacherIdAsync(userId);
         return View();
     }
 
     [HttpGet]
     public async Task<JsonResult> GetSectionsByCourse(Guid courseId) =>
-        Json(await _context.Sections.Where(s => s.CourseId == courseId).Select(s => new { s.SectionId, s.Title }).ToListAsync());
+        Json(await _quizService.GetSectionsByCourseIdAsync(courseId));
 
     [HttpGet]
     public async Task<JsonResult> GetLessonsBySection(int sectionId) =>
-        Json(await _context.Lessons.Where(l => l.SectionId == sectionId).Select(l => new { l.LessonId, l.Title }).ToListAsync());
+        Json(await _quizService.GetLessonsBySectionIdAsync(sectionId));
 
-    [HttpPost]
-    [Authorize(Roles = "Instructor")]
     [HttpPost]
     [Authorize(Roles = "Instructor")]
     public async Task<IActionResult> Create(Quiz quiz, IFormCollection form)
@@ -64,8 +57,7 @@ public class QuizController : Controller
                 }
             }
 
-            _context.Quizzes.Add(quiz);
-            await _context.SaveChangesAsync();
+            await _quizService.CreateQuizAsync(quiz);
 
             return RedirectToAction("Menu", "Instructor");
         }
@@ -79,7 +71,7 @@ public class QuizController : Controller
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> TakeByLesson(int lessonId)
     {
-        var quiz = await _context.Quizzes.FirstOrDefaultAsync(q => q.LessonId == lessonId);
+        var quiz = await _quizService.GetQuizByLessonIdAsync(lessonId);
         if (quiz == null) return RedirectToAction("Index", "Student");
         return RedirectToAction("Take", new { id = quiz.QuizId });
     }
@@ -89,7 +81,7 @@ public class QuizController : Controller
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!await _quizService.CanUserAttemptAsync(userId, id)) return Content("Bạn đã hết 3 lượt làm bài!");
-        var quiz = await _context.Quizzes.Include(q => q.Questions).ThenInclude(qs => qs.QuizAnswers).FirstOrDefaultAsync(q => q.QuizId == id);
+        var quiz = await _quizService.GetQuizWithQuestionsAsync(id);
         return View(quiz);
     }
 
@@ -105,33 +97,21 @@ public class QuizController : Controller
     }
 
     public async Task<IActionResult> Result(Guid id) =>
-        View(await _context.QuizAttempts.Include(a => a.Quiz).FirstOrDefaultAsync(a => a.AttemptId == id));
+        View(await _quizService.GetQuizAttemptByIdAsync(id));
 
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> History()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var history = await _context.QuizAttempts
-            .Include(a => a.Quiz) 
-            .Where(a => a.UserId == userId)
-            .OrderByDescending(a => a.AttemptedAt)
-            .ToListAsync();
-
+        var history = await _quizService.GetQuizAttemptHistoryByUserIdAsync(userId);
         return View(history);
     }
 
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> AttemptDetail(Guid id)
     {
-        var attempt = await _context.QuizAttempts
-            .Include(a => a.Quiz)
-            .ThenInclude(q => q.Questions)
-            .FirstOrDefaultAsync(a => a.AttemptId == id);
-
-        ViewBag.UserAnswers = await _context.QuizAnswers
-            .Where(ans => ans.AttemptId == id)
-            .ToListAsync();
-
+        var attempt = await _quizService.GetQuizAttemptWithDetailsAsync(id);
+        ViewBag.UserAnswers = await _quizService.GetQuizAnswersByAttemptIdAsync(id);
         return View(attempt);
     }
 }

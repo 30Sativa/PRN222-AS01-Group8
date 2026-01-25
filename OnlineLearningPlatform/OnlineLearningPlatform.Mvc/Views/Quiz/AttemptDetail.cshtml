@@ -1,27 +1,122 @@
-﻿@model OnlineLearningPlatform.Models.Entities.QuizAttempt
+@model OnlineLearningPlatform.Models.Entities.QuizAttempt
 @{
+    ViewData["Title"] = "Chi tiết bài làm";
     var userAnswers = (List<OnlineLearningPlatform.Models.Entities.QuizAnswer>)ViewBag.UserAnswers;
+    var questions = Model.Quiz.Questions.ToList();
+    var totalQuestions = questions.Count;
+    var correctCount = 0;
+    var questionIndex = 0;
 }
 
-<div class="container mt-4">
-    <div class="card border-0 shadow">
-        <div class="card-body p-4">
-            <h3>Xem lại bài làm: @Model.Quiz.Title</h3>
-            <p class="text-muted">Điểm số: <strong>@Model.Score</strong> | Ngày làm: @Model.AttemptedAt</p>
-            <hr />
+<link rel="stylesheet" href="~/css/Quiz/quiz.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
 
-            @foreach (var q in Model.Quiz.Questions)
-            {
-                var userAns = userAnswers.FirstOrDefault(x => x.QuestionId == q.QuestionId)?.UserAnswer;
-                bool isCorrect = userAns?.Trim().ToLower() == q.CorrectAnswer.Trim().ToLower();
-
-                <div class="mb-4 p-3 border rounded @(isCorrect ? "border-success bg-light" : "border-danger")">
-                    <h5 class="fw-bold">@q.Content</h5>
-                    <p class="mb-1">Câu trả lời của bạn: <span class="fw-bold @(isCorrect ? "text-success" : "text-danger")">@userAns</span></p>
-                    <p class="mb-0 text-muted">Đáp án đúng: <span class="text-success fw-bold">@q.CorrectAnswer</span></p>
-                </div>
-            }
-            <a asp-action="History" class="btn btn-secondary px-4 mt-3">Quay lại danh sách</a>
+<div class="detail-container">
+    <!-- Header -->
+    <div class="detail-header">
+        <h2><i class="bi bi-file-earmark-check me-2"></i>@Model.Quiz.Title</h2>
+        <div class="detail-header-meta">
+            <div class="detail-meta-item">
+                <i class="bi bi-calendar3"></i>
+                <span>@Model.AttemptedAt.ToString("dd/MM/yyyy")</span>
+            </div>
+            <div class="detail-meta-item">
+                <i class="bi bi-clock"></i>
+                <span>@Model.AttemptedAt.ToString("HH:mm")</span>
+            </div>
+            <div class="detail-meta-item">
+                <i class="bi bi-question-circle"></i>
+                <span>@totalQuestions câu hỏi</span>
+            </div>
         </div>
+        <div class="detail-score-badge">
+            <div class="score-circle">
+                @Model.Score
+                <small>/10</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Review -->
+    <div class="review-cards">
+        @foreach (var q in questions)
+        {
+            questionIndex++;
+            var userAns = userAnswers.FirstOrDefault(x => x.QuestionId == q.QuestionId)?.UserAnswer;
+            var isCorrect = userAns?.Trim().ToLower() == q.CorrectAnswer.Trim().ToLower();
+            if (isCorrect) correctCount++;
+
+            <div class="review-card @(isCorrect ? "correct" : "incorrect")">
+                <div class="review-card-header">
+                    <div style="display: flex; align-items: center;">
+                        <span class="review-question-number">@questionIndex</span>
+                        <span class="review-question-text">@q.Content</span>
+                    </div>
+                    <div class="review-status @(isCorrect ? "correct" : "incorrect")">
+                        @if (isCorrect)
+                        {
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Đúng</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>Sai</span>
+                        }
+                    </div>
+                </div>
+                <div class="review-card-body">
+                    <div class="review-answer-row user-answer">
+                        <div class="review-answer-label">
+                            <i class="bi bi-person-fill"></i>
+                            Câu trả lời của bạn:
+                        </div>
+                        <div class="review-answer-value user">
+                            @(string.IsNullOrEmpty(userAns) ? "(Không trả lời)" : userAns)
+                        </div>
+                    </div>
+                    @if (!isCorrect)
+                    {
+                        <div class="review-answer-row correct-answer">
+                            <div class="review-answer-label">
+                                <i class="bi bi-check-lg"></i>
+                                Đáp án đúng:
+                            </div>
+                            <div class="review-answer-value correct">@q.CorrectAnswer</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Summary -->
+    <div style="background: white; border-radius: var(--border-radius-lg); padding: 1.5rem; margin-top: 2rem; box-shadow: var(--shadow-sm); text-align: center;">
+        <h4 style="color: var(--text-color); margin-bottom: 1rem;">
+            <i class="bi bi-bar-chart-fill me-2" style="color: var(--primary-color);"></i>
+            Tổng kết
+        </h4>
+        <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;">
+            <div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">@correctCount</div>
+                <div style="color: var(--text-light); font-size: 0.9rem;">Câu đúng</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--error-color);">@(totalQuestions - correctCount)</div>
+                <div style="color: var(--text-light); font-size: 0.9rem;">Câu sai</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">@(Math.Round((double)correctCount / totalQuestions * 100))%</div>
+                <div style="color: var(--text-light); font-size: 0.9rem;">Tỷ lệ đúng</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-btn-wrapper">
+        <a asp-action="History" class="btn-back">
+            <i class="bi bi-arrow-left"></i>
+            Quay lại danh sách
+        </a>
     </div>
 </div>

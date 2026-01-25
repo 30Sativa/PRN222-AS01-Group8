@@ -1,7 +1,9 @@
+@import url('~/css/common.css');
+
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+    background: #f8f9fa;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
     color: #2c3e50;
@@ -24,7 +26,7 @@ body {
 
 .course-header-content {
     padding: 40px;
-    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     position: relative;
 }
@@ -450,5 +452,344 @@ body {
     .btn-enroll,
     .btn-back {
         width: 100%;
+    }
+}
+
+/* Reviews Section */
+.course-reviews-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.reviews-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.reviews-header-section h2 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-view-all-reviews {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-view-all-reviews:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Review Summary Card */
+.review-summary-card {
+    display: flex;
+    gap: 40px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.summary-left {
+    min-width: 180px;
+}
+
+.average-rating-display {
+    text-align: center;
+}
+
+.rating-number {
+    font-size: 48px;
+    font-weight: 700;
+    color: #667eea;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.stars-display {
+    margin-bottom: 10px;
+}
+
+.stars-display .star {
+    font-size: 24px;
+    color: #ddd;
+    margin: 0 2px;
+}
+
+.stars-display .star.filled {
+    color: #ffc107;
+}
+
+.total-reviews-text {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.summary-right {
+    flex: 1;
+}
+
+.rating-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rating-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.rating-label {
+    min-width: 50px;
+    font-size: 14px;
+    color: #666;
+}
+
+.rating-bar-container {
+    flex: 1;
+}
+
+.rating-bar-bg {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rating-bar-progress {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+.rating-count-text {
+    min-width: 30px;
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+}
+
+/* User Review Card */
+.user-review-card {
+    background: #f0f7ff;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.user-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-review-header h3 {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-edit-review {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-review:hover {
+    background: #5568d3;
+    color: white;
+    text-decoration: none;
+}
+
+.user-review-content {
+    margin-top: 15px;
+}
+
+.user-review-rating {
+    margin-bottom: 10px;
+}
+
+.user-review-rating .star {
+    font-size: 20px;
+    color: #ddd;
+    margin-right: 3px;
+}
+
+.user-review-rating .star.filled {
+    color: #ffc107;
+}
+
+.user-review-comment {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+.user-review-date {
+    color: #999;
+    font-size: 12px;
+}
+
+/* Create Review Prompt */
+.create-review-prompt {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.create-review-prompt p {
+    color: #856404;
+    font-size: 14px;
+    margin: 0 0 15px 0;
+}
+
+.btn-create-review {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-create-review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Reviews List Preview */
+.reviews-list-preview {
+    margin-top: 25px;
+}
+
+.reviews-list-preview h3 {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+}
+
+.review-item-preview {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.3s ease;
+}
+
+.review-item-preview:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.review-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.review-item-rating {
+    display: flex;
+    gap: 2px;
+}
+
+.review-item-rating .star {
+    font-size: 16px;
+    color: #ddd;
+}
+
+.review-item-rating .star.filled {
+    color: #ffc107;
+}
+
+.review-item-comment {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+.review-item-date {
+    color: #999;
+    font-size: 12px;
+}
+
+.no-reviews-message {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.no-reviews-message p {
+    margin: 0 0 15px 0;
+    font-style: italic;
+}
+
+/* Responsive for Reviews */
+@media (max-width: 768px) {
+    .reviews-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .review-summary-card {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .rating-row {
+        flex-wrap: wrap;
+    }
+
+    .user-review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
 }

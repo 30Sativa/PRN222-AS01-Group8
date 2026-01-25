@@ -1,0 +1,136 @@
+@model OnlineLearningPlatform.Services.DTO.Request.CreateQuizRequest
+
+@{
+    ViewData["Title"] = "Tạo Quiz mới";
+    Layout = "~/Views/Shared/_LayoutTeacher.cshtml";
+}
+
+<div class="container py-4">
+    <div class="card shadow p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="text-primary mb-2"><i class="fas fa-question-circle me-2"></i>Tạo Quiz mới</h3>
+                <p class="text-muted mb-0">Bài học: <strong>@ViewBag.LessonTitle</strong></p>
+            </div>
+            <a asp-action="ManageSections" asp-route-id="@ViewBag.CourseId" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form asp-action="CreateQuiz" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="lessonId" value="@ViewBag.LessonId" />
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Tiêu đề Quiz <span class="text-danger">*</span></label>
+                <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề quiz" required />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div id="qContainer" class="mb-3"></div>
+
+            <div class="d-flex gap-2 mb-3">
+                <button type="button" class="btn btn-outline-primary" onclick="addQ()">
+                    <i class="fas fa-plus me-2"></i>Thêm câu hỏi
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="ManageSections" asp-route-id="@ViewBag.CourseId" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Hủy
+                </a>
+                <button type="submit" class="btn btn-success px-5">
+                    <i class="fas fa-save me-2"></i>Lưu Quiz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let qIdx = 0;
+
+        function addQ() {
+            let h = `<div class="card p-3 mb-3 border-start border-primary border-4 shadow-sm" id="q${qIdx}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-primary">Câu hỏi ${qIdx + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQ(${qIdx})">
+                        <i class="fas fa-trash"></i> Xóa
+                    </button>
+                </div>
+                <input name="Questions[${qIdx}].Content" class="form-control mb-2" placeholder="Nội dung câu hỏi" required />
+                <div id="ans${qIdx}" class="mb-2"></div>
+                <button type="button" class="btn btn-sm btn-link text-primary" onclick="addA(${qIdx})">
+                    <i class="fas fa-plus me-1"></i>Thêm đáp án
+                </button>
+                <input type="hidden" name="Questions[${qIdx}].CorrectAnswerIndex" id="correct_${qIdx}" value="0" required />
+            </div>`;
+            $('#qContainer').append(h);
+            addA(qIdx);
+            addA(qIdx);
+            qIdx++;
+            updateQuestionNumbers();
+        }
+
+        function removeQ(qi) {
+            $(`#q${qi}`).remove();
+            updateQuestionNumbers();
+        }
+
+        function updateQuestionNumbers() {
+            $('#qContainer .card').each(function(index) {
+                $(this).find('h6').text(`Câu hỏi ${index + 1}`);
+            });
+        }
+
+        function addA(qi) {
+            let ai = $(`#ans${qi} .input-group`).length;
+            let h = `<div class="input-group mb-2" id="ans${qi}_${ai}">
+                <div class="input-group-text">
+                    <input type="radio" name="correct_radio_${qi}" value="${ai}" onchange="setCorrectAnswer(${qi}, ${ai})" required>
+                </div>
+                <input name="Questions[${qi}].Answers[${ai}].UserAnswer" class="form-control" placeholder="Đáp án ${ai + 1}" required />
+                <button type="button" class="btn btn-outline-danger" onclick="removeA(${qi}, ${ai})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>`;
+            $(`#ans${qi}`).append(h);
+        }
+
+        function setCorrectAnswer(qi, ai) {
+            $(`#correct_${qi}`).val(ai);
+        }
+
+        function removeA(qi, ai) {
+            $(`#ans${qi}_${ai}`).remove();
+            // Re-index remaining answers
+            $(`#ans${qi} .input-group`).each(function(index) {
+                $(this).attr('id', `ans${qi}_${index}`);
+                $(this).find('input[type="radio"]').val(index);
+                $(this).find('input[type="radio"]').attr('onchange', `setCorrectAnswer(${qi}, ${index})`);
+                $(this).find('input[type="text"]').attr('name', `Questions[${qi}].Answers[${index}].UserAnswer`);
+                $(this).find('input[type="text"]').attr('placeholder', `Đáp án ${index + 1}`);
+            });
+            // Set first answer as correct if none selected
+            if ($(`#ans${qi} input[type="radio"]:checked`).length === 0 && $(`#ans${qi} input[type="radio"]`).length > 0) {
+                $(`#ans${qi} input[type="radio"]`).first().prop('checked', true);
+                setCorrectAnswer(qi, 0);
+            }
+        }
+
+        // Tự động thêm câu hỏi đầu tiên khi trang load
+        window.onload = function() {
+            addQ();
+        };
+    </script>
+}

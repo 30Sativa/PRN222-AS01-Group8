@@ -1,7 +1,9 @@
+@import url('~/css/common.css');
+
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #a8d8ff 0%, #7db9e8 100%);
+    background: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
 }
@@ -15,8 +17,8 @@ body {
 /* Lesson Header */
 .lesson-header {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     padding: 30px;
     margin-bottom: 30px;
 }
@@ -67,8 +69,8 @@ body {
 /* Video Container */
 .video-container {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     padding: 30px;
     margin-bottom: 30px;
     overflow: hidden;

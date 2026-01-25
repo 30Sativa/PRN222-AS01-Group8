@@ -1,0 +1,118 @@
+@model List<OnlineLearningPlatform.Services.DTO.Response.Review.ReviewDto>
+@{
+    ViewData["Title"] = "Đánh giá khóa học";
+    var course = ViewBag.Course as OnlineLearningPlatform.Services.DTO.Response.Course.CourseDetailDto;
+    var summary = ViewBag.ReviewSummary as OnlineLearningPlatform.Services.DTO.Response.Review.CourseReviewSummaryDto;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/review.css" />
+}
+
+<div class="reviews-container">
+    <div class="reviews-header">
+        <h2>Đánh giá khóa học</h2>
+        @if (course != null)
+        {
+            <div class="course-info">
+                <h3>@course.Title</h3>
+                <a asp-action="CourseDetails" asp-route-id="@course.CourseId" class="btn btn-link">← Quay lại chi tiết khóa học</a>
+            </div>
+        }
+    </div>
+
+    @if (summary != null)
+    {
+        <div class="review-summary">
+            <div class="summary-main">
+                <div class="average-rating">
+                    <span class="rating-value">@summary.AverageRating</span>
+                    <div class="stars">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="star @(i <= Math.Round(summary.AverageRating) ? "filled" : "")">★</span>
+                        }
+                    </div>
+                    <p class="total-reviews">@summary.TotalReviews đánh giá</p>
+                </div>
+                <div class="rating-breakdown">
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        var count = i == 5 ? summary.Rating5Count : 
+                                   i == 4 ? summary.Rating4Count : 
+                                   i == 3 ? summary.Rating3Count : 
+                                   i == 2 ? summary.Rating2Count : summary.Rating1Count;
+                        var percentage = summary.TotalReviews > 0 ? (count * 100.0 / summary.TotalReviews) : 0;
+                        <div class="rating-bar-item">
+                            <span class="rating-label">@i sao</span>
+                            <div class="rating-bar">
+                                <div class="rating-bar-fill" style="width: @percentage%"></div>
+                            </div>
+                            <span class="rating-count">@count</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (summary?.UserReview != null)
+    {
+        <div class="user-review-section">
+            <h3>Đánh giá của bạn</h3>
+            <div class="review-card user-review">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <strong>@summary.UserReview.UserName</strong>
+                        <span class="review-date">@summary.UserReview.CreatedAt.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="review-rating">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="star @(i <= summary.UserReview.Rating ? "filled" : "")">★</span>
+                        }
+                    </div>
+                </div>
+                <p class="review-comment">@summary.UserReview.Comment</p>
+                <div class="review-actions">
+                    <a asp-action="ReviewCourse" asp-route-courseId="@summary.UserReview.CourseId" class="btn btn-sm btn-primary">Chỉnh sửa</a>
+                    <form asp-action="DeleteReview" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="reviewId" value="@summary.UserReview.ReviewId" />
+                        <input type="hidden" name="courseId" value="@summary.UserReview.CourseId" />
+                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="reviews-list">
+        <h3>Tất cả đánh giá (@Model.Count)</h3>
+        @if (Model.Any())
+        {
+            @foreach (var review in Model)
+            {
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <strong>@review.UserName</strong>
+                            <span class="review-date">@review.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="review-rating">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="star @(i <= review.Rating ? "filled" : "")">★</span>
+                            }
+                        </div>
+                    </div>
+                    <p class="review-comment">@review.Comment</p>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="no-reviews">Chưa có đánh giá nào cho khóa học này.</p>
+        }
+    </div>
+</div>

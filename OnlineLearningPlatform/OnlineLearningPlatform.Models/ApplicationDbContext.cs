@@ -72,6 +72,25 @@ namespace OnlineLearningPlatform.Models
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            // Payment relationships
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Course)
+                .WithMany()
+                .HasForeignKey(p => p.CourseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Enrollment)
+                .WithOne(e => e.Payment)
+                .HasForeignKey<Enrollment>(e => e.PaymentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
 
         /// <summary>
