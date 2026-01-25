@@ -154,6 +154,27 @@
         }
     </div>
 
+    <!-- Mark as Complete -->
+    <div class="lesson-actions">
+        <form asp-action="MarkAsComplete" asp-controller="Student" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="lessonId" value="@Model.LessonId" />
+            
+            @if (Model.IsCompleted)
+            {
+                <button type="submit" class="btn-complete completed">
+                    <span class="icon">✅</span> Đã hoàn thành
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn-complete">
+                    <span class="icon">✔</span> Hoàn thành bài học
+                </button>
+            }
+        </form>
+    </div>
+
     <!-- Navigation -->
     <div class="lesson-navigation">
         @if (Model.CourseId.HasValue)

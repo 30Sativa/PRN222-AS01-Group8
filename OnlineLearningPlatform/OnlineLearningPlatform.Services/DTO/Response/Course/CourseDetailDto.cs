@@ -10,6 +10,7 @@ namespace OnlineLearningPlatform.Services.DTO.Response.Course
         public decimal Price { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsEnrolled { get; set; }
+        public double ProgressPercentage { get; set; }
         public List<SectionDto> Sections { get; set; } = new();
     }
 
@@ -35,5 +36,6 @@ namespace OnlineLearningPlatform.Services.DTO.Response.Course
         public string? CourseTitle { get; set; }
         public Guid? CourseId { get; set; }
         public string? SectionTitle { get; set; }
+        public bool IsCompleted { get; set; }
     }
 }

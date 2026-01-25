@@ -28,6 +28,8 @@ namespace OnlineLearningPlatform.Services.Implements
                 return null; // Không cho xem nếu chưa đăng ký
             }
 
+            var isCompleted = await IsLessonCompletedAsync(userId, lessonId);
+
             return new LessonDto
             {
                 LessonId = lesson.LessonId,
@@ -37,8 +39,24 @@ namespace OnlineLearningPlatform.Services.Implements
                 OrderIndex = lesson.OrderIndex,
                 CourseTitle = lesson.Section?.Course?.Title ?? "Unknown Course",
                 CourseId = lesson.Section?.Course?.CourseId,
-                SectionTitle = lesson.Section?.Title ?? "Unknown Section"
+                SectionTitle = lesson.Section?.Title ?? "Unknown Section",
+                IsCompleted = isCompleted
             };
+        }
+
+        public async Task MarkLessonAsCompleteAsync(string userId, int lessonId)
+        {
+            var isEnrolled = await _lessonRepository.IsUserEnrolledInLessonCourseAsync(userId, lessonId);
+            if (isEnrolled)
+            {
+                await _lessonRepository.MarkLessonCompleteAsync(userId, lessonId);
+            }
+        }
+
+        public async Task<bool> IsLessonCompletedAsync(string userId, int lessonId)
+        {
+            var progress = await _lessonRepository.GetLessonProgressAsync(userId, lessonId);
+            return progress?.IsCompleted ?? false;
         }
     }
 }

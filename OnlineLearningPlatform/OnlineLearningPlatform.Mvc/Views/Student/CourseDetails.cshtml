@@ -123,6 +123,17 @@ else
                 @if (Model.Course.IsEnrolled)
                 {
                     <span class="badge enrolled-badge">Đã đăng ký</span>
+                    
+                    <!-- Progress Bar -->
+                    <div class="course-progress-container">
+                        <div class="progress-info">
+                            <span>Tiến độ học tập</span>
+                            <span class="progress-value">@Model.Course.ProgressPercentage%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: @Model.Course.ProgressPercentage%"></div>
+                        </div>
+                    </div>
                 }
             </div>
         </div>
@@ -187,26 +198,27 @@ else
                                             {
                                                 var hasQuiz = _db.Quizzes.Any(q => q.LessonId == lesson.LessonId);
 
-                                                <li class="lesson-item">
+                                                <li class="lesson-item @(lesson.IsCompleted ? "completed" : "")">
                                                     <div class="lesson-info-left">
                                                         <span class="lesson-icon">
-                                                            @if (lesson.LessonType?.ToLower() == "video")
+                                                            @if (lesson.IsCompleted)
+                                                            {
+                                                                <span class="icon-check">✅</span>
+                                                            }
+                                                            else if (lesson.LessonType?.ToLower() == "video")
                                                             {
                                                                 <span>▶</span>
                                                             }
                                                             else if (lesson.LessonType?.ToLower() == "reading")
                                                             {
-
                                                                 <span>📄</span>
                                                             }
                                                             else if (lesson.LessonType?.ToLower() == "quiz")
                                                             {
-
                                                                 <span>❓</span>
                                                             }
                                                             else
                                                             {
-
                                                                 <span>📝</span>
                                                             }
                                                         </span>

@@ -115,5 +115,21 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             return View(lesson);
         }
+
+        // POST: Student/MarkAsComplete - Đánh dấu hoàn thành bài học
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAsComplete(int lessonId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            await _lessonService.MarkLessonAsCompleteAsync(userId, lessonId);
+
+            return RedirectToAction(nameof(WatchLesson), new { lessonId = lessonId });
+        }
     }
 }

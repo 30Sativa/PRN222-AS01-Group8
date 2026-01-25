@@ -202,3 +202,48 @@ video.video-player {
         font-size: 14px;
     }
 }
+
+/* Lesson Actions */
+.lesson-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.btn-complete {
+    padding: 15px 40px;
+    background: white;
+    color: #4CAF50;
+    border: 2px solid #4CAF50;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+}
+
+.btn-complete:hover {
+    background: #4CAF50;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-complete.completed {
+    background: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.btn-complete.completed:hover {
+    background: #45a049;
+    border-color: #45a049;
+}
+
+.btn-complete .icon {
+    font-size: 22px;
+}
