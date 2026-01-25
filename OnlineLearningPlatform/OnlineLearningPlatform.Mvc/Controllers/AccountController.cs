@@ -190,11 +190,12 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             return RedirectToAction("Login", "Account");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _authService.LogoutAsync();
             return RedirectToAction("Login", "Account");
-
         }
     }
 }

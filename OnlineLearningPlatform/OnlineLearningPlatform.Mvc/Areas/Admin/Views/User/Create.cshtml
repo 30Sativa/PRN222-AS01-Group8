@@ -1,4 +1,4 @@
-﻿@model OnlineLearningPlatform.Mvc.Models.Admin.CreateUserViewModel
+@model OnlineLearningPlatform.Mvc.Models.Admin.CreateUserViewModel
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Admin/user-edit.css" />
@@ -6,12 +6,12 @@
 
 <div class="form-container">
 
-    <h2>Create User</h2>
+    <h2>Tạo người dùng</h2>
 
     <form asp-action="Create" method="post">
 
         <div class="form-group">
-            <label>Full Name</label>
+            <label>Họ và tên</label>
             <input asp-for="FullName" />
         </div>
 
@@ -21,19 +21,19 @@
         </div>
 
         <div class="form-group">
-            <label>Password</label>
+            <label>Mật khẩu</label>
             <input asp-for="Password" type="password" />
         </div>
 
         <div class="form-group">
-            <label>Role</label>
+            <label>Vai trò</label>
             <select asp-for="Role"
                     asp-items="@(new SelectList(Model.Roles))">
             </select>
         </div>
 
-        <button type="submit" class="btn-save">Create</button>
-        <a asp-action="Index">Cancel</a>
+        <button type="submit" class="btn-save">Tạo</button>
+        <a asp-action="Index">Hủy</a>
 
     </form>
 

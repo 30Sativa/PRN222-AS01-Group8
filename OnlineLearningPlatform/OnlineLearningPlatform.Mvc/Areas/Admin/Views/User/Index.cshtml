@@ -1,8 +1,8 @@
-﻿@using OnlineLearningPlatform.Mvc.Models.Admin
+@using OnlineLearningPlatform.Mvc.Models.Admin
 @model List<UserViewModel>
 
 @{
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = "Quản lý người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 
 }
@@ -20,7 +20,7 @@
            asp-controller="User"
            asp-action="Create"
            class="btn btn-primary">
-            + Create User
+            + Tạo người dùng
         </a>
     </div>
 
@@ -30,11 +30,11 @@
 
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Tên</th>
                 <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th style="width:320px;">Actions</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th style="width:320px;">Thao tác</th>
             </tr>
         </thead>
 
@@ -56,11 +56,11 @@
                     <td>
                         @if (u.IsLocked)
                         {
-                            <span class="badge badge-locked">Locked</span>
+                            <span class="badge badge-locked">Đã khóa</span>
                         }
                         else
                         {
-                            <span class="badge badge-active">Active</span>
+                            <span class="badge badge-active">Hoạt động</span>
                         }
                     </td>
 
@@ -73,7 +73,7 @@
                            asp-action="Edit"
                            asp-route-id="@u.Id"
                            class="btn btn-edit">
-                            Edit
+                            Sửa
                         </a>
 
                         <!-- CHANGE ROLE -->
@@ -82,7 +82,7 @@
                            asp-action="EditRole"
                            asp-route-id="@u.Id"
                            class="btn btn-role">
-                            Role
+                            Vai trò
                         </a>
 
                         <!-- LOCK / UNLOCK -->
@@ -93,7 +93,7 @@
                                asp-action="Unlock"
                                asp-route-id="@u.Id"
                                class="btn btn-unlock">
-                                Unlock
+                                Mở khóa
                             </a>
                         }
                         else
@@ -103,7 +103,7 @@
                                asp-action="Lock"
                                asp-route-id="@u.Id"
                                class="btn btn-lock">
-                                Lock
+                                Khóa
                             </a>
                         }
 

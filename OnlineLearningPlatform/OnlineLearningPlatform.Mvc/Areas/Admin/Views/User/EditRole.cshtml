@@ -1,4 +1,4 @@
-﻿@using OnlineLearningPlatform.Mvc.Models.Admin
+@using OnlineLearningPlatform.Mvc.Models.Admin
 @model UpdateUserRoleViewModel
 
 @section Styles {
@@ -7,21 +7,21 @@
 
     
 <div class="form-container">
-    <h2>Update Role</h2>
+    <h2>Cập nhật vai trò</h2>
 
     <form asp-action="EditRole" method="post">
 
         <input type="hidden" asp-for="Id" />
 
         <div class="form-group">
-            <label>Role</label>
+            <label>Vai trò</label>
 
             <select asp-for="Role" asp-items="@(new SelectList(Model.Roles))">
             </select>
         </div>
 
-        <button type="submit" class="btn-save">Save</button>
-        <a asp-action="Index">Cancel</a>
+        <button type="submit" class="btn-save">Lưu</button>
+        <a asp-action="Index">Hủy</a>
 
     </form>
 </div>

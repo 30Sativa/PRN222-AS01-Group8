@@ -1,9 +1,10 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #a8d8ff 0%, #7db9e8 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
+    color: #2c3e50;
 }
 
 .course-details-container {
@@ -23,7 +24,7 @@ body {
 
 .course-header-content {
     padding: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
     color: white;
     position: relative;
 }
@@ -232,7 +233,7 @@ body {
 
 .section-toggle {
     font-size: 14px;
-    color: #667eea;
+    color: #4caf50;
     transition: transform 0.3s ease;
     font-weight: bold;
 }
