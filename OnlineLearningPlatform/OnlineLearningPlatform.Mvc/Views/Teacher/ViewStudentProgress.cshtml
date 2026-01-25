@@ -1,0 +1,180 @@
+@model OnlineLearningPlatform.Services.DTO.Response.Teacher.StudentProgressDto
+
+@{
+    ViewData["Title"] = "Tiến độ học tập";
+}
+
+<link rel="stylesheet" href="~/css/Teacher/student-progress.css" />
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Chi tiết tiến độ học tập</h2>
+            <p class="text-muted mb-0">
+                Học viên: <strong>@Model.StudentName</strong> (@Model.StudentEmail)
+            </p>
+            <p class="text-muted">
+                Khóa học: <strong>@Model.CourseTitle</strong>
+            </p>
+        </div>
+        <a asp-action="ViewEnrollments" asp-route-id="@Model.CourseId" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Overall Progress Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-graph-up"></i> Tổng quan tiến độ</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><strong>Tiến độ tổng thể:</strong></span>
+                        <span class="badge bg-primary">@Model.OverallProgress.ToString("0.0")%</span>
+                    </div>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             style="width: @Model.OverallProgress%"
+                             aria-valuenow="@Model.OverallProgress"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            @Model.OverallProgress.ToString("0.0")%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Ngày đăng ký:</strong> @Model.EnrolledAt.ToString("dd/MM/yyyy HH:mm")</p>
+                    @if (Model.OverallProgress >= 100)
+                    {
+                        <span class="badge bg-success">Đã hoàn thành</span>
+                    }
+                    else if (Model.OverallProgress > 0)
+                    {
+                        <span class="badge bg-warning">Đang học</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Chưa bắt đầu</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Statistics Row -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>@Model.CompletedLessons / @Model.TotalLessons</h4>
+                            <p class="text-muted mb-0">Bài học</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>@Model.CompletedQuizzes / @Model.TotalQuizzes</h4>
+                            <p class="text-muted mb-0">Bài kiểm tra</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>@Model.CompletedAssignments / @Model.TotalAssignments</h4>
+                            <p class="text-muted mb-0">Bài tập</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress by Sections -->
+    <div class="sections-container">
+        @if (Model.SectionProgress.Any())
+        {
+            @foreach (var item in Model.SectionProgress)
+            {
+                var sectionProgressClass = item.Progress >= 100 ? "bg-success" :
+                                          item.Progress >= 50 ? "bg-warning" : "bg-info";
+
+                <div class="card mb-3">
+                    <div class="card-header" style="background-color: #f8f9fa;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-folder"></i> @item.SectionTitle
+                            </h5>
+                            <span class="badge bg-secondary">@item.CompletedLessons / @item.TotalLessons bài học</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 20px;">
+                            <div class="progress-bar @sectionProgressClass"
+                                 role="progressbar"
+                                 style="width: @item.Progress%"
+                                 aria-valuenow="@item.Progress"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                                @item.Progress.ToString("0.0")%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="lessons-list">
+                            @foreach (var lesson in item.LessonProgress)
+                            {
+                                var lessonIcon = lesson.LessonType.ToLower() switch
+                                {
+                                    "video" => "bi-play-circle",
+                                    "quiz" => "bi-question-circle",
+                                    "assignment" => "bi-file-earmark-text",
+                                    _ => "bi-file-text"
+                                };
+
+                                var lessonStatusClass = lesson.IsCompleted ? "lesson-completed" : "lesson-incomplete";
+                                var checkIcon = lesson.IsCompleted ? "bi-check-circle-fill text-success" : "bi-circle text-muted";
+
+                                <div class="lesson-item @lessonStatusClass">
+                                    <div class="lesson-info">
+                                        <i class="@checkIcon me-2"></i>
+                                        <i class="bi @lessonIcon me-2"></i>
+                                        <span class="lesson-title">@lesson.LessonTitle</span>
+                                    </div>
+                                    <div class="lesson-status">
+                                        @if (lesson.IsCompleted && lesson.CompletedAt.HasValue)
+                                        {
+                                            <small class="text-success">
+                                                <i class="bi bi-check-circle"></i> Hoàn thành: @lesson.CompletedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-muted">Chưa hoàn thành</small>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Khóa học chưa có nội dung.
+            </div>
+        }
+    </div>
+</div>

@@ -44,6 +44,7 @@ namespace OnlineLearningPlatform.Mvc
             builder.Services.AddScoped<ILessonRepository, LessonRepository>();
             builder.Services.AddScoped<ITeacherRepository, TeacherRepository>(); // Teacher Repository
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); // Category Repository
+            builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>(); // Lesson Progress Repository
 
 
             // Đăng ký các dịch vụ tùy chỉnh - Service

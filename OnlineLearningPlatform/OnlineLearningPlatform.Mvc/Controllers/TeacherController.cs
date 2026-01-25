@@ -537,5 +537,53 @@ namespace OnlineLearningPlatform.Mvc.Controllers
 
             return RedirectToAction(nameof(ManageSections), new { id = courseId });
         }
+
+        // ===== QUẢN LÝ HỌC VIÊN =====
+
+        // GET: Teacher/ViewEnrollments/{id} - Xem danh sách học viên đăng ký khóa học
+        public async Task<IActionResult> ViewEnrollments(Guid id)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            // Lấy thông tin khóa học
+            var course = await _teacherService.GetTeacherCourseByIdAsync(id, teacherId);
+            if (course == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy khóa học.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Lấy danh sách học viên
+            var enrollments = await _teacherService.GetCourseEnrollmentsAsync(id, teacherId);
+
+            ViewBag.CourseId = id;
+            ViewBag.CourseTitle = course.Title;
+
+            return View(enrollments);
+        }
+
+        // GET: Teacher/ViewStudentProgress?courseId={courseId}&studentId={studentId}
+        public async Task<IActionResult> ViewStudentProgress(Guid courseId, string studentId)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            var progress = await _teacherService.GetStudentProgressAsync(courseId, studentId, teacherId);
+
+            if (progress == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin tiến độ.";
+                return RedirectToAction(nameof(ViewEnrollments), new { id = courseId });
+            }
+
+            return View(progress);
+        }
     }
 }
