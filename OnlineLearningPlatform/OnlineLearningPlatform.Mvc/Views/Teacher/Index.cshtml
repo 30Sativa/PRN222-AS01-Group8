@@ -2,6 +2,7 @@
 @using OnlineLearningPlatform.Models.Enums
 @{
     ViewData["Title"] = "Quản lý khóa học";
+    var statusFilter = (ViewData["StatusFilter"] as string)?.ToLowerInvariant() ?? "all";
     var hasPending = Model.PendingCourses != null && Model.PendingCourses.Any();
     var hasPublished = Model.PublishedCourses != null && Model.PublishedCourses.Any();
     var hasRejected = Model.RejectedCourses != null && Model.RejectedCourses.Any();
@@ -45,56 +46,45 @@
     }
     else
     {
-        @* Khóa đang chờ duyệt *@
-        @if (hasPending)
-        {
-            <div class="mb-5 pb-4 border-bottom">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h4 class="text-warning mb-0">
-                        <i class="bi bi-hourglass-split"></i> Khóa đang chờ duyệt
-                    </h4>
-                    <span class="badge bg-warning text-dark">@Model.PendingCourses.Count khóa</span>
+        <!-- Filter + Search -->
+        <div class="mb-4">
+            <form method="get" asp-action="Index" class="row g-2 align-items-end">
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label class="form-label mb-1">Trạng thái</label>
+                    <select name="statusFilter" class="form-select" onchange="this.form.submit()">
+                        <option value="all" selected="@(statusFilter == "all" ? "selected" : null)">Tất cả</option>
+                        <option value="published" selected="@(statusFilter == "published" ? "selected" : null)">Đã duyệt / Đã xuất bản</option>
+                        <option value="pending" selected="@(statusFilter == "pending" ? "selected" : null)">Chờ duyệt</option>
+                        <option value="rejected" selected="@(statusFilter == "rejected" ? "selected" : null)">Bị từ chối</option>
+                    </select>
                 </div>
-                <p class="text-muted small mb-3">
-                    <i class="bi bi-info-circle"></i> Các khóa học dưới đây đang chờ quản trị viên phê duyệt. Sau khi được duyệt, bạn sẽ có thể quản lý và xem học viên.
-                </p>
-                <div class="row">
-                    @foreach (var course in Model.PendingCourses)
-                    {
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            @await Html.PartialAsync("_CourseCard", course)
-                        </div>
-                    }
+                <div class="col-12 col-md-8 col-lg-7">
+                    <label class="form-label mb-1">Tìm kiếm</label>
+                    <input type="text"
+                           name="searchString"
+                           value="@ViewData["CurrentFilter"]"
+                           class="form-control"
+                           placeholder="Tìm kiếm theo tên hoặc mô tả..."
+                           aria-label="Tìm kiếm khóa học">
                 </div>
-            </div>
-        }
+                <div class="col-12 col-lg-2 d-grid">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-funnel"></i> Lọc
+                    </button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string) || statusFilter != "all")
+            {
+                <div class="mt-2">
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Đặt lại
+                    </a>
+                </div>
+            }
+        </div>
 
-        @* Khóa bị từ chối *@
-        @if (hasRejected)
-        {
-            <div class="mb-5 pb-4 border-bottom">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h4 class="text-danger mb-0">
-                        <i class="bi bi-x-circle"></i> Khóa bị từ chối
-                    </h4>
-                    <span class="badge bg-danger">@Model.RejectedCourses.Count khóa</span>
-                </div>
-                <p class="text-muted small mb-3">
-                    <i class="bi bi-info-circle"></i> Các khóa học dưới đây đã bị quản trị viên từ chối. Bạn có thể xem lý do, chỉnh sửa nội dung và gửi lại sau.
-                </p>
-                <div class="row">
-                    @foreach (var course in Model.RejectedCourses)
-                    {
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            @await Html.PartialAsync("_CourseCard", course)
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-
-        @* Khóa đã xuất bản *@
-        @if (hasPublished)
+        @* Mặc định hiển thị "Đã xuất bản" trước *@
+        @if (statusFilter == "all" || statusFilter == "published")
         {
             <div class="mt-4">
                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -104,37 +94,88 @@
                     <span class="badge bg-success">@Model.PublishedCourses.Count khóa</span>
                 </div>
 
-                <!-- Search Form for Published Courses -->
-                <div class="mb-3">
-                    <form method="get" asp-action="Index">
-                        <div class="input-group">
-                            <input type="text" 
-                                   name="searchString" 
-                                   value="@ViewData["CurrentFilter"]" 
-                                   class="form-control" 
-                                   placeholder="Tìm kiếm khóa học của bạn theo tên hoặc mô tả..." 
-                                   aria-label="Tìm kiếm khóa học">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-search"></i> Tìm kiếm
-                            </button>
-                            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
-                            {
-                                <a asp-action="Index" class="btn btn-outline-secondary">
-                                    <i class="bi bi-x-circle"></i> Xóa bộ lọc
-                                </a>
-                            }
-                        </div>
-                    </form>
-                </div>
-                <div class="row">
-                    @foreach (var course in Model.PublishedCourses)
-                    {
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            @await Html.PartialAsync("_CourseCard", course)
-                        </div>
-                    }
-                </div>
+                @if (!hasPublished)
+                {
+                    <div class="alert alert-light border">
+                        Không có khóa học nào đã được duyệt/đã xuất bản.
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var course in Model.PublishedCourses)
+                        {
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                @await Html.PartialAsync("_CourseCard", course)
+                            </div>
+                        }
+                    </div>
+                }
             </div>
+        }
+
+        @if (statusFilter == "all" || statusFilter == "pending")
+        {
+            @if (hasPending)
+            {
+                <div class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h4 class="text-warning mb-0">
+                            <i class="bi bi-hourglass-split"></i> Khóa đang chờ duyệt
+                        </h4>
+                        <span class="badge bg-warning text-dark">@Model.PendingCourses.Count khóa</span>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-info-circle"></i> Các khóa học dưới đây đang chờ quản trị viên phê duyệt. Sau khi được duyệt, bạn sẽ có thể quản lý và xem học viên.
+                    </p>
+                    <div class="row">
+                        @foreach (var course in Model.PendingCourses)
+                        {
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                @await Html.PartialAsync("_CourseCard", course)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (statusFilter == "pending")
+            {
+                <div class="alert alert-light border">
+                    Không có khóa học nào đang chờ duyệt.
+                </div>
+            }
+        }
+
+        @if (statusFilter == "all" || statusFilter == "rejected")
+        {
+            @if (hasRejected)
+            {
+                <div class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h4 class="text-danger mb-0">
+                            <i class="bi bi-x-circle"></i> Khóa bị từ chối
+                        </h4>
+                        <span class="badge bg-danger">@Model.RejectedCourses.Count khóa</span>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-info-circle"></i> Các khóa học dưới đây đã bị quản trị viên từ chối. Bạn có thể xem lý do, chỉnh sửa nội dung và gửi lại sau.
+                    </p>
+                    <div class="row">
+                        @foreach (var course in Model.RejectedCourses)
+                        {
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                @await Html.PartialAsync("_CourseCard", course)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (statusFilter == "rejected")
+            {
+                <div class="alert alert-light border">
+                    Không có khóa học nào bị từ chối.
+                </div>
+            }
         }
     }
 </div>

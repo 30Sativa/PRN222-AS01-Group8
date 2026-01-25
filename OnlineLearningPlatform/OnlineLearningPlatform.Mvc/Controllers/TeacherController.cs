@@ -27,7 +27,8 @@ namespace OnlineLearningPlatform.Mvc.Controllers
         }
 
         // GET: Teacher/Index - Quản lý danh sách khóa học của giảng viên (gồm khóa chờ duyệt + đã xuất bản)
-        public async Task<IActionResult> Index(string? searchString)
+        // statusFilter: all|published|pending|rejected (default: all)
+        public async Task<IActionResult> Index(string? searchString, string? statusFilter)
         {
             var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -36,11 +37,30 @@ namespace OnlineLearningPlatform.Mvc.Controllers
                 return Unauthorized();
             }
 
+            statusFilter = string.IsNullOrWhiteSpace(statusFilter) ? "all" : statusFilter.Trim().ToLowerInvariant();
+            if (statusFilter is not ("all" or "published" or "pending" or "rejected"))
+            {
+                statusFilter = "all";
+            }
+
             var pending = await _teacherService.GetTeacherPendingCoursesAsync(teacherId);
             var published = await _teacherService.GetTeacherCoursesAsync(teacherId, searchString);
             var rejected = await _teacherService.GetTeacherRejectedCoursesAsync(teacherId);
 
             ViewData["CurrentFilter"] = searchString;
+            ViewData["StatusFilter"] = statusFilter;
+
+            // Áp dụng search cho pending/rejected (published đã được lọc trong service)
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var term = searchString.Trim().ToLowerInvariant();
+                bool Match(OnlineLearningPlatform.Services.DTO.Response.TeacherCourseDto c) =>
+                    (c.Title?.ToLowerInvariant().Contains(term) ?? false) ||
+                    (c.Description?.ToLowerInvariant().Contains(term) ?? false);
+
+                pending = pending.Where(Match).ToList();
+                rejected = rejected.Where(Match).ToList();
+            }
 
             var viewModel = new TeacherIndexViewModel
             {
