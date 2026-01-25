@@ -1,0 +1,108 @@
+@model List<OnlineLearningPlatform.Services.DTO.Response.Teacher.EnrollmentDto>
+
+@{
+    ViewData["Title"] = "Danh sách học viên";
+    var courseTitle = ViewBag.CourseTitle as string ?? "Khóa học";
+    var courseId = ViewBag.CourseId as Guid? ?? Guid.Empty;
+}
+
+<link rel="stylesheet" href="~/css/Teacher/view-enrollments.css" />
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Danh sách học viên</h2>
+            <p class="text-muted">Khóa học: <strong>@courseTitle</strong></p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-primary">@Model.Count</h3>
+                    <p class="text-muted mb-0">Tổng học viên đăng ký</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollments Table -->
+    @if (Model.Any())
+    {
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Danh sách chi tiết</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>STT</th>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                var enrollment = Model[i];
+
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>
+                                        <strong>@enrollment.StudentName</strong>
+                                    </td>
+                                    <td>@enrollment.StudentEmail</td>
+                                    <td>@enrollment.EnrolledAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <a asp-action="ViewStudentProgress"
+                                           asp-route-courseId="@courseId"
+                                           asp-route-studentId="@enrollment.StudentId"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Xem chi tiết tiến độ">
+                                            <i class="bi bi-graph-up"></i> Chi tiết
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+            <h5>Chưa có học viên nào đăng ký khóa học này</h5>
+            <p class="mb-0">Hãy quảng bá khóa học của bạn để thu hút học viên!</p>
+        </div>
+    }
+</div>

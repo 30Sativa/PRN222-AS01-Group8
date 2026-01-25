@@ -1,0 +1,59 @@
+﻿@model OnlineLearningPlatform.Models.Entities.Quiz
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h3 class="text-primary mb-4">Thiết lập Quiz mới</h3>
+        <form asp-action="Create" method="post">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label>1. Chọn Khóa học</label>
+                    <select id="cSel" class="form-select border-primary shadow-sm">
+                        <option value="">-- Chọn --</option>
+                        @foreach (var c in ViewBag.CourseList)
+                        {
+                            <option value="@c.CourseId">@c.Title</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4"><label>2. Chọn Chương</label><select id="sSel" class="form-select border-primary" disabled><option value="">-- Chọn --</option></select></div>
+                <div class="col-md-4"><label>3. Chọn Bài học</label><select asp-for="LessonId" id="lSel" class="form-select border-primary" required disabled><option value="">-- Chọn --</option></select></div>
+            </div>
+            <input asp-for="Title" class="form-control mb-3" placeholder="Tiêu đề Quiz" required />
+            <div id="qContainer"></div>
+            <button type="button" class="btn btn-outline-primary" onclick="addQ()">+ Thêm câu hỏi</button>
+            <button type="submit" class="btn btn-success float-end px-5">Lưu bài Quiz</button>
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#cSel').change(function() {
+        $('#sSel, #lSel').empty().append('<option value="">-- Chọn --</option>').prop('disabled', true);
+        if($(this).val()) $.getJSON('/Quiz/GetSectionsByCourse', {courseId: $(this).val()}, d => {
+            $('#sSel').prop('disabled', false); $.each(d, (i, v) => $('#sSel').append(new Option(v.title, v.sectionId)));
+        });
+    });
+    $('#sSel').change(function() {
+        $('#lSel').empty().append('<option value="">-- Chọn --</option>').prop('disabled', true);
+        if($(this).val()) $.getJSON('/Quiz/GetLessonsBySection', {sectionId: $(this).val()}, d => {
+            $('#lSel').prop('disabled', false); $.each(d, (i, v) => $('#lSel').append(new Option(v.title, v.lessonId)));
+        });
+    });
+    let qIdx = 0;
+    function addQ() {
+        let h = `<div class="card p-3 mb-3 border-start border-primary border-4 shadow-sm" id="q${qIdx}">
+            <input name="Questions[${qIdx}].Content" class="form-control mb-2" placeholder="Nội dung câu hỏi" required />
+            <div id="ans${qIdx}"></div>
+            <button type="button" class="btn btn-sm btn-link" onclick="addA(${qIdx})">+ Thêm đáp án</button>
+        </div>`;
+        $('#qContainer').append(h); addA(qIdx); addA(qIdx); qIdx++;
+    }
+    function addA(qi) {
+        let ai = $(`#ans${qi} .input-group`).length;
+        let h = `<div class="input-group mb-1">
+            <div class="input-group-text"><input type="radio" name="correct_${qi}" value="${ai}" required></div>
+            <input name="Questions[${qi}].QuizAnswers[${ai}].UserAnswer" class="form-control" placeholder="Đáp án" required />
+        </div>`;
+        $(`#ans${qi}`).append(h);
+    }
+    window.onload = addQ;
+</script>

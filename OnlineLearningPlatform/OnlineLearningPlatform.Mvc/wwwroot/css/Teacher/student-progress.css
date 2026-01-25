@@ -1,0 +1,158 @@
+/* Student Progress CSS */
+
+.card {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    background: white;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 20px;
+    font-weight: 600;
+}
+
+/* Overall Progress */
+.progress {
+    border-radius: 10px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Stat Cards */
+.stat-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 24px;
+}
+
+.stat-content h4 {
+    margin: 0;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-content p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Sections Container */
+.sections-container {
+    margin-top: 20px;
+}
+
+/* Lessons List */
+.lessons-list {
+    padding: 10px 0;
+}
+
+.lesson-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-left: 4px solid #dee2e6;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.lesson-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.lesson-item.lesson-completed {
+    border-left-color: #4CAF50;
+    background: #f0fdf4;
+}
+
+.lesson-item.lesson-completed:hover {
+    background: #e8f5e9;
+}
+
+.lesson-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.lesson-title {
+    font-weight: 500;
+    color: #333;
+}
+
+.lesson-status {
+    text-align: right;
+}
+
+/* Icons */
+.bi-check-circle-fill {
+    font-size: 18px;
+}
+
+.bi-circle {
+    font-size: 18px;
+}
+
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 15px;
+    }
+    
+    .lesson-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .lesson-status {
+        margin-top: 8px;
+        text-align: left;
+        width: 100%;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}

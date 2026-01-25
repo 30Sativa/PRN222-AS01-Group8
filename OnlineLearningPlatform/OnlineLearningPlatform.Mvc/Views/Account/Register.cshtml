@@ -1,0 +1,56 @@
+@model OnlineLearningPlatform.Mvc.Models.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = null;
+}
+<link rel="stylesheet" href="~/css/Account/register.css" />
+<div class="login-container">
+    <div class="login-card">
+        <h2>Đăng ký</h2>
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <input asp-for="FullName" class="form-control" placeholder="Họ và tên" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="Email" class="form-control" placeholder="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="Password" type="password" class="form-control" placeholder="Mật khẩu" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Xác nhận mật khẩu" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div> 
+                <label asp-for="Role" class="form-label">Chọn vai trò:</label>
+                <select asp-for="Role" class="form-select">
+                    <option value="Student">Học viên</option>
+                    <option value="Instructor">Giảng viên</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
+        </form>
+        <div class="mt-3">
+            <p>
+                Đã có tài khoản?
+                <a asp-controller="Account" asp-action="Login">
+                    Đăng nhập ngay
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

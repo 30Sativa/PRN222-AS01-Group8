@@ -1,0 +1,27 @@
+@using OnlineLearningPlatform.Mvc.Models.Admin
+@model UpdateUserRoleViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/user-edit.css" />
+}
+
+    
+<div class="form-container">
+    <h2>Cập nhật vai trò</h2>
+
+    <form asp-action="EditRole" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label>Vai trò</label>
+
+            <select asp-for="Role" asp-items="@(new SelectList(Model.Roles))">
+            </select>
+        </div>
+
+        <button type="submit" class="btn-save">Lưu</button>
+        <a asp-action="Index">Hủy</a>
+
+    </form>
+</div>

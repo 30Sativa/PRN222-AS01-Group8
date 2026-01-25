@@ -1,0 +1,34 @@
+@model OnlineLearningPlatform.Mvc.Models.Admin.UserEditViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/user-edit.css" />
+}
+
+<div class="edit-container">
+
+    <h2>Sửa người dùng</h2>
+
+    <form asp-action="Edit" method="post" class="edit-form">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label>Họ và tên</label>
+            <input asp-for="FullName" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <label>Email (chỉ đọc)</label>
+            <input asp-for="Email" readonly class="form-input readonly" />
+        </div>
+
+      
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Lưu</button>
+            <a asp-action="Index" class="btn-cancel">Hủy</a>
+        </div>
+
+    </form>
+
+</div>

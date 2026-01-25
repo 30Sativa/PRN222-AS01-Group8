@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="OnlineLearningPlatform.Models/OnlineLearningPlatform.Models.csproj" />
   <Project Path="OnlineLearningPlatform.Mvc/OnlineLearningPlatform.Mvc.csproj" />
+  <Project Path="OnlineLearningPlatform.Repository/OnlineLearningPlatform.Repositories.csproj" />
+  <Project Path="OnlineLearningPlatform.Services/OnlineLearningPlatform.Services.csproj" />
 </Solution>

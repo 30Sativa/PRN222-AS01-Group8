@@ -1,0 +1,224 @@
+/* Teacher Courses List - Matching Student Theme */
+
+.teacher-courses-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.teacher-courses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    background: white;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.teacher-courses-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* Course Cards - Matching Student Style */
+.row .col-md-6 .card,
+.row .col-lg-4 .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: white;
+}
+
+.row .col-md-6 .card:hover,
+.row .col-lg-4 .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Header - Gradient Purple like Student */
+.card-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.card-title {
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+}
+
+.card-text {
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+}
+
+/* Course Stats */
+.course-stats {
+    padding: 0 20px 15px 20px;
+}
+
+.course-stats .d-flex {
+    margin-bottom: 8px;
+}
+
+.course-stats span {
+    font-size: 13px;
+    color: #555;
+}
+
+.course-stats i {
+    margin-right: 5px;
+    color: #667eea;
+}
+
+/* Badges */
+.mb-2 {
+    padding: 0 20px;
+    margin-bottom: 15px !important;
+}
+
+.mb-2 .badge {
+    margin-right: 8px;
+    margin-bottom: 5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* Card Footer */
+.card-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 15px 15px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 5px;
+    width: 100%;
+}
+
+.btn-group .btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-group .btn i {
+    margin-right: 4px;
+}
+
+.btn-outline-primary {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-info {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+    background: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+}
+
+.btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-outline-success:hover {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* Empty State */
+.alert-info {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-left: 4px solid #17a2b8;
+}
+
+.alert-info h4 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.alert-info p {
+    color: #666;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .teacher-courses-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .teacher-courses-header h2 {
+        font-size: 24px;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .card-title {
+        font-size: 18px;
+        min-height: auto;
+    }
+}

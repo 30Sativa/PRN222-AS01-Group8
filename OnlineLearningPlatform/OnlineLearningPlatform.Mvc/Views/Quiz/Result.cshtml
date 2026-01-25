@@ -1,0 +1,9 @@
+﻿@model OnlineLearningPlatform.Models.Entities.QuizAttempt
+<div class="container mt-5 text-center">
+    <div class="card shadow p-5">
+        <h1 class="display-1 fw-bold @(Model.Score >= 5 ? "text-success" : "text-danger")">@Model.Score</h1>
+        <h3>Điểm của bạn</h3>
+        <p>Bài kiểm tra: @Model.Quiz.Title</p>
+        <a href="/Student/Index" class="btn btn-outline-primary mt-4">Về trang chủ</a>
+    </div>
+</div>

@@ -1,0 +1,117 @@
+@using OnlineLearningPlatform.Mvc.Models.Admin
+@model List<UserViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/user.css" />
+}
+
+<div class="user-container">
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <a asp-area="Admin"
+           asp-controller="User"
+           asp-action="Create"
+           class="btn btn-primary">
+            + Tạo người dùng
+        </a>
+    </div>
+
+
+    <!-- TABLE -->
+    <table class="user-table">
+
+        <thead>
+            <tr>
+                <th>Tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th style="width:320px;">Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.FullName</td>
+                    <td>@u.Email</td>
+
+                    <!-- ROLE BADGE -->
+                    <td>
+                        <span class="badge badge-role">
+                            @u.Role
+                        </span>
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+                        @if (u.IsLocked)
+                        {
+                            <span class="badge badge-locked">Đã khóa</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-active">Hoạt động</span>
+                        }
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td class="actions">
+
+                        <!-- EDIT INFO -->
+                        <a asp-area="Admin"
+                           asp-controller="User"
+                           asp-action="Edit"
+                           asp-route-id="@u.Id"
+                           class="btn btn-edit">
+                            Sửa
+                        </a>
+
+                        <!-- CHANGE ROLE -->
+                        <a asp-area="Admin"
+                           asp-controller="User"
+                           asp-action="EditRole"
+                           asp-route-id="@u.Id"
+                           class="btn btn-role">
+                            Vai trò
+                        </a>
+
+                        <!-- LOCK / UNLOCK -->
+                        @if (u.IsLocked)
+                        {
+                            <a asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Unlock"
+                               asp-route-id="@u.Id"
+                               class="btn btn-unlock">
+                                Mở khóa
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Lock"
+                               asp-route-id="@u.Id"
+                               class="btn btn-lock">
+                                Khóa
+                            </a>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>

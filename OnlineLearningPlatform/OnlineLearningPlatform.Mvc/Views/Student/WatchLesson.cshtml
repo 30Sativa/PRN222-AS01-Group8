@@ -1,0 +1,193 @@
+@using OnlineLearningPlatform.Services.DTO.Response.Course
+@model LessonDto
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/watch-lesson.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+}
+
+<div class="lesson-container">
+    <!-- Lesson Header -->
+    <div class="lesson-header">
+        <div class="breadcrumb">
+            <a asp-action="Index">Danh sách khóa học</a>
+            @if (Model.CourseId.HasValue)
+            {
+                <span> / </span>
+                <a asp-action="CourseDetails" asp-route-id="@Model.CourseId.Value">@Model.CourseTitle</a>
+            }
+            @if (!string.IsNullOrEmpty(Model.SectionTitle))
+            {
+                <span> / </span>
+                <span>@Model.SectionTitle</span>
+            }
+            <span> / </span>
+            <span class="current">@Model.Title</span>
+        </div>
+        <h1>@Model.Title</h1>
+        <div class="lesson-meta">
+            <span class="course-name">Khóa học: @Model.CourseTitle</span>
+            <span class="section-name">Phần: @Model.SectionTitle</span>
+        </div>
+    </div>
+
+    <!-- Video Player / Quiz Player -->
+    <div class="video-container">
+        @if (Model.LessonType?.ToLower() == "quiz")
+        {
+            @* Giao diện nút bấm to rõ cho học sinh làm Quiz của bạn *@
+            <div class="text-center p-5 bg-white shadow-sm rounded border border-warning my-3">
+                <div class="mb-3">
+                    <i class="bi bi-pencil-square text-warning" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="fw-bold mt-3">Bài kiểm tra: @Model.Title</h2>
+                <p class="text-muted">Vui lòng nhấn nút bên dưới để bắt đầu làm bài trắc nghiệm để củng cố kiến thức.</p>
+                <div class="mt-4">
+                    <a asp-controller="Quiz" asp-action="TakeByLesson" asp-route-lessonId="@Model.LessonId"
+                       class="btn btn-warning btn-lg px-5 fw-bold shadow-sm rounded-pill">
+                        <i class="bi bi-play-fill"></i> BẮT ĐẦU LÀM QUIZ
+                    </a>
+                </div>
+                <p class="small text-muted mt-3 italic text-decoration-underline">Lưu ý: Bạn có tối đa 3 lần thực hiện bài kiểm tra này.</p>
+            </div>
+        }
+        else if (Model.LessonType?.ToLower() == "video")
+        {
+            @if (!string.IsNullOrEmpty(Model.Content))
+            {
+                var isYouTube = Model.Content.Contains("youtube.com") || Model.Content.Contains("youtu.be");
+                var isVimeo = Model.Content.Contains("vimeo.com");
+
+                @if (isYouTube)
+                {
+                    var videoId = "";
+                    if (Model.Content.Contains("watch?v="))
+                    {
+                        videoId = Model.Content.Split(new[] { "watch?v=" }, StringSplitOptions.None)[1].Split('&')[0];
+                    }
+                    else if (Model.Content.Contains("youtu.be/"))
+                    {
+                        videoId = Model.Content.Split(new[] { "youtu.be/" }, StringSplitOptions.None)[1].Split('?')[0];
+                    }
+                    else if (Model.Content.Contains("embed/"))
+                    {
+                        videoId = Model.Content.Split(new[] { "embed/" }, StringSplitOptions.None)[1].Split('?')[0];
+                    }
+
+                    @if (!string.IsNullOrEmpty(videoId))
+                    {
+                        <div class="video-wrapper">
+                            <iframe src="https://www.youtube.com/embed/@videoId"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    class="video-player">
+                            </iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="video-error">
+                            <p>URL video không hợp lệ. Vui lòng kiểm tra lại.</p>
+                        </div>
+                    }
+                }
+                else if (isVimeo)
+                {
+                    var videoId = "";
+                    if (Model.Content.Contains("vimeo.com/"))
+                    {
+                        var parts = Model.Content.Split(new[] { "vimeo.com/" }, StringSplitOptions.None);
+                        if (parts.Length > 1)
+                        {
+                            videoId = parts[1].Split('?')[0].Split('/')[0];
+                        }
+                    }
+
+                    @if (!string.IsNullOrEmpty(videoId))
+                    {
+                        <div class="video-wrapper">
+                            <iframe src="https://player.vimeo.com/video/@videoId"
+                                    frameborder="0"
+                                    allow="autoplay; fullscreen; picture-in-picture"
+                                    allowfullscreen
+                                    class="video-player">
+                            </iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="video-error">
+                            <p>URL video không hợp lệ. Vui lòng kiểm tra lại.</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="video-wrapper">
+                        <video controls class="video-player" width="100%" height="auto">
+                            <source src="@Model.Content" type="video/mp4">
+                            <source src="@Model.Content" type="video/webm">
+                            <source src="@Model.Content" type="video/ogg">
+                            Trình duyệt của bạn không hỗ trợ thẻ video.
+                        </video>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="video-error">
+                    <p>Video chưa được cập nhật.</p>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="content-display">
+                <div class="content-text">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Mark as Complete -->
+    <div class="lesson-actions">
+        <form asp-action="MarkAsComplete" asp-controller="Student" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="lessonId" value="@Model.LessonId" />
+            
+            @if (Model.IsCompleted)
+            {
+                <button type="submit" class="btn-complete completed">
+                    <span class="icon">✅</span> Đã hoàn thành
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn-complete">
+                    <span class="icon">✔</span> Hoàn thành bài học
+                </button>
+            }
+        </form>
+    </div>
+
+    <!-- Navigation -->
+    <div class="lesson-navigation">
+        @if (Model.CourseId.HasValue)
+        {
+            <a asp-action="CourseDetails" asp-route-id="@Model.CourseId.Value" class="btn-back">
+                ← Quay lại khóa học
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn-back">
+                ← Quay lại danh sách khóa học
+            </a>
+        }
+    </div>
+</div>

@@ -1,0 +1,200 @@
+@model OnlineLearningPlatform.Mvc.Models.Teacher.ManageSectionsViewModel
+
+@{
+    ViewData["Title"] = "Quản lý nội dung khóa học";
+    Layout = "~/Views/Shared/_LayoutTeacher.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-book me-2"></i>@Model.CourseTitle</h2>
+            <p class="text-muted">Quản lý chương và bài học</p>
+        </div>
+        <div>
+            <a asp-action="CreateSection" asp-route-courseId="@Model.CourseId" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Thêm chương mới
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Sections.Any())
+    {
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Chưa có chương nào</h4>
+            <p>Bắt đầu tạo chương đầu tiên cho khóa học của bạn bằng cách nhấn nút "Thêm chương mới".</p>
+        </div>
+    }
+    else
+    {
+        <div class="accordion" id="sectionsAccordion">
+            @for (int i = 0; i < Model.Sections.Count; i++)
+            {
+                var sec = Model.Sections[i];
+                var sectionIndex = i;
+                var collapseId = $"collapse{sec.SectionId}";
+                var headingId = $"heading{sec.SectionId}";
+
+                <div class="accordion-item mb-3 shadow-sm">
+                    <h2 class="accordion-header" id="@headingId">
+                        <button class="accordion-button @(i == 0 ? "" : "collapsed")" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#@collapseId" aria-expanded="@(i == 0 ? "true" : "false")"
+                            aria-controls="@collapseId">
+                            <div class="d-flex justify-content-between align-items-center w-100 pe-3">
+                                <span>
+                                    <strong>Chương @(sec.OrderIndex ?? (i + 1)):</strong> @sec.Title
+                                </span>
+                                <span class="badge bg-primary">@sec.TotalLessons bài học</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="@collapseId" class="accordion-collapse collapse @(i == 0 ? "show" : "")"
+                        aria-labelledby="@headingId" data-bs-parent="#sectionsAccordion">
+                        <div class="accordion-body">
+                            <!-- Section Actions -->
+                            <div class="mb-3 d-flex gap-2">
+                                <a asp-action="CreateLesson" asp-route-sectionId="@sec.SectionId"
+                                    class="btn btn-sm btn-success">
+                                    <i class="fas fa-plus me-1"></i>Thêm bài học
+                                </a>
+                                <a asp-action="EditSection" asp-route-id="@sec.SectionId"
+                                    class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit me-1"></i>Sửa chương
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmDeleteSection(@sec.SectionId, '@sec.Title')">
+                                    <i class="fas fa-trash me-1"></i>Xóa chương
+                                </button>
+                            </div>
+
+                            <!-- Lessons List -->
+                            @if (!sec.Lessons.Any())
+                            {
+                                <div class="alert alert-light">
+                                    <i class="fas fa-info-circle me-2"></i>Chưa có bài học nào trong chương này.
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="list-group">
+                                    @foreach (var lesson in sec.Lessons.OrderBy(l => l.OrderIndex))
+                                    {
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas @GetLessonIcon(lesson.LessonType) me-2"></i>
+                                                        @lesson.Title
+                                                    </h6>
+                                                    <small class="text-muted">
+                                                        <span
+                                                            class="badge bg-secondary me-2">@GetLessonTypeText(lesson.LessonType)</span>
+                                                        @if (lesson.OrderIndex.HasValue)
+                                                        {
+                                                            <span>Thứ tự: @lesson.OrderIndex</span>
+                                                        }
+                                                    </small>
+                                                </div>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a asp-action="EditLesson" asp-route-id="@lesson.LessonId"
+                                                        class="btn btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                        onclick="confirmDeleteLesson(@lesson.LessonId, '@lesson.Title')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Hidden forms for delete actions -->
+<form id="deleteSectionForm" asp-action="DeleteSection" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteSectionId" />
+    <input type="hidden" name="courseId" value="@Model.CourseId" />
+</form>
+
+<form id="deleteLessonForm" asp-action="DeleteLesson" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteLessonId" />
+    <input type="hidden" name="courseId" value="@Model.CourseId" />
+</form>
+
+@section Scripts {
+    <script>
+        function confirmDeleteSection(sectionId, sectionTitle) {
+            if (confirm(`Bạn có chắc muốn xóa chương "${sectionTitle}"?\n\nToàn bộ bài học trong chương cũng sẽ bị xóa!`)) {
+                document.getElementById('deleteSectionId').value = sectionId;
+                document.getElementById('deleteSectionForm').submit();
+            }
+        }
+
+        function confirmDeleteLesson(lessonId, lessonTitle) {
+            if (confirm(`Bạn có chắc muốn xóa bài học "${lessonTitle}"?`)) {
+                document.getElementById('deleteLessonId').value = lessonId;
+                document.getElementById('deleteLessonForm').submit();
+            }
+        }
+
+        // Auto hide alerts
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}
+
+@functions {
+    string GetLessonIcon(string lessonType)
+    {
+        return lessonType switch
+        {
+            "video" => "fa-play-circle",
+            "reading" => "fa-file-alt",
+            "quiz" => "fa-question-circle",
+            "assignment" => "fa-tasks",
+            _ => "fa-file"
+        };
+    }
+
+    string GetLessonTypeText(string lessonType)
+    {
+        return lessonType switch
+        {
+            "video" => "Video",
+            "reading" => "Tài liệu",
+            "quiz" => "Bài kiểm tra",
+            "assignment" => "Bài tập",
+            _ => "Khác"
+        };
+    }
+}

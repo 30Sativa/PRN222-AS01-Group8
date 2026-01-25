@@ -1,0 +1,108 @@
+@model List<OnlineLearningPlatform.Services.DTO.Response.TeacherCourseDto>
+@{
+    ViewData["Title"] = "Quản lý khóa học";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teacher/teacher-courses.css" />
+}
+
+<div class="teacher-courses-container">
+    <div class="teacher-courses-header">
+        <h2>Quản lý khóa học của tôi</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tạo khóa học mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            <h4 class="alert-heading">Chưa có khóa học nào</h4>
+            <p>Bạn chưa tạo khóa học nào. Hãy bắt đầu bằng cách nhấn nút "Tạo khóa học mới" bên trên.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var course in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@course.Title</h5>
+                            <p class="card-text">
+                                @(course.Description != null && course.Description.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description ?? "")
+                            </p>
+                            
+                            <div class="mb-2">
+                                @if (!string.IsNullOrEmpty(course.CategoryName))
+                                {
+                                    <span class="badge bg-secondary">@course.CategoryName</span>
+                                }
+                                @if (course.Price == 0)
+                                {
+                                    <span class="badge bg-success">Miễn phí</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">@course.Price.ToString("N0") VNĐ</span>
+                                }
+                            </div>
+
+                            <div class="course-stats mb-3">
+                                <div class="d-flex justify-content-between text-muted small">
+                                    <span><i class="bi bi-people"></i> @course.TotalEnrollments học viên</span>
+                                    <span><i class="bi bi-book"></i> @course.TotalSections chương</span>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted small mt-1">
+                                    <span><i class="bi bi-file-earmark-text"></i> @course.TotalLessons bài học</span>
+                                    <span><i class="bi bi-calendar"></i> @course.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group w-100" role="group">
+                                <a asp-action="Edit" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Sửa
+                                </a>
+                                <a asp-action="ManageSections" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-list-ul"></i> Nội dung
+                                </a>
+                                <a asp-action="ViewEnrollments" asp-route-id="@course.CourseId" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-people"></i> Học viên
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}

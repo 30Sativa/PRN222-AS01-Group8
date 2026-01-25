@@ -1,0 +1,67 @@
+@model List<OnlineLearningPlatform.Mvc.Models.CourseManagerViewModel>
+@using OnlineLearningPlatform.Models.Enums
+
+
+
+@{
+    ViewData["Title"] = "Quản lý khóa học";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/course.css" />
+}
+
+
+
+<div class="course-page">
+
+    <div class="card">
+        <table class="course-table">
+            <thead>
+                <tr>
+                    <th>Tiêu đề</th>
+                    <th>Giảng viên</th>
+                    <th>Giá</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="title">@c.Title</td>
+                        <td>@c.TeacherName</td>
+                        <td class="price">@c.PriceText</td>
+                        <td>
+                            <span class="status status-@c.Status.ToString().ToLower()">
+                                @c.StatusText
+                            </span>
+                        </td>
+                        <td>
+                            @if (c.Status == CourseStatus.Pending)
+                            {
+                                <div class="action-group">
+
+                                    <form asp-action="Approve" method="post">
+                                        <input type="hidden" name="id" value="@c.CourseId" />
+                                        <button class="btn btn-success">Duyệt</button>
+                                    </form>
+
+                                    <form asp-action="Reject" method="post" class="reject-form">
+                                        <input name="reason" placeholder="Lý do từ chối..." />
+                                        <input type="hidden" name="id" value="@c.CourseId" />
+                                        <button class="btn btn-danger">Từ chối</button>
+                                    </form>
+
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
