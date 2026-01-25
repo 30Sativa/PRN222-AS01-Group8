@@ -13,10 +13,17 @@ namespace OnlineLearningPlatform.Mvc.Controllers
     public class TeacherController : Controller
     {
         private readonly ITeacherService _teacherService;
+        private readonly IReviewService _reviewService;
+        private readonly ICourseService _courseService;
 
-        public TeacherController(ITeacherService teacherService)
+        public TeacherController(
+            ITeacherService teacherService,
+            IReviewService reviewService,
+            ICourseService courseService)
         {
             _teacherService = teacherService;
+            _reviewService = reviewService;
+            _courseService = courseService;
         }
 
         // GET: Teacher/Index - Quản lý danh sách khóa học của giảng viên (gồm khóa chờ duyệt + đã xuất bản)
@@ -980,6 +987,35 @@ namespace OnlineLearningPlatform.Mvc.Controllers
             }
 
             return RedirectToAction(nameof(ManageSections), new { id = courseId });
+        }
+
+        // ===== XEM ĐÁNH GIÁ KHÓA HỌC =====
+
+        // GET: Teacher/ViewCourseReviews/{id} - Xem tất cả đánh giá của khóa học
+        public async Task<IActionResult> ViewCourseReviews(Guid id)
+        {
+            var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(teacherId))
+            {
+                return Unauthorized();
+            }
+
+            // Kiểm tra teacher có quyền xem khóa học này không
+            var course = await _teacherService.GetTeacherCourseByIdAsync(id, teacherId);
+            if (course == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy khóa học hoặc bạn không có quyền xem.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Lấy tất cả reviews của khóa học (không cần userId vì teacher chỉ xem)
+            var reviews = await _reviewService.GetCourseReviewsAsync(id, null);
+            var summary = await _reviewService.GetCourseReviewSummaryAsync(id, null);
+
+            ViewBag.Course = course;
+            ViewBag.ReviewSummary = summary;
+
+            return View(reviews);
         }
     }
 }
