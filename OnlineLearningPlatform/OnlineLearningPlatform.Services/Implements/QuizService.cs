@@ -25,7 +25,10 @@ namespace OnlineLearningPlatform.Services.Implements
 
         public async Task<QuizAttempt> SubmitQuizAsync(string userId, int quizId, Dictionary<int, string> answers)
         {
-            var quiz = await _unitOfWork.Quizzes.GetQuizWithQuestionsAsync(quizId);
+            var quiz = await _context.Quizzes
+                .Include(q => q.Questions)
+                .FirstOrDefaultAsync(q => q.QuizId == quizId);
+
             int correctCount = 0;
             var attemptId = Guid.NewGuid();
 
@@ -41,6 +44,7 @@ namespace OnlineLearningPlatform.Services.Implements
             {
                 string studentAns = answers.ContainsKey(question.QuestionId) ? answers[question.QuestionId] : "";
 
+              
                 _context.QuizAnswers.Add(new QuizAnswer
                 {
                     AnswerId = Guid.NewGuid(),
@@ -56,11 +60,12 @@ namespace OnlineLearningPlatform.Services.Implements
                 }
             }
 
-            decimal finalScore = quiz.Questions.Count > 0 ? (decimal)correctCount / quiz.Questions.Count * 10 : 0;
-            attempt.Score = (double)Math.Round(finalScore, 2);
+            double score = (double)correctCount / quiz.Questions.Count * 10;
+            attempt.Score = Math.Round(score, 2);
 
             _context.QuizAttempts.Add(attempt);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
+
             return attempt;
         }
     }

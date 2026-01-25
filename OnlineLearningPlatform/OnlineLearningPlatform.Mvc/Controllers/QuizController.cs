@@ -106,4 +106,32 @@ public class QuizController : Controller
 
     public async Task<IActionResult> Result(Guid id) =>
         View(await _context.QuizAttempts.Include(a => a.Quiz).FirstOrDefaultAsync(a => a.AttemptId == id));
+
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> History()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var history = await _context.QuizAttempts
+            .Include(a => a.Quiz) 
+            .Where(a => a.UserId == userId)
+            .OrderByDescending(a => a.AttemptedAt)
+            .ToListAsync();
+
+        return View(history);
+    }
+
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> AttemptDetail(Guid id)
+    {
+        var attempt = await _context.QuizAttempts
+            .Include(a => a.Quiz)
+            .ThenInclude(q => q.Questions)
+            .FirstOrDefaultAsync(a => a.AttemptId == id);
+
+        ViewBag.UserAnswers = await _context.QuizAnswers
+            .Where(ans => ans.AttemptId == id)
+            .ToListAsync();
+
+        return View(attempt);
+    }
 }

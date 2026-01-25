@@ -1,0 +1,43 @@
+﻿@model IEnumerable<OnlineLearningPlatform.Models.Entities.QuizAttempt>
+@{
+    ViewData["Title"] = "Lịch sử làm bài";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="bi bi-clock-history me-2"></i>Lịch sử làm bài của bạn</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên bài Quiz</th>
+                        <th>Thời gian làm</th>
+                        <th>Điểm số</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Quiz.Title</td>
+                            <td>@item.AttemptedAt.ToString("HH:mm - dd/MM/yyyy")</td>
+                            <td><span class="badge @(item.Score >= 5 ? "bg-success" : "bg-danger")">@item.Score / 10</span></td>
+                            <td>@(item.Score >= 5 ? "Đạt" : "Không đạt")</td>
+                            <td>
+                                <a asp-action="AttemptDetail" asp-route-id="@item.AttemptId" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.Any())
+            {
+                <p class="text-center text-muted">Bạn chưa làm bài kiểm tra nào.</p>
+            }
+        </div>
+    </div>
+</div>

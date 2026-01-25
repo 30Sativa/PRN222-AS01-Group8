@@ -6,8 +6,8 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Student/course-details.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        /* CSS để đưa các nút về bên phải và làm đẹp dòng bài học */
         .lesson-item {
             display: flex;
             justify-content: space-between;
@@ -30,10 +30,9 @@
         .lesson-actions-right {
             display: flex;
             align-items: center;
-            gap: 8px; /* Khoảng cách giữa nút Xem và Làm Quiz */
+            gap: 8px;
         }
 
-        /* Style cho nút Làm Quiz màu vàng */
         .btn-quiz-custom {
             background-color: #ffc107;
             color: #000 !important;
@@ -43,6 +42,9 @@
             text-decoration: none;
             font-size: 0.85rem;
             border: 1px solid #e0a800;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
             .btn-quiz-custom:hover {
@@ -50,13 +52,39 @@
                 color: #000;
             }
 
-        /* Đảm bảo nút Xem gốc vẫn đẹp */
+        .btn-history-custom {
+            background-color: #17a2b8;
+            color: #fff !important;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border: 1px solid #138496;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .btn-history-custom:hover {
+                background-color: #138496;
+            }
+
         .btn-watch {
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.85rem;
             text-decoration: none;
             display: inline-block;
+        }
+
+        .content-header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
         }
     </style>
 }
@@ -71,7 +99,7 @@
 else
 {
     <div class="course-details-container">
-        <!-- Course Header -->
+        <!-- Header Section -->
         <div class="course-header-section">
             <div class="course-header-content">
                 <h1>@Model.Course.Title</h1>
@@ -99,15 +127,26 @@ else
             </div>
         </div>
 
-        <!-- Course Description -->
+        <!-- Description Section -->
         <div class="course-description-section">
             <h2>Mô tả khóa học</h2>
             <p>@Model.Course.Description</p>
         </div>
 
-        <!-- Course Content (Sections & Lessons) -->
+        <!-- Content Section -->
         <div class="course-content-section">
-            <h2>Nội dung khóa học</h2>
+            <div class="content-header-area">
+                <h2 style="margin:0;">Nội dung khóa học</h2>
+
+                @* NÚT XEM LỊCH SỬ: Chỉ hiện khi học sinh đã đăng ký *@
+                @if (Model.Course.IsEnrolled)
+                {
+                    <a asp-controller="Quiz" asp-action="History" class="btn-history-custom">
+                        <i class="bi bi-clock-history"></i> Xem lịch sử Quiz
+                    </a>
+                }
+            </div>
+
             @if (Model.Course.Sections == null || !Model.Course.Sections.Any())
             {
                 <p class="no-content">Khóa học chưa có nội dung.</p>
@@ -120,9 +159,9 @@ else
                         <div class="section-card @(Model.Course.IsEnrolled ? "" : "locked")">
                             <div class="section-header @(Model.Course.IsEnrolled ? "" : "locked")"
                                  @if (Model.Course.IsEnrolled)
-                                 {
-                                                     <text> onclick="toggleSection(@(section.SectionId))" </text>
-                                             }
+                                {
+                                     <text> onclick="toggleSection(@(section.SectionId))" </text>
+                                 }
             >
                                             <h3>@(section.Title)</h3>
                                             <div class="section-header-right">
@@ -146,11 +185,9 @@ else
                                         <ul class="lessons-list" style="list-style: none; padding: 0;">
                                             @foreach (var lesson in section.Lessons)
                                             {
-                                                // TỰ ĐỘNG KIỂM TRA XEM BÀI HỌC CÓ QUIZ KHÔNG
                                                 var hasQuiz = _db.Quizzes.Any(q => q.LessonId == lesson.LessonId);
 
                                                 <li class="lesson-item">
-                                                    <!-- BÊN TRÁI: Icon và Tiêu đề -->
                                                     <div class="lesson-info-left">
                                                         <span class="lesson-icon">
                                                             @if (lesson.LessonType?.ToLower() == "video")
@@ -176,7 +213,6 @@ else
                                                         <span class="lesson-title">@lesson.Title</span>
                                                     </div>
 
-                                                    <!-- BÊN PHẢI: Các nút hành động (Xem và Làm Quiz) -->
                                                     <div class="lesson-actions-right">
                                                         <a asp-action="WatchLesson" asp-route-lessonId="@lesson.LessonId" class="btn-watch">
                                                             Xem
@@ -186,7 +222,7 @@ else
                                                         {
                                                             <a asp-controller="Quiz" asp-action="TakeByLesson" asp-route-lessonId="@lesson.LessonId"
                                                                class="btn-quiz-custom">
-                                                                Làm Quiz
+                                                                <i class="bi bi-pencil-square"></i> Làm Quiz
                                                             </a>
                                                         }
                                                     </div>
@@ -202,19 +238,14 @@ else
             }
         </div>
 
-        <!-- Action Buttons -->
         <div class="course-actions">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success">
-                    @TempData["SuccessMessage"]
-                </div>
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-error">
-                    @TempData["ErrorMessage"]
-                </div>
+                <div class="alert alert-error">@TempData["ErrorMessage"]</div>
             }
             <div class="action-buttons-group">
                 @if (Model.CanEnroll)
