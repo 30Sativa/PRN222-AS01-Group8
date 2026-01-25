@@ -1,9 +1,115 @@
-﻿@model OnlineLearningPlatform.Models.Entities.QuizAttempt
-<div class="container mt-5 text-center">
-    <div class="card shadow p-5">
-        <h1 class="display-1 fw-bold @(Model.Score >= 5 ? "text-success" : "text-danger")">@Model.Score</h1>
-        <h3>Điểm của bạn</h3>
-        <p>Bài kiểm tra: @Model.Quiz.Title</p>
-        <a href="/Student/Index" class="btn btn-outline-primary mt-4">Về trang chủ</a>
+@model OnlineLearningPlatform.Models.Entities.QuizAttempt
+@{
+    ViewData["Title"] = "Kết quả Quiz";
+    var isPassed = Model.Score >= 5;
+    var passMessage = isPassed 
+        ? "Chúc mừng! Bạn đã hoàn thành xuất sắc bài kiểm tra này." 
+        : "Đừng nản lòng! Hãy ôn tập lại và thử lại lần nữa nhé.";
+}
+
+<link rel="stylesheet" href="~/css/Quiz/quiz.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+
+<div class="result-container">
+    <div class="result-card">
+        <!-- Result Header -->
+        <div class="result-header @(isPassed ? "passed" : "failed")">
+            <div class="result-icon">
+                @if (isPassed)
+                {
+                    <i class="bi bi-trophy-fill"></i>
+                }
+                else
+                {
+                    <i class="bi bi-emoji-frown"></i>
+                }
+            </div>
+            <div class="result-score">@Model.Score</div>
+            <div class="result-score-label">điểm / 10</div>
+        </div>
+
+        <!-- Result Body -->
+        <div class="result-body">
+            <div class="result-status @(isPassed ? "passed" : "failed")">
+                @if (isPassed)
+                {
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>ĐẠT</span>
+                }
+                else
+                {
+                    <i class="bi bi-x-circle-fill"></i>
+                    <span>CHƯA ĐẠT</span>
+                }
+            </div>
+
+            <p class="result-quiz-name">
+                Bài kiểm tra: <span class="result-quiz-title">@Model.Quiz.Title</span>
+            </p>
+
+            <p class="result-message">@passMessage</p>
+
+            <div class="result-actions">
+                <a asp-action="AttemptDetail" asp-route-id="@Model.AttemptId" class="btn-primary">
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    Xem chi tiết bài làm
+                </a>
+                <a asp-action="History" class="btn-secondary">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Xem lịch sử làm bài
+                </a>
+                <a href="/Student/Index" class="btn-back" style="border: none; color: var(--text-light);">
+                    <i class="bi bi-house me-2"></i>
+                    Về trang chủ
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    /* Confetti animation for passed results */
+    @if (isPassed)
+    {
+        <text>
+        .result-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-container::before,
+        .result-container::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: confetti 2s ease-out infinite;
+        }
+
+        .result-container::before {
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .result-container::after {
+            right: 10%;
+            animation-delay: 0.5s;
+        }
+
+        @@keyframes confetti {
+            0% {
+                top: -10px;
+                opacity: 1;
+                transform: rotate(0deg);
+            }
+            100% {
+                top: 100%;
+                opacity: 0;
+                transform: rotate(720deg);
+            }
+        }
+        </text>
+    }
+</style>
