@@ -15,7 +15,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-    <ProjectReference Include="..\OnlineLearningPlatform.Models\OnlineLearningPlatform.Models.csproj" />
     <ProjectReference Include="..\OnlineLearningPlatform.Repository\OnlineLearningPlatform.Repositories.csproj" />
   </ItemGroup>
 

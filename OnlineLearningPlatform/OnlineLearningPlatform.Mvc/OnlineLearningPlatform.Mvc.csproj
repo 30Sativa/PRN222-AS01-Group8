@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OnlineLearningPlatform.Repository\OnlineLearningPlatform.Repositories.csproj" />
     <ProjectReference Include="..\OnlineLearningPlatform.Services\OnlineLearningPlatform.Services.csproj" />
   </ItemGroup>
 
